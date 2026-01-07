@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
 import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { UnitStatus } from "@prisma/client";
 
 // ============================================
@@ -192,11 +192,6 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     revalidatePath("/dashboard");
     revalidatePath("/reports");
     revalidatePath("/map");
-
-    // Invalidate cache tags for server-side caching
-    revalidateTag("map-points");
-    revalidateTag("dashboard-stats");
-    revalidateTag("recent-activity");
 
     return {
       success: true,

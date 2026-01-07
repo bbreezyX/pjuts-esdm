@@ -318,11 +318,50 @@ export async function getMonthlyReportTrend(): Promise<ActionResult<{
 }
 
 // ============================================
-// GET RECENT ACTIVITY (no change needed, already efficient)
+// OPTIMIZED & CACHED: GET RECENT ACTIVITY
 // ============================================
 
 /**
- * Get recent activity for the activity feed
+ * Internal function to fetch recent activity (for caching)
+ */
+async function fetchRecentActivity(limit: number = 10): Promise<RecentActivity[]> {
+    const recentReports = await prisma.report.findMany({
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        select: {
+            id: true,
+            createdAt: true,
+            user: {
+                select: { name: true },
+            },
+            unit: {
+                select: { serialNumber: true, province: true },
+            },
+        },
+    });
+
+    return recentReports.map((report) => ({
+        id: report.id,
+        type: "report" as const,
+        description: `Report submitted for ${report.unit.serialNumber}`,
+        timestamp: report.createdAt,
+        user: report.user.name,
+        province: report.unit.province,
+    }));
+}
+
+// Cached version - refreshes every 60 seconds
+const getCachedRecentActivity = unstable_cache(
+    () => fetchRecentActivity(10),
+    ["recent-activity"],
+    {
+        revalidate: CacheDurations.SHORT,
+        tags: [CacheTags.RECENT_ACTIVITY],
+    }
+);
+
+/**
+ * Get recent activity for the activity feed (CACHED)
  */
 export async function getRecentActivity(limit: number = 10): Promise<ActionResult<RecentActivity[]>> {
     try {
@@ -334,35 +373,15 @@ export async function getRecentActivity(limit: number = 10): Promise<ActionResul
             };
         }
 
-        // Get recent reports - already optimized with limit
-        const recentReports = await prisma.report.findMany({
-            take: limit,
-            orderBy: { createdAt: "desc" },
-            select: {
-                id: true,
-                createdAt: true,
-                user: {
-                    select: { name: true },
-                },
-                unit: {
-                    select: { serialNumber: true, province: true },
-                },
-            },
-        });
+        // Use cached version for default limit, otherwise fetch directly
+        if (limit === 10) {
+            const data = await getCachedRecentActivity();
+            return { success: true, data };
+        }
 
-        const activities: RecentActivity[] = recentReports.map((report) => ({
-            id: report.id,
-            type: "report" as const,
-            description: `Report submitted for ${report.unit.serialNumber}`,
-            timestamp: report.createdAt,
-            user: report.user.name,
-            province: report.unit.province,
-        }));
-
-        return {
-            success: true,
-            data: activities,
-        };
+        // For custom limits, fetch directly (rare case)
+        const data = await fetchRecentActivity(limit);
+        return { success: true, data };
     } catch (error) {
         console.error("Get recent activity error:", error);
         return {
