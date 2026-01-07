@@ -569,26 +569,26 @@ export function ReportFormClient({
 
                 {/* Summary */}
                 <div className="space-y-3">
-                  <div className="flex justify-between py-2 border-b">
+                  <div className="flex justify-between py-2">
                     <span className="text-slate-600">Unit</span>
                     <span className="font-medium text-slate-900">
                       {selectedUnit?.serialNumber}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2 border-b">
+                  <div className="flex justify-between py-2">
                     <span className="text-slate-600">Lokasi</span>
                     <span className="font-medium text-slate-900">
                       {selectedUnit?.province}, {selectedUnit?.regency}
                     </span>
                   </div>
-                  <div className="flex justify-between py-2 border-b">
+                  <div className="flex justify-between py-2">
                     <span className="text-slate-600">Koordinat GPS</span>
                     <code className="text-sm text-slate-900">
                       {formData.latitude?.toFixed(6)},{" "}
                       {formData.longitude?.toFixed(6)}
                     </code>
                   </div>
-                  <div className="flex justify-between py-2 border-b">
+                  <div className="flex justify-between py-2">
                     <span className="text-slate-600">Tegangan</span>
                     <Badge
                       variant={

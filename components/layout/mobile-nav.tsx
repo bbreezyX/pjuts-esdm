@@ -34,9 +34,9 @@ export function MobileNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center justify-center -mt-6"
+                className="flex flex-col items-center justify-center -mt-6 group active:scale-95 transition-transform duration-200"
               >
-                <div className="w-14 h-14 rounded-full bg-esdm-gradient shadow-lg flex items-center justify-center">
+                <div className="w-14 h-14 rounded-full bg-esdm-gradient shadow-lg shadow-primary-500/25 flex items-center justify-center ring-4 ring-white group-hover:shadow-primary-500/40 transition-shadow duration-200">
                   <Icon className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-[10px] font-medium text-primary-600 mt-1">
@@ -51,12 +51,28 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "mobile-nav-item flex-1",
-                isActive && "active"
+                "relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-200 group flex-1",
+                isActive 
+                  ? "text-primary-600" 
+                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
               )}
             >
-              <Icon />
-              <span>{item.label}</span>
+              <div className={cn(
+                "relative p-1.5 rounded-xl transition-all duration-200",
+                isActive && "bg-primary-50"
+              )}>
+                <Icon className={cn(
+                  "w-5 h-5 transition-transform duration-200",
+                  isActive && "scale-110",
+                  "group-active:scale-95"
+                )} />
+              </div>
+              <span className={cn(
+                "text-[10px] font-medium transition-colors duration-200",
+                isActive ? "text-primary-600" : "text-slate-500"
+              )}>
+                {item.label}
+              </span>
             </Link>
           );
         })}

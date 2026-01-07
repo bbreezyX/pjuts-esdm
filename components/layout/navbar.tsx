@@ -77,7 +77,7 @@ export function Navbar({ user }: NavbarProps) {
                   </div>
                   <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
                 </div>
-                <div className="hidden sm:block">
+                <div className="block">
                   <h1 className="text-lg font-bold text-slate-900 tracking-tight">
                     PJUTS <span className="text-primary-600">ESDM</span>
                   </h1>

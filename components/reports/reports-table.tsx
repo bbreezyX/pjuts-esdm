@@ -217,14 +217,15 @@ export function ReportsTable({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
                     <div>
-                      <p className="font-medium text-slate-900">
+                      <p className="font-medium text-slate-900 truncate pr-2">
                         {report.unit.serialNumber}
                       </p>
-                      <p className="text-xs text-slate-500">
+                      <p className="text-xs text-slate-500 truncate">
                         {report.unit.province}, {report.unit.regency}
                       </p>
                     </div>
                     <Badge
+                      className="shrink-0"
                       variant={
                         report.batteryVoltage >= 20
                           ? "success"
@@ -236,11 +237,34 @@ export function ReportsTable({
                       {report.batteryVoltage}V
                     </Badge>
                   </div>
-                  <div className="mt-2 flex items-center gap-3 text-xs text-slate-500">
-                    <span className="flex items-center gap-1">
-                      <User className="h-3 w-3" />
-                      {report.user.name}
-                    </span>
+                  <div className="mt-2 flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-xs text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <User className="h-3 w-3" />
+                        {report.user.name}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={() => setSelectedReport(report)}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {isAdmin && (
+                        <Button
+                          variant="ghost"
+                          size="icon-sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => setDeleteConfirm(report)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mt-1 text-xs text-slate-400">
                     <span className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
                       {getRelativeTime(report.createdAt)}
@@ -289,14 +313,14 @@ export function ReportsTable({
         open={!!selectedReport}
         onOpenChange={() => setSelectedReport(null)}
       >
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="w-[95vw] sm:w-full max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6 rounded-lg sm:rounded-xl">
           {selectedReport && (
             <>
               <DialogHeader>
-                <DialogTitle>
+                <DialogTitle className="text-left">
                   Laporan {selectedReport.unit.serialNumber}
                 </DialogTitle>
-                <DialogDescription>
+                <DialogDescription className="text-left">
                   {formatDateTime(selectedReport.createdAt)} oleh{" "}
                   {selectedReport.user.name}
                 </DialogDescription>
@@ -304,17 +328,17 @@ export function ReportsTable({
 
               <div className="grid gap-4">
                 {/* Image */}
-                <div className="relative aspect-video rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-slate-100">
                   <Image
                     src={selectedReport.imageUrl}
                     alt="Report Image"
                     fill
-                    className="object-cover"
+                    className="object-contain"
                   />
                 </div>
 
                 {/* Details */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-slate-50 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
                       <Zap className="h-4 w-4 text-amber-500" />
@@ -329,7 +353,7 @@ export function ReportsTable({
                       <MapPin className="h-4 w-4 text-primary-500" />
                       <span className="text-sm text-slate-500">Koordinat</span>
                     </div>
-                    <p className="text-sm font-mono text-slate-900">
+                    <p className="text-sm font-mono text-slate-900 break-all">
                       {selectedReport.latitude.toFixed(6)},{" "}
                       {selectedReport.longitude.toFixed(6)}
                     </p>
@@ -344,7 +368,7 @@ export function ReportsTable({
                 )}
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="gap-2 sm:gap-0">
                 <Button
                   variant="outline"
                   onClick={() =>
