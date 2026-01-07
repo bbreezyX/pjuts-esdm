@@ -3,11 +3,25 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
+// Get passwords from environment variables for security
+const SEED_ADMIN_PASSWORD = process.env.SEED_ADMIN_PASSWORD;
+const SEED_STAFF_PASSWORD = process.env.SEED_STAFF_PASSWORD;
+
 async function main() {
+  // Validate required environment variables
+  if (!SEED_ADMIN_PASSWORD || !SEED_STAFF_PASSWORD) {
+    console.error("❌ Error: Required environment variables are missing!");
+    console.error("   Please set SEED_ADMIN_PASSWORD and SEED_STAFF_PASSWORD in your .env file");
+    console.error("   Example:");
+    console.error('   SEED_ADMIN_PASSWORD="your-secure-admin-password"');
+    console.error('   SEED_STAFF_PASSWORD="your-secure-staff-password"');
+    process.exit(1);
+  }
+
   console.log("🌱 Starting database seed...");
 
   // Create Admin User
-  const adminPassword = await bcrypt.hash("admin123", 12);
+  const adminPassword = await bcrypt.hash(SEED_ADMIN_PASSWORD, 12);
   const admin = await prisma.user.upsert({
     where: { email: "admin@esdm.go.id" },
     update: {},
@@ -21,7 +35,7 @@ async function main() {
   console.log("✅ Created admin user:", admin.email);
 
   // Create Field Staff Users
-  const staffPassword = await bcrypt.hash("staff123", 12);
+  const staffPassword = await bcrypt.hash(SEED_STAFF_PASSWORD, 12);
   const staffUsers = [
     { email: "petugas1@esdm.go.id", name: "Budi Santoso" },
     { email: "petugas2@esdm.go.id", name: "Siti Rahayu" },
@@ -159,9 +173,10 @@ async function main() {
   }
 
   console.log("\n🎉 Database seed completed!");
-  console.log("\n📋 Login credentials:");
-  console.log("   Admin: admin@esdm.go.id / admin123");
-  console.log("   Staff: petugas1@esdm.go.id / staff123");
+  console.log("\n📋 Users created:");
+  console.log("   Admin: admin@esdm.go.id");
+  console.log("   Staff: petugas1@esdm.go.id, petugas2@esdm.go.id, petugas3@esdm.go.id");
+  console.log("\n⚠️  Passwords are set from environment variables (SEED_ADMIN_PASSWORD, SEED_STAFF_PASSWORD)");
 }
 
 main()

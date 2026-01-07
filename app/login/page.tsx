@@ -46,7 +46,7 @@ export default function LoginPage() {
       {/* Left Panel - Illustration */}
       <div className="hidden lg:flex lg:w-1/2 bg-esdm-gradient relative overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
-        
+
         <div className="relative z-10 flex flex-col justify-between p-12 w-full">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
@@ -163,34 +163,7 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          {/* Demo Credentials */}
-          <div className="mt-8 p-4 bg-slate-50 rounded-xl border border-slate-100">
-            <p className="text-xs font-medium text-slate-500 mb-3">
-              Demo Credentials:
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <div
-                className="bg-white p-3 rounded-lg border cursor-pointer hover:border-primary-300 transition-colors"
-                onClick={() => {
-                  setEmail("admin@esdm.go.id");
-                  setPassword("admin123");
-                }}
-              >
-                <p className="font-medium text-slate-900 text-sm">Admin</p>
-                <p className="text-xs text-slate-500">admin@esdm.go.id</p>
-              </div>
-              <div
-                className="bg-white p-3 rounded-lg border cursor-pointer hover:border-primary-300 transition-colors"
-                onClick={() => {
-                  setEmail("petugas1@esdm.go.id");
-                  setPassword("staff123");
-                }}
-              >
-                <p className="font-medium text-slate-900 text-sm">Petugas</p>
-                <p className="text-xs text-slate-500">petugas1@esdm.go.id</p>
-              </div>
-            </div>
-          </div>
+
 
           {/* Footer */}
           <p className="text-center text-xs text-slate-400 mt-8">

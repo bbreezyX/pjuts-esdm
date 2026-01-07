@@ -55,6 +55,10 @@ R2_ACCESS_KEY_ID="your-r2-access-key-id"
 R2_SECRET_ACCESS_KEY="your-r2-secret-access-key"
 R2_BUCKET_NAME="pjuts-esdm"
 R2_PUBLIC_URL="https://your-bucket.r2.dev"
+
+# Database Seed (only needed for initial setup)
+SEED_ADMIN_PASSWORD="your-secure-admin-password"
+SEED_STAFF_PASSWORD="your-secure-staff-password"
 ```
 
 ### 3. Database Setup
@@ -108,12 +112,18 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ## 🔐 Authentication
 
-### Demo Credentials
+### User Accounts
 
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | admin@esdm.go.id | admin123 |
-| Field Staff | petugas1@esdm.go.id | staff123 |
+After running `npm run db:seed`, the following accounts are created:
+
+| Role | Email |
+|------|-------|
+| Admin | admin@esdm.go.id |
+| Field Staff | petugas1@esdm.go.id |
+| Field Staff | petugas2@esdm.go.id |
+| Field Staff | petugas3@esdm.go.id |
+
+> **Note:** Passwords are set from environment variables `SEED_ADMIN_PASSWORD` and `SEED_STAFF_PASSWORD`.
 
 ### Role Permissions
 
