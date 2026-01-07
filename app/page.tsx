@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import {
@@ -10,7 +11,10 @@ import {
   Wifi,
   ArrowRight,
   CheckCircle2,
+  Activity,
+  Zap,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default async function HomePage() {
   const session = await auth();
@@ -21,258 +25,373 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-slate-50 font-sans selection:bg-amber-400/30">
       {/* Hero Section */}
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden bg-esdm-gradient min-h-[90vh] flex flex-col">
         {/* Background Pattern */}
-        <div className="absolute inset-0 bg-esdm-gradient">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/50 to-primary-950/90" />
+          
+          {/* Animated Gradient Orbs */}
+          <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-400/20 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute top-1/2 -left-24 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl animate-pulse delay-700" />
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
-          <nav className="flex items-center justify-between mb-16">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-xl bg-white/10 backdrop-blur flex items-center justify-center">
-                <Lightbulb className="w-7 h-7 text-amber-400" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-grow flex flex-col pb-28 lg:pb-40">
+          {/* Navbar */}
+          <nav className="flex items-center justify-between py-6 lg:py-8 animate-fade-in">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-white/20 blur-xl rounded-full" />
+                <Image
+                  src="/logo-esdm.png"
+                  alt="Logo ESDM"
+                  width={56}
+                  height={56}
+                  className="relative w-12 h-12 lg:w-14 lg:h-14 object-contain drop-shadow-2xl"
+                />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-white">
+                <h1 className="text-2xl font-bold text-white tracking-tight leading-none">
                   PJUTS <span className="text-amber-400">ESDM</span>
                 </h1>
-                <p className="text-xs text-blue-200">Kementerian ESDM RI</p>
+                <p className="text-xs text-primary-100 font-medium tracking-wide uppercase opacity-90">
+                  Kementerian ESDM RI
+                </p>
               </div>
             </div>
-            <Link
-              href="/login"
-              className="px-5 py-2.5 bg-white text-primary-700 rounded-lg font-semibold text-sm hover:bg-amber-50 transition-colors"
-            >
-              Masuk
+            <Link href="/login">
+              <Button 
+                variant="ghost" 
+                className="text-white hover:bg-white/10 hover:text-amber-300 transition-colors font-medium"
+              >
+                Masuk ke Sistem
+              </Button>
             </Link>
           </nav>
 
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-400/20 rounded-full text-amber-300 text-sm font-medium mb-6">
-                <span className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+          {/* Hero Content */}
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center flex-grow py-8 lg:py-0">
+            <div className="animate-slide-up" style={{ animationDelay: "0.1s" }}>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/5 border border-white/10 rounded-full text-amber-300 text-xs sm:text-sm font-medium mb-6 sm:mb-8 backdrop-blur-sm shadow-xl">
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                </span>
                 Sistem Monitoring Real-time
               </div>
-              <h2 className="text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
-                Sistem Monitoring{" "}
-                <span className="text-amber-400">Penerangan Jalan</span> Umum
-                Tenaga Surya
+              
+              <h2 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight mb-6 tracking-tight">
+                Monitoring <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">
+                  PJUTS
+                </span>{" "}
+                Nasional
               </h2>
-              <p className="text-lg text-blue-100 mb-8 max-w-xl">
-                Platform terpadu untuk monitoring dan pelaporan unit PJUTS di
-                seluruh Indonesia. Pantau status, kelola laporan, dan analisis
-                data dengan mudah.
+              
+              <p className="text-base sm:text-lg lg:text-xl text-primary-100 mb-8 sm:mb-10 max-w-xl leading-relaxed opacity-90">
+                Platform terintegrasi Kementerian ESDM untuk pemantauan, pelaporan, dan analisis kinerja 
+                Penerangan Jalan Umum Tenaga Surya di seluruh Indonesia.
               </p>
+              
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/login"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-400 text-primary-900 rounded-xl font-semibold hover:bg-amber-300 transition-colors"
-                >
-                  Mulai Sekarang
-                  <ArrowRight className="w-5 h-5" />
+                <Link href="/login" className="w-full sm:w-auto">
+                  <Button size="xl" className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-primary-950 font-bold shadow-amber-900/20 shadow-lg border-b-4 border-amber-600 active:border-b-0 active:translate-y-1 transition-all">
+                    Mulai Sekarang
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
                 </Link>
-                <Link
-                  href="#features"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white/10 backdrop-blur text-white rounded-xl font-semibold hover:bg-white/20 transition-colors"
-                >
-                  Pelajari Lebih Lanjut
+                <Link href="#features" className="w-full sm:w-auto">
+                  <Button size="xl" variant="outline" className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 hover:border-white/40 shadow-lg">
+                    Pelajari Sistem
+                  </Button>
                 </Link>
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="mt-10 sm:mt-12 pt-8 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 relative z-10">
+                 <div className="flex items-center gap-3 group">
+                   <div className="p-2 sm:p-2.5 bg-white/10 rounded-xl group-hover:bg-amber-500/20 transition-all duration-300 ring-1 ring-white/10 group-hover:scale-110 group-hover:ring-amber-500/50 shadow-lg shadow-black/10">
+                     <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
+                   </div>
+                   <div className="flex flex-col">
+                     <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">Data Aman</span>
+                     <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">Enkripsi AES-256</span>
+                   </div>
+                 </div>
+                 
+                 <div className="flex items-center gap-3 group">
+                   <div className="p-2 sm:p-2.5 bg-white/10 rounded-xl group-hover:bg-amber-500/20 transition-all duration-300 ring-1 ring-white/10 group-hover:scale-110 group-hover:ring-amber-500/50 shadow-lg shadow-black/10">
+                     <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
+                   </div>
+                   <div className="flex flex-col">
+                     <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">Reliabel</span>
+                     <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">99.9% Uptime SLA</span>
+                   </div>
+                 </div>
+
+                 <div className="flex items-center gap-3 group col-span-2 sm:col-span-1">
+                   <div className="p-2 sm:p-2.5 bg-white/10 rounded-xl group-hover:bg-amber-500/20 transition-all duration-300 ring-1 ring-white/10 group-hover:scale-110 group-hover:ring-amber-500/50 shadow-lg shadow-black/10">
+                     <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
+                   </div>
+                   <div className="flex flex-col">
+                     <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">Real-time</span>
+                     <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">Sync &lt; 1 Detik</span>
+                   </div>
+                 </div>
               </div>
             </div>
 
-            {/* Stats Cards */}
-            <div className="hidden lg:grid grid-cols-2 gap-4">
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/10">
-                <p className="text-4xl font-bold text-white mb-1">10,000+</p>
-                <p className="text-blue-200">Unit PJUTS Terpasang</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/10">
-                <p className="text-4xl font-bold text-white mb-1">34</p>
-                <p className="text-blue-200">Provinsi Terjangkau</p>
-              </div>
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-6 border border-white/10">
-                <p className="text-4xl font-bold text-white mb-1">50,000+</p>
-                <p className="text-blue-200">Laporan Terkirim</p>
-              </div>
-              <div className="bg-amber-400/20 backdrop-blur rounded-2xl p-6 border border-amber-400/30">
-                <p className="text-4xl font-bold text-amber-400 mb-1">24/7</p>
-                <p className="text-amber-200">Monitoring Real-time</p>
-              </div>
+            {/* Stats Visualization */}
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 animate-slide-up mt-8 lg:mt-0" style={{ animationDelay: "0.3s" }}>
+              <StatsCard 
+                value="12,500+" 
+                label="Unit Terpasang" 
+                icon={Lightbulb}
+                delay="0.4s"
+              />
+              <StatsCard 
+                value="34" 
+                label="Provinsi" 
+                icon={MapPin}
+                delay="0.5s"
+                className="lg:translate-y-8"
+              />
+              <StatsCard 
+                value="50k+" 
+                label="Laporan Masuk" 
+                icon={BarChart3}
+                delay="0.6s"
+              />
+              <StatsCard 
+                value="24/7" 
+                label="Monitoring Aktif" 
+                icon={Zap}
+                delay="0.7s"
+                className="lg:translate-y-8 bg-gradient-to-br from-amber-500/20 to-amber-600/20 border-amber-500/30"
+                valueColor="text-amber-400"
+              />
             </div>
           </div>
         </div>
 
-        {/* Wave Divider */}
-        <div className="absolute bottom-0 left-0 right-0">
-          <svg
-            viewBox="0 0 1440 120"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="w-full"
-          >
-            <path
-              d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-              fill="white"
-            />
+        {/* Decorative Wave */}
+        <div className="absolute bottom-0 left-0 right-0 h-24 lg:h-32 w-full overflow-hidden leading-none">
+          <svg className="relative block w-[calc(100%+1.3px)] h-full" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="fill-slate-50 opacity-10"></path>
+              <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="fill-slate-50"></path>
           </svg>
         </div>
       </section>
 
       {/* Features Section */}
-      <section id="features" className="py-20 lg:py-32">
+      <section id="features" className="py-24 lg:py-32 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
-              Fitur Unggulan
-            </h3>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Didesain untuk memudahkan petugas lapangan dan manajemen dalam
-              monitoring PJUTS
+          <div className="text-center mb-20 max-w-3xl mx-auto">
+            <h3 className="text-amber-600 font-bold tracking-wider uppercase text-sm mb-3">Fitur Utama</h3>
+            <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-6">
+              Teknologi Monitoring Terdepan
+            </h2>
+            <p className="text-lg text-slate-600 leading-relaxed">
+              Dikembangkan khusus untuk kebutuhan Kementerian ESDM dalam mengelola 
+              infrastruktur penerangan jalan tenaga surya secara efisien dan transparan.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <FeatureCard
               icon={MapPin}
-              title="Peta Interaktif"
-              description="Visualisasi lokasi seluruh unit PJUTS di Indonesia dengan status real-time dan clustering otomatis"
-              color="blue"
+              title="Peta Interaktif Nasional"
+              description="Visualisasi sebaran unit PJUTS di seluruh Indonesia dengan clustering cerdas dan status operasional real-time."
+              variant="blue"
             />
             <FeatureCard
               icon={Smartphone}
-              title="Mobile-First"
-              description="Antarmuka responsif yang optimal untuk petugas lapangan dengan form pelaporan bertahap"
-              color="green"
+              title="Aplikasi Lapangan Mobile"
+              description="Antarmuka responsif yang memudahkan petugas lapangan melakukan pelaporan dan update status dari lokasi."
+              variant="amber"
             />
             <FeatureCard
               icon={BarChart3}
-              title="Dashboard Analitik"
-              description="KPI cards, grafik tren, dan statistik per provinsi untuk pengambilan keputusan"
-              color="purple"
+              title="Analitik & Pelaporan"
+              description="Dashboard eksekutif dengan KPI, grafik tren, dan statistik per wilayah untuk dukungan pengambilan keputusan."
+              variant="blue"
             />
             <FeatureCard
               icon={Wifi}
-              title="PWA Offline-Ready"
-              description="Aplikasi dapat diinstal dan menyimpan data saat offline untuk area dengan sinyal terbatas"
-              color="amber"
+              title="Mode Offline Cerdas"
+              description="Kemampuan operasional penuh di area tanpa sinyal dengan sinkronisasi otomatis saat koneksi tersedia kembali."
+              variant="slate"
             />
             <FeatureCard
               icon={Shield}
-              title="Autentikasi Aman"
-              description="Sistem login dengan role-based access control untuk admin dan petugas lapangan"
-              color="red"
+              title="Keamanan Tingkat Lanjut"
+              description="Sistem autentikasi berlapis dan enkripsi data untuk menjamin keamanan informasi infrastruktur vital."
+              variant="slate"
             />
             <FeatureCard
               icon={Lightbulb}
-              title="Monitoring Status"
-              description="Pantau status operasional, kebutuhan perawatan, dan unit offline secara real-time"
-              color="cyan"
+              title="Manajemen Aset Terpadu"
+              description="Siklus hidup lengkap unit PJUTS mulai dari instalasi, perawatan berkala, hingga penggantian komponen."
+              variant="amber"
             />
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 lg:py-32 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h3 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4">
-              Cara Kerja
-            </h3>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Proses pelaporan yang mudah dalam 4 langkah sederhana
-            </p>
+      {/* How It Works - Bento Style */}
+      <section className="py-24 lg:py-32 bg-slate-900 text-white relative overflow-hidden">
+        {/* BG Decoration */}
+        <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-5" />
+        <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-900/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div className="max-w-2xl">
+              <h3 className="text-amber-400 font-bold tracking-wider uppercase text-sm mb-3">Workflow Sistem</h3>
+              <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+                Mekanisme Pelaporan Terpadu
+              </h2>
+              <p className="text-lg text-slate-400">
+                Alur kerja digital yang menyederhanakan proses monitoring lapangan menjadi langkah-langkah efisien.
+              </p>
+            </div>
           </div>
 
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              {
-                step: "01",
-                title: "Pilih Unit",
-                description: "Pilih unit PJUTS yang akan dilaporkan dari daftar",
-              },
-              {
-                step: "02",
-                title: "Ambil Foto",
-                description: "Foto kondisi unit dengan GPS lokasi otomatis",
-              },
-              {
-                step: "03",
-                title: "Isi Data",
-                description: "Masukkan tegangan baterai dan catatan kondisi",
-              },
-              {
-                step: "04",
-                title: "Kirim",
-                description: "Laporan terkirim dan status unit diperbarui",
-              },
-            ].map((item, index) => (
-              <div key={item.step} className="text-center">
-                <div className="relative mb-6">
-                  <div className="w-16 h-16 rounded-2xl bg-primary-600 text-white font-bold text-xl flex items-center justify-center mx-auto">
-                    {item.step}
-                  </div>
-                  {index < 3 && (
-                    <div className="hidden md:block absolute top-1/2 left-full w-full h-0.5 bg-primary-200 -translate-y-1/2" />
-                  )}
-                </div>
-                <h4 className="text-lg font-semibold text-slate-900 mb-2">
-                  {item.title}
-                </h4>
-                <p className="text-slate-600">{item.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 auto-rows-[minmax(180px,auto)]">
+            {/* Step 1: Identifikasi - Large Card */}
+            <div className="md:col-span-2 bg-gradient-to-br from-slate-800 to-slate-900 rounded-3xl p-6 sm:p-8 border border-white/5 relative overflow-hidden group hover:border-amber-500/30 transition-all duration-500">
+              <div className="absolute top-0 right-0 p-4 sm:p-8 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:scale-110 duration-700">
+                <MapPin className="w-32 h-32 sm:w-48 sm:h-48 text-white" />
               </div>
-            ))}
+              <div className="relative z-10 h-full flex flex-col justify-between">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center mb-6 font-bold text-base sm:text-lg border border-blue-500/30">01</div>
+                <div>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Identifikasi Aset</h3>
+                  <p className="text-sm sm:text-base text-slate-400 max-w-md">
+                    Temukan unit PJUTS dengan mudah melalui pemindaian QR Code fisik atau pencarian ID digital pada peta interaktif yang terintegrasi dengan GPS.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 2: Dokumentasi - Tall Card */}
+            <div className="md:row-span-2 bg-slate-800 rounded-3xl p-6 sm:p-8 border border-white/5 relative overflow-hidden group hover:border-amber-500/30 transition-all duration-500">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/40" />
+              <div className="absolute -right-10 -bottom-10 opacity-10 group-hover:opacity-20 transition-opacity transform group-hover:rotate-12 duration-700">
+                <Smartphone className="w-48 h-48 sm:w-64 sm:h-64 text-white" />
+              </div>
+              <div className="relative z-10 h-full flex flex-col">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center mb-6 font-bold text-base sm:text-lg border border-amber-500/30">02</div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-4 group-hover:text-amber-400 transition-colors">Dokumentasi Digital</h3>
+                <p className="text-sm sm:text-base text-slate-400 mb-8 flex-grow">
+                  Ambil foto kondisi fisik unit secara langsung melalui aplikasi. Sistem otomatis menyematkan metadata lokasi (geotagging) dan waktu pengambilan untuk validitas data yang tak terbantahkan.
+                </p>
+                <div className="bg-slate-900/50 rounded-xl p-4 border border-white/5 backdrop-blur-sm">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                    <span className="text-xs font-mono text-slate-300">GPS: -6.2088, 106.8456</span>
+                  </div>
+                  <div className="h-2 w-full bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-full w-3/4 bg-amber-500 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Step 3: Input Data */}
+            <div className="bg-slate-800 rounded-3xl p-6 sm:p-8 border border-white/5 relative overflow-hidden group hover:border-amber-500/30 transition-all duration-500">
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center font-bold text-base sm:text-lg border border-purple-500/30">03</div>
+                  <Activity className="w-6 h-6 sm:w-8 sm:h-8 text-slate-600 group-hover:text-purple-400 transition-colors" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Input Parameter</h3>
+                <p className="text-slate-400 text-sm">
+                  Lengkapi formulir teknis yang responsif: tegangan baterai, daya load, dan status operasional komponen.
+                </p>
+              </div>
+            </div>
+
+            {/* Step 4: Sinkronisasi */}
+            <div className="bg-slate-800 rounded-3xl p-6 sm:p-8 border border-white/5 relative overflow-hidden group hover:border-amber-500/30 transition-all duration-500">
+              <div className="relative z-10">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-base sm:text-lg border border-emerald-500/30">04</div>
+                  <CheckCircle2 className="w-6 h-6 sm:w-8 sm:h-8 text-slate-600 group-hover:text-emerald-400 transition-colors" />
+                </div>
+                <h3 className="text-lg sm:text-xl font-bold text-white mb-2 group-hover:text-emerald-400 transition-colors">Real-time Sync</h3>
+                <p className="text-slate-400 text-sm">
+                  Data terkirim instan ke server pusat ESDM. Dashboard analitik langsung diperbarui untuk pemantauan nasional.
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 lg:py-32">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="bg-esdm-gradient rounded-3xl p-12 lg:p-16 relative overflow-hidden">
-            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
-            <div className="relative">
-              <h3 className="text-3xl lg:text-4xl font-bold text-white mb-4">
-                Siap Memulai?
+      <section className="py-24 lg:py-32 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="bg-esdm-gradient rounded-[2rem] sm:rounded-[2.5rem] p-8 sm:p-12 lg:p-20 relative overflow-hidden shadow-2xl shadow-primary-900/20 group">
+            <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-20" />
+            
+            {/* Hover Effect Background */}
+            <div className="absolute inset-0 bg-gradient-to-r from-primary-600/0 via-white/5 to-primary-600/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+            
+            <div className="relative z-10">
+              <h3 className="text-2xl sm:text-3xl lg:text-5xl font-bold text-white mb-4 sm:mb-6">
+                Siap Berkontribusi?
               </h3>
-              <p className="text-lg text-blue-100 mb-8 max-w-xl mx-auto">
-                Bergabung dengan sistem monitoring PJUTS ESDM untuk memantau dan
-                melaporkan kondisi penerangan jalan tenaga surya di Indonesia.
+              <p className="text-base sm:text-xl text-primary-100 mb-8 sm:mb-10 max-w-2xl mx-auto">
+                Bergabunglah dengan sistem monitoring nasional untuk memastikan penerangan jalan tenaga surya yang andal bagi masyarakat.
               </p>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-amber-400 text-primary-900 rounded-xl font-semibold text-lg hover:bg-amber-300 transition-colors"
-              >
-                Masuk ke Sistem
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <Link href="/login" className="w-full sm:w-auto">
+                  <Button size="xl" className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-primary-900 font-bold border-b-4 border-amber-600 active:border-b-0 active:translate-y-1">
+                    Akses Dashboard
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Button>
+                </Link>
+                <Link href="https://www.esdm.go.id" target="_blank" className="w-full sm:w-auto">
+                  <Button size="xl" variant="outline" className="w-full sm:w-auto bg-transparent border-white/30 text-white hover:bg-white/10 hover:border-white">
+                    Website Resmi ESDM
+                  </Button>
+                </Link>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-900 py-12">
+      <footer className="bg-white border-t border-slate-200 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary-600 flex items-center justify-center">
-                <Lightbulb className="w-6 h-6 text-amber-400" />
-              </div>
-              <div>
-                <h4 className="font-bold text-white">PJUTS ESDM</h4>
-                <p className="text-xs text-slate-400">
+            <div className="flex items-center gap-4">
+              <Image
+                src="/logo-esdm.png"
+                alt="Logo ESDM"
+                width={48}
+                height={48}
+                className="w-10 h-10 object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all"
+              />
+              <div className="text-left">
+                <h4 className="font-bold text-slate-900">PJUTS ESDM</h4>
+                <p className="text-xs text-slate-500 uppercase tracking-wide">
                   Kementerian Energi dan Sumber Daya Mineral
                 </p>
               </div>
             </div>
-            <p className="text-sm text-slate-400">
-              © {new Date().getFullYear()} Kementerian ESDM RI. Hak Cipta
-              Dilindungi.
-            </p>
+            <div className="flex gap-6 text-sm text-slate-500 font-medium">
+               <span>© {new Date().getFullYear()} ESDM RI</span>
+               <Link href="#" className="hover:text-primary-600 transition-colors">Kebijakan Privasi</Link>
+               <Link href="#" className="hover:text-primary-600 transition-colors">Bantuan</Link>
+            </div>
           </div>
         </div>
       </footer>
@@ -284,31 +403,60 @@ function FeatureCard({
   icon: Icon,
   title,
   description,
-  color,
+  variant = "blue",
 }: {
   icon: React.ElementType;
   title: string;
   description: string;
-  color: "blue" | "green" | "purple" | "amber" | "red" | "cyan";
+  variant?: "blue" | "amber" | "slate";
 }) {
-  const colors = {
-    blue: "bg-blue-100 text-blue-600",
-    green: "bg-emerald-100 text-emerald-600",
-    purple: "bg-purple-100 text-purple-600",
-    amber: "bg-amber-100 text-amber-600",
-    red: "bg-red-100 text-red-600",
-    cyan: "bg-cyan-100 text-cyan-600",
+  const variants = {
+    blue: "bg-primary-50 text-primary-600 group-hover:bg-primary-600 group-hover:text-white",
+    amber: "bg-amber-50 text-amber-600 group-hover:bg-amber-500 group-hover:text-white",
+    slate: "bg-slate-100 text-slate-600 group-hover:bg-slate-800 group-hover:text-white",
   };
 
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-slate-200 transition-all group">
+    <div className="group bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-xl hover:border-slate-200 transition-all duration-300 hover:-translate-y-1">
       <div
-        className={`w-12 h-12 rounded-xl ${colors[color]} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}
+        className={`w-14 h-14 rounded-2xl ${variants[variant]} flex items-center justify-center mb-6 transition-colors duration-300`}
       >
-        <Icon className="w-6 h-6" />
+        <Icon className="w-7 h-7" />
       </div>
-      <h4 className="text-lg font-semibold text-slate-900 mb-2">{title}</h4>
-      <p className="text-slate-600">{description}</p>
+      <h4 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary-700 transition-colors">{title}</h4>
+      <p className="text-slate-600 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function StatsCard({ 
+  value, 
+  label, 
+  icon: Icon, 
+  className,
+  delay,
+  valueColor = "text-white"
+}: { 
+  value: string, 
+  label: string, 
+  icon: React.ElementType; 
+  className?: string,
+  delay?: string,
+  valueColor?: string
+}) {
+  return (
+    <div 
+      className={`bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-lg hover:bg-white/15 transition-colors ${className}`}
+      style={{ animationDelay: delay }}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="p-2 bg-white/10 rounded-lg">
+          <Icon className="w-6 h-6 text-amber-400" />
+        </div>
+        {/* Sparkline decoration could go here */}
+      </div>
+      <p className={`text-4xl font-bold ${valueColor} mb-1 tracking-tight`}>{value}</p>
+      <p className="text-primary-200 text-sm font-medium uppercase tracking-wide">{label}</p>
     </div>
   );
 }
