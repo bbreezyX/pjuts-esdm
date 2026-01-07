@@ -200,21 +200,22 @@ export function Navbar({ user }: NavbarProps) {
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div
-            className="fixed inset-0 bg-black/50"
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm"
             onClick={() => setMobileMenuOpen(false)}
           />
-          <div className="fixed right-0 top-0 bottom-0 w-80 bg-white shadow-xl animate-slide-in-right">
-            <div className="flex items-center justify-between p-4 border-b">
+          <div className="fixed right-4 top-20 w-72 bg-white shadow-2xl rounded-2xl border border-slate-100 overflow-hidden animate-fade-in">
+            <div className="flex items-center justify-between p-4 bg-slate-50/50">
               <span className="font-semibold text-slate-900">Menu</span>
               <Button
                 variant="ghost"
                 size="icon"
+                className="h-8 w-8"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </Button>
             </div>
-            <nav className="p-4 space-y-1">
+            <nav className="p-2 space-y-1">
               {navItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
@@ -224,24 +225,24 @@ export function Navbar({ user }: NavbarProps) {
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
+                      "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                       isActive
                         ? "bg-primary-50 text-primary-700"
                         : "text-slate-600 hover:bg-slate-100"
                     )}
                   >
-                    <Icon className="w-5 h-5" />
+                    <Icon className="w-4 h-4" />
                     {item.label}
                   </Link>
                 );
               })}
             </nav>
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
+            <div className="p-2 bg-slate-50/50">
               <button
                 onClick={handleLogout}
-                className="flex w-full items-center gap-2 text-red-600 font-medium"
+                className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50 text-sm font-medium transition-colors"
               >
-                <LogOut className="w-5 h-5" />
+                <LogOut className="w-4 h-4" />
                 Keluar
               </button>
             </div>
