@@ -19,34 +19,39 @@ interface StatCardProps {
 
 const colorVariants = {
   blue: {
-    bg: "bg-gradient-to-br from-primary-50 to-primary-100",
-    icon: "bg-primary-500 text-white",
-    text: "text-primary-700",
-    border: "border-primary-200",
+    wrapper: "hover:border-primary-200 hover:shadow-primary-100/50",
+    iconBg: "bg-primary-50",
+    iconColor: "text-primary-600",
+    trendPositive: "text-primary-600 bg-primary-50",
+    trendNegative: "text-primary-600 bg-primary-50",
   },
   green: {
-    bg: "bg-gradient-to-br from-emerald-50 to-emerald-100",
-    icon: "bg-emerald-500 text-white",
-    text: "text-emerald-700",
-    border: "border-emerald-200",
+    wrapper: "hover:border-emerald-200 hover:shadow-emerald-100/50",
+    iconBg: "bg-emerald-50",
+    iconColor: "text-emerald-600",
+    trendPositive: "text-emerald-600 bg-emerald-50",
+    trendNegative: "text-emerald-600 bg-emerald-50",
   },
   yellow: {
-    bg: "bg-gradient-to-br from-amber-50 to-amber-100",
-    icon: "bg-amber-500 text-white",
-    text: "text-amber-700",
-    border: "border-amber-200",
+    wrapper: "hover:border-amber-200 hover:shadow-amber-100/50",
+    iconBg: "bg-amber-50",
+    iconColor: "text-amber-600",
+    trendPositive: "text-amber-600 bg-amber-50",
+    trendNegative: "text-amber-600 bg-amber-50",
   },
   red: {
-    bg: "bg-gradient-to-br from-red-50 to-red-100",
-    icon: "bg-red-500 text-white",
-    text: "text-red-700",
-    border: "border-red-200",
+    wrapper: "hover:border-red-200 hover:shadow-red-100/50",
+    iconBg: "bg-red-50",
+    iconColor: "text-red-600",
+    trendPositive: "text-red-600 bg-red-50",
+    trendNegative: "text-red-600 bg-red-50",
   },
   slate: {
-    bg: "bg-gradient-to-br from-slate-50 to-slate-100",
-    icon: "bg-slate-500 text-white",
-    text: "text-slate-700",
-    border: "border-slate-200",
+    wrapper: "hover:border-slate-200 hover:shadow-slate-100/50",
+    iconBg: "bg-slate-50",
+    iconColor: "text-slate-600",
+    trendPositive: "text-slate-600 bg-slate-50",
+    trendNegative: "text-slate-600 bg-slate-50",
   },
 };
 
@@ -64,55 +69,56 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "relative overflow-hidden rounded-xl border p-5 transition-all hover:shadow-md",
-        colors.bg,
-        colors.border,
+        "group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+        colors.wrapper,
         className
       )}
     >
-      {/* Decorative Pattern */}
-      <div className="absolute -right-4 -top-4 h-24 w-24 opacity-10">
-        <Icon className="h-full w-full" />
-      </div>
-
-      <div className="relative">
-        <div className="flex items-start justify-between">
-          <div
-            className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-lg shadow-sm",
-              colors.icon
-            )}
-          >
-            <Icon className="h-5 w-5" />
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm font-medium text-slate-500">{title}</p>
+          <div className="mt-2 flex items-baseline gap-2">
+            <h3 className="text-3xl font-bold tracking-tight text-slate-900">
+              {typeof value === "number" ? value.toLocaleString("id-ID") : value}
+            </h3>
           </div>
-
-          {trend && (
-            <div
-              className={cn(
-                "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
-                trend.isPositive
-                  ? "bg-emerald-100 text-emerald-700"
-                  : "bg-red-100 text-red-700"
+          
+          {(description || trend) && (
+             <div className="mt-2 flex items-center gap-2">
+              {trend && (
+                <span
+                  className={cn(
+                    "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+                    trend.isPositive
+                      ? "bg-emerald-50 text-emerald-700"
+                      : "bg-red-50 text-red-700"
+                  )}
+                >
+                  {trend.isPositive ? (
+                    <TrendingUp className="h-3 w-3" />
+                  ) : (
+                    <TrendingDown className="h-3 w-3" />
+                  )}
+                  {trend.value}%
+                </span>
               )}
-            >
-              {trend.isPositive ? (
-                <TrendingUp className="h-3 w-3" />
-              ) : (
-                <TrendingDown className="h-3 w-3" />
+              {description && (
+                <p className="text-xs text-slate-400 truncate max-w-[120px]">
+                  {description}
+                </p>
               )}
-              {trend.value}%
-            </div>
+             </div>
           )}
         </div>
 
-        <div className="mt-4">
-          <p className="text-sm font-medium text-slate-600">{title}</p>
-          <p className={cn("mt-1 text-3xl font-bold tracking-tight", colors.text)}>
-            {typeof value === "number" ? value.toLocaleString("id-ID") : value}
-          </p>
-          {description && (
-            <p className="mt-1 text-xs text-slate-500">{description}</p>
+        <div
+          className={cn(
+            "flex h-12 w-12 items-center justify-center rounded-xl transition-colors",
+            colors.iconBg,
+            colors.iconColor
           )}
+        >
+          <Icon className="h-6 w-6 stroke-[2]" />
         </div>
       </div>
     </div>
@@ -136,15 +142,14 @@ export function MiniStat({ label, value, icon, color = "blue" }: MiniStatProps) 
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-3 rounded-lg border border-slate-100 bg-white p-3 shadow-sm">
       {icon && <span className="text-slate-400">{icon}</span>}
       <div>
-        <p className="text-xs text-slate-500">{label}</p>
-        <p className={cn("text-sm font-semibold", textColors[color])}>
+        <p className="text-xs text-slate-500 font-medium">{label}</p>
+        <p className={cn("text-sm font-bold", textColors[color])}>
           {typeof value === "number" ? value.toLocaleString("id-ID") : value}
         </p>
       </div>
     </div>
   );
 }
-

@@ -59,7 +59,7 @@ export function DashboardClient({
       </PageHeader>
 
       {/* KPI Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard
           title="Total Unit"
           value={stats?.totalUnits || 0}
@@ -72,19 +72,22 @@ export function DashboardClient({
           value={stats?.operationalUnits || 0}
           icon={CheckCircle2}
           color="green"
-          trend={{ value: 12, isPositive: true }}
+          trend={{ value: 98, isPositive: true }}
+          description="Unit berfungsi normal"
         />
         <StatCard
           title="Perlu Perawatan"
           value={stats?.maintenanceNeeded || 0}
           icon={AlertTriangle}
           color="yellow"
+          description="Membutuhkan tindakan"
         />
         <StatCard
           title="Offline"
           value={stats?.offlineUnits || 0}
           icon={XCircle}
           color="red"
+          description="Tidak terhubung ke sistem"
         />
       </div>
 
