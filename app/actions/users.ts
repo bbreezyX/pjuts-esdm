@@ -1,0 +1,211 @@
+"use server";
+
+import { auth } from "@/lib/auth";
+import prisma from "@/lib/db";
+import { revalidatePath } from "next/cache";
+import { Role } from "@prisma/client";
+import bcrypt from "bcryptjs";
+import { z } from "zod";
+
+// ============================================
+// TYPES & SCHEMAS
+// ============================================
+
+export interface ActionResult<T = void> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  errors?: Record<string, string[]>;
+}
+
+export interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+  createdAt: Date;
+}
+
+const createUserSchema = z.object({
+  name: z.string().min(3, "Nama minimal 3 karakter"),
+  email: z.string().email("Email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+  role: z.nativeEnum(Role),
+});
+
+const updateUserSchema = z.object({
+  name: z.string().min(3, "Nama minimal 3 karakter"),
+  email: z.string().email("Email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter").optional().or(z.literal("")),
+  role: z.nativeEnum(Role),
+});
+
+// ============================================
+// GET USERS
+// ============================================
+
+export async function getUsers(): Promise<ActionResult<UserData[]>> {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const users = await prisma.user.findMany({
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    return { success: true, data: users };
+  } catch (error) {
+    console.error("Get users error:", error);
+    return { success: false, error: "Gagal mengambil data pengguna" };
+  }
+}
+
+// ============================================
+// CREATE USER
+// ============================================
+
+export async function createUser(formData: FormData): Promise<ActionResult<UserData>> {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const rawData = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      role: formData.get("role"),
+    };
+
+    const validation = createUserSchema.safeParse(rawData);
+    if (!validation.success) {
+      return {
+        success: false,
+        error: "Validasi gagal",
+        errors: validation.error.flatten().fieldErrors,
+      };
+    }
+
+    const { name, email, password, role } = validation.data;
+
+    // Check duplicate email
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      return { success: false, error: "Email sudah digunakan" };
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    const user = await prisma.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    revalidatePath("/users");
+    return { success: true, data: user };
+  } catch (error) {
+    console.error("Create user error:", error);
+    return { success: false, error: "Gagal membuat pengguna" };
+  }
+}
+
+// ============================================
+// UPDATE USER
+// ============================================
+
+export async function updateUser(userId: string, formData: FormData): Promise<ActionResult<UserData>> {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    const rawData = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      password: formData.get("password"),
+      role: formData.get("role"),
+    };
+
+    const validation = updateUserSchema.safeParse(rawData);
+    if (!validation.success) {
+      return {
+        success: false,
+        error: "Validasi gagal",
+        errors: validation.error.flatten().fieldErrors,
+      };
+    }
+
+    const { name, email, password, role } = validation.data;
+
+    const dataToUpdate: any = { name, email, role };
+    if (password && password.length >= 6) {
+      dataToUpdate.password = await bcrypt.hash(password, 12);
+    }
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: dataToUpdate,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      },
+    });
+
+    revalidatePath("/users");
+    return { success: true, data: user };
+  } catch (error) {
+    console.error("Update user error:", error);
+    return { success: false, error: "Gagal mengupdate pengguna" };
+  }
+}
+
+// ============================================
+// DELETE USER
+// ============================================
+
+export async function deleteUser(userId: string): Promise<ActionResult> {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    if (session.user.id === userId) {
+        return { success: false, error: "Tidak dapat menghapus akun sendiri" };
+    }
+
+    await prisma.user.delete({ where: { id: userId } });
+
+    revalidatePath("/users");
+    return { success: true };
+  } catch (error) {
+    console.error("Delete user error:", error);
+    return { success: false, error: "Gagal menghapus pengguna" };
+  }
+}
+

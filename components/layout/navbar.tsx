@@ -43,6 +43,7 @@ const navItems = [
   { href: "/units", label: "Unit PJUTS", icon: Lightbulb },
   { href: "/reports", label: "Laporan", icon: ClipboardList },
   { href: "/analytics", label: "Analitik", icon: FileBarChart },
+  { href: "/users", label: "Pengguna", icon: User, adminOnly: true },
 ];
 
 export function Navbar({ user }: NavbarProps) {
@@ -90,6 +91,9 @@ export function Navbar({ user }: NavbarProps) {
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               {navItems.map((item) => {
+                // Skip admin-only items if user is not admin
+                if (item.adminOnly && user.role !== "ADMIN") return null;
+
                 const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 const Icon = item.icon;
                 return (
