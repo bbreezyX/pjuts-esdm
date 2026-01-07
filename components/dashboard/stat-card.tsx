@@ -69,12 +69,14 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+        "group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-md p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
         colors.wrapper,
         className
       )}
     >
-      <div className="flex items-start justify-between">
+      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
+
+      <div className="flex items-start justify-between relative z-10">
         <div>
           <p className="text-sm font-medium text-slate-500">{title}</p>
           <div className="mt-2 flex items-baseline gap-2">
@@ -82,16 +84,16 @@ export function StatCard({
               {typeof value === "number" ? value.toLocaleString("id-ID") : value}
             </h3>
           </div>
-          
+
           {(description || trend) && (
-             <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex items-center gap-2">
               {trend && (
                 <span
                   className={cn(
-                    "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium",
+                    "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold",
                     trend.isPositive
-                      ? "bg-emerald-50 text-emerald-700"
-                      : "bg-red-50 text-red-700"
+                      ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100"
+                      : "bg-red-50 text-red-600 ring-1 ring-red-100"
                   )}
                 >
                   {trend.isPositive ? (
@@ -107,13 +109,13 @@ export function StatCard({
                   {description}
                 </p>
               )}
-             </div>
+            </div>
           )}
         </div>
 
         <div
           className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-xl transition-colors",
+            "flex h-12 w-12 items-center justify-center rounded-2xl transition-colors shadow-sm ring-1 ring-inset ring-black/5",
             colors.iconBg,
             colors.iconColor
           )}
@@ -142,7 +144,7 @@ export function MiniStat({ label, value, icon, color = "blue" }: MiniStatProps) 
   };
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-slate-100 bg-white p-3 shadow-sm">
+    <div className="flex items-center gap-3 rounded-xl border border-slate-200/60 bg-white/90 backdrop-blur-sm p-3 shadow-sm hover:shadow-md transition-all">
       {icon && <span className="text-slate-400">{icon}</span>}
       <div>
         <p className="text-xs text-slate-500 font-medium">{label}</p>

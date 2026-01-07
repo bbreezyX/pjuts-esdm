@@ -12,6 +12,7 @@ import {
   TrendingUp,
   MapPin,
   Download,
+  ChevronRight,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -93,7 +94,7 @@ export function DashboardClient({
 
       {/* Report Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card>
+        <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md hover:shadow-md transition-all">
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
@@ -104,7 +105,7 @@ export function DashboardClient({
                   {stats?.totalReports?.toLocaleString("id-ID") || 0}
                 </p>
               </div>
-              <div className="p-2 bg-primary-100 rounded-lg">
+              <div className="p-2 bg-primary-100 rounded-lg shadow-sm">
                 <FileBarChart className="h-6 w-6 text-primary-600" />
               </div>
             </div>
@@ -115,7 +116,7 @@ export function DashboardClient({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md hover:shadow-md transition-all">
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
@@ -126,19 +127,19 @@ export function DashboardClient({
                   {stats?.reportsThisMonth?.toLocaleString("id-ID") || 0}
                 </p>
               </div>
-              <div className="p-2 bg-primary-100 rounded-lg">
+              <div className="p-2 bg-primary-100 rounded-lg shadow-sm">
                 <Calendar className="h-6 w-6 text-primary-600" />
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3">
-              <Badge variant="success" className="text-xs">
+              <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
                 +24% dari bulan lalu
               </Badge>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md hover:shadow-md transition-all">
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
@@ -149,7 +150,7 @@ export function DashboardClient({
                   {stats?.reportsToday?.toLocaleString("id-ID") || 0}
                 </p>
               </div>
-              <div className="p-2 bg-emerald-100 rounded-lg">
+              <div className="p-2 bg-emerald-100 rounded-lg shadow-sm">
                 <Clock className="h-6 w-6 text-emerald-600" />
               </div>
             </div>
@@ -192,42 +193,62 @@ export function DashboardClient({
         </div>
 
         {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Aksi Cepat</CardTitle>
+        <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md h-full">
+          <CardHeader className="pb-3 bg-slate-50/50 border-b border-slate-100">
+            <CardTitle className="text-base font-semibold text-slate-800">Aksi Cepat</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pt-6">
             <Link href="/report/new" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <FileBarChart className="h-4 w-4 mr-3 text-primary-600" />
-                Buat Laporan Baru
-              </Button>
+              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-primary-100 hover:bg-primary-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary-600 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
+                    <FileBarChart className="h-5 w-5" />
+                  </div>
+                  <span className="font-medium text-slate-700 group-hover:text-primary-700 transition-colors">Buat Laporan Baru</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
+              </div>
             </Link>
             <Link href="/map" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <MapPin className="h-4 w-4 mr-3 text-emerald-600" />
-                Lihat Peta PJUTS
-              </Button>
+              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-emerald-100 hover:bg-emerald-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100 group-hover:scale-105 transition-all">
+                    <MapPin className="h-5 w-5" />
+                  </div>
+                  <span className="font-medium text-slate-700 group-hover:text-emerald-700 transition-colors">Lihat Peta PJUTS</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+              </div>
             </Link>
             <Link href="/units" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <Lightbulb className="h-4 w-4 mr-3 text-amber-600" />
-                Kelola Unit
-              </Button>
+              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-amber-100 hover:bg-amber-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-100 group-hover:scale-105 transition-all">
+                    <Lightbulb className="h-5 w-5" />
+                  </div>
+                  <span className="font-medium text-slate-700 group-hover:text-amber-700 transition-colors">Kelola Unit</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+              </div>
             </Link>
             <Link href="/reports" className="block">
-              <Button variant="outline" className="w-full justify-start">
-                <Calendar className="h-4 w-4 mr-3 text-slate-600" />
-                Riwayat Laporan
-              </Button>
+              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm transition-all duration-200 cursor-pointer">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600 group-hover:bg-slate-200 group-hover:scale-105 transition-all">
+                    <Calendar className="h-5 w-5" />
+                  </div>
+                  <span className="font-medium text-slate-700 group-hover:text-slate-900 transition-colors">Riwayat Laporan</span>
+                </div>
+                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
+              </div>
             </Link>
           </CardContent>
         </Card>
       </div>
 
       {/* Province Table */}
-      <Card className="mt-6">
-        <CardHeader className="flex flex-row items-center justify-between">
+      <Card className="mt-6 border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md">
+        <CardHeader className="flex flex-row items-center justify-between pb-4 bg-slate-50/50 border-b border-slate-100">
           <CardTitle className="text-lg">Statistik per Provinsi</CardTitle>
           <Link href="/analytics">
             <Button variant="ghost" size="sm">
@@ -237,49 +258,57 @@ export function DashboardClient({
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
+            <table className="w-full text-left text-sm">
+              <thead className="bg-slate-50/50 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-100">
                 <tr>
-                  <th>Provinsi</th>
-                  <th className="text-center">Total</th>
-                  <th className="text-center">Operasional</th>
-                  <th className="text-center">Perawatan</th>
-                  <th className="text-center">Offline</th>
-                  <th className="text-center">Laporan</th>
+                  <th className="px-6 py-4 font-semibold">Provinsi</th>
+                  <th className="px-6 py-4 text-center font-semibold">Total Unit</th>
+                  <th className="px-6 py-4 text-center font-semibold text-emerald-600">Operasional</th>
+                  <th className="px-6 py-4 text-center font-semibold text-amber-600">Perawatan</th>
+                  <th className="px-6 py-4 text-center font-semibold text-red-600">Offline</th>
+                  <th className="px-6 py-4 text-center font-semibold">Laporan</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody className="divide-y divide-slate-100">
                 {provinces.slice(0, 10).map((prov, index) => (
                   <tr
                     key={prov.province}
-                    className="animate-fade-in"
+                    className="group hover:bg-slate-50/50 transition-colors animate-in fade-in duration-500"
                     style={{ animationDelay: `${index * 0.05}s` }}
                   >
-                    <td className="font-medium text-slate-900">
+                    <td className="px-6 py-4 font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
                       {prov.province}
                     </td>
-                    <td className="text-center">
-                      <Badge variant="secondary">{prov.totalUnits}</Badge>
+                    <td className="px-6 py-4 text-center">
+                      <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200">
+                        {prov.totalUnits}
+                      </Badge>
                     </td>
-                    <td className="text-center">
-                      <span className="text-emerald-600 font-medium">
+                    <td className="px-6 py-4 text-center">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
                         {prov.operational}
                       </span>
                     </td>
-                    <td className="text-center">
-                      <span className="text-amber-600 font-medium">
-                        {prov.maintenanceNeeded}
-                      </span>
+                    <td className="px-6 py-4 text-center">
+                      {prov.maintenanceNeeded > 0 ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20">
+                          {prov.maintenanceNeeded}
+                        </span>
+                      ) : (
+                        <span className="text-slate-300">-</span>
+                      )}
                     </td>
-                    <td className="text-center">
-                      <span className="text-red-600 font-medium">
-                        {prov.offline}
-                      </span>
+                    <td className="px-6 py-4 text-center">
+                      {prov.offline > 0 ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20">
+                          {prov.offline}
+                        </span>
+                      ) : (
+                        <span className="text-slate-300">-</span>
+                      )}
                     </td>
-                    <td className="text-center">
-                      <span className="text-primary-600 font-medium">
-                        {prov.totalReports}
-                      </span>
+                    <td className="px-6 py-4 text-center text-slate-600">
+                      {prov.totalReports > 0 ? prov.totalReports : <span className="text-slate-300">0</span>}
                     </td>
                   </tr>
                 ))}

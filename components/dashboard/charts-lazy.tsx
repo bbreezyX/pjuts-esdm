@@ -39,14 +39,18 @@ export const ProvinceChart = dynamic<ProvinceChartProps>(
     {
         ssr: false,
         loading: () => (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg">Unit per Provinsi (Top 8)</CardTitle>
+            <Card className="border-slate-200/60 shadow-sm overflow-hidden h-full">
+                <CardHeader className="pb-2 bg-slate-50/50 border-b border-slate-100">
+                    <CardTitle className="text-base font-semibold text-slate-800">Unit per Provinsi (Top 8)</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="h-[300px] flex items-center justify-center">
-                        <div className="text-center">
-                            <Skeleton className="w-full h-[280px] rounded-lg" />
+                <CardContent className="pt-6">
+                    <div className="h-[320px] flex items-center justify-center">
+                        <div className="text-center w-full px-4">
+                            <div className="flex items-end justify-between h-[280px] gap-2">
+                                {Array.from({ length: 8 }).map((_, i) => (
+                                    <Skeleton key={i} className="w-full rounded-t-lg" style={{ height: `${Math.random() * 80 + 20}%` }} />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 </CardContent>
@@ -63,21 +67,21 @@ export const StatusDonutChart = dynamic<StatusDonutChartProps>(
     {
         ssr: false,
         loading: () => (
-            <Card>
-                <CardHeader>
-                    <CardTitle className="text-lg">Distribusi Status</CardTitle>
+            <Card className="border-slate-200/60 shadow-sm overflow-hidden h-full">
+                <CardHeader className="pb-2 bg-slate-50/50 border-b border-slate-100">
+                    <CardTitle className="text-base font-semibold text-slate-800">Distribusi Status</CardTitle>
                 </CardHeader>
-                <CardContent>
-                    <div className="flex items-center justify-center">
-                        <Skeleton className="w-48 h-48 rounded-full" />
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-center py-4">
+                        <Skeleton className="w-52 h-52 rounded-full" />
                     </div>
-                    <div className="grid grid-cols-2 gap-3 mt-6">
+                    <div className="grid grid-cols-2 gap-3 mt-4 pt-4 border-t border-slate-100">
                         {Array.from({ length: 4 }).map((_, i) => (
-                            <div key={i} className="flex items-center gap-2">
-                                <Skeleton className="h-3 w-3 rounded-full" />
-                                <div>
-                                    <Skeleton className="h-2 w-16 mb-1" />
-                                    <Skeleton className="h-4 w-8" />
+                            <div key={i} className="flex items-center gap-2.5 p-1.5">
+                                <Skeleton className="h-2.5 w-2.5 rounded-full" />
+                                <div className="space-y-1">
+                                    <Skeleton className="h-2 w-16" />
+                                    <Skeleton className="h-3 w-10" />
                                 </div>
                             </div>
                         ))}

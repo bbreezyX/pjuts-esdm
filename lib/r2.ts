@@ -6,23 +6,44 @@ import {
 } from "@aws-sdk/client-s3";
 
 // ============================================
-// R2 CLIENT CONFIGURATION
+// R2 CLIENT CONFIGURATION (LAZY INITIALIZATION)
 // ============================================
 
-const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID!;
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID!;
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY!;
-const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!;
-const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL!;
+// Environment variables - accessed lazily to prevent build-time errors
+function getR2Config() {
+  const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;
+  const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
+  const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY;
+  const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME;
+  const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL;
 
-const r2Client = new S3Client({
-  region: "auto",
-  endpoint: `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: R2_ACCESS_KEY_ID,
-    secretAccessKey: R2_SECRET_ACCESS_KEY,
-  },
-});
+  if (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME || !R2_PUBLIC_URL) {
+    throw new Error(
+      "Missing R2 configuration. Please ensure all R2 environment variables are set: " +
+      "R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL"
+    );
+  }
+
+  return { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME, R2_PUBLIC_URL };
+}
+
+// Lazy-initialized R2 client singleton
+let r2ClientInstance: S3Client | null = null;
+
+function getR2Client(): S3Client {
+  if (!r2ClientInstance) {
+    const config = getR2Config();
+    r2ClientInstance = new S3Client({
+      region: "auto",
+      endpoint: `https://${config.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      credentials: {
+        accessKeyId: config.R2_ACCESS_KEY_ID,
+        secretAccessKey: config.R2_SECRET_ACCESS_KEY,
+      },
+    });
+  }
+  return r2ClientInstance;
+}
 
 // ============================================
 // TYPES
@@ -54,7 +75,7 @@ function generateFilePath(region: string, unitId: string): string {
   const timestamp = Date.now();
   const sanitizedRegion = region.toLowerCase().replace(/\s+/g, "-");
   const sanitizedUnitId = unitId.replace(/[^a-zA-Z0-9-]/g, "_");
-  
+
   return `reports/${sanitizedRegion}/${sanitizedUnitId}/${timestamp}.webp`;
 }
 
@@ -62,8 +83,9 @@ function generateFilePath(region: string, unitId: string): string {
  * Get public URL for an uploaded file
  */
 function getPublicUrl(path: string): string {
+  const config = getR2Config();
   // Remove trailing slash from R2_PUBLIC_URL if present
-  const baseUrl = R2_PUBLIC_URL.replace(/\/$/, "");
+  const baseUrl = config.R2_PUBLIC_URL.replace(/\/$/, "");
   return `${baseUrl}/${path}`;
 }
 
@@ -76,14 +98,18 @@ function getPublicUrl(path: string): string {
  */
 export async function uploadImageToR2(options: ImageUploadOptions): Promise<UploadResult> {
   const { region, unitId, fileBuffer, contentType } = options;
-  
+
   try {
     // Generate unique file path
     const filePath = generateFilePath(region, unitId);
-    
+
+    // Get config and client
+    const config = getR2Config();
+    const r2Client = getR2Client();
+
     // Upload to R2
     const command = new PutObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: config.R2_BUCKET_NAME,
       Key: filePath,
       Body: fileBuffer,
       ContentType: contentType,
@@ -96,11 +122,11 @@ export async function uploadImageToR2(options: ImageUploadOptions): Promise<Uplo
         "uploaded-at": new Date().toISOString(),
       },
     });
-    
+
     await r2Client.send(command);
-    
+
     const publicUrl = getPublicUrl(filePath);
-    
+
     return {
       success: true,
       url: publicUrl,
@@ -141,11 +167,14 @@ export async function uploadReportImage(
  */
 export async function deleteFromR2(filePath: string): Promise<boolean> {
   try {
+    const config = getR2Config();
+    const r2Client = getR2Client();
+
     const command = new DeleteObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: config.R2_BUCKET_NAME,
       Key: filePath,
     });
-    
+
     await r2Client.send(command);
     return true;
   } catch (error) {
@@ -163,11 +192,14 @@ export async function deleteFromR2(filePath: string): Promise<boolean> {
  */
 export async function fileExistsInR2(filePath: string): Promise<boolean> {
   try {
+    const config = getR2Config();
+    const r2Client = getR2Client();
+
     const command = new HeadObjectCommand({
-      Bucket: R2_BUCKET_NAME,
+      Bucket: config.R2_BUCKET_NAME,
       Key: filePath,
     });
-    
+
     await r2Client.send(command);
     return true;
   } catch {
@@ -187,7 +219,7 @@ export async function processImage(buffer: Buffer): Promise<Buffer> {
   try {
     // Dynamic import of sharp for image processing
     const sharp = (await import("sharp")).default;
-    
+
     const processedImage = await sharp(buffer)
       .resize(1920, 1080, {
         fit: "inside",
@@ -198,7 +230,7 @@ export async function processImage(buffer: Buffer): Promise<Buffer> {
         effort: 4,
       })
       .toBuffer();
-    
+
     return processedImage;
   } catch (error) {
     console.error("Image processing error:", error);
