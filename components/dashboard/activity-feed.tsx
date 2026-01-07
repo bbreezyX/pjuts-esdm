@@ -47,7 +47,7 @@ export function ActivityFeed({ activities, maxHeight = "400px" }: ActivityFeedPr
   return (
     <Card className="border-slate-200/60 shadow-sm overflow-hidden h-full">
       <CardHeader className="pb-4 bg-slate-50/50 border-b border-slate-100">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-0">
           <div className="space-y-1">
             <CardTitle className="text-base font-semibold text-slate-800 flex items-center gap-2">
               <Clock className="w-4 h-4 text-slate-500" />
@@ -57,7 +57,7 @@ export function ActivityFeed({ activities, maxHeight = "400px" }: ActivityFeedPr
               Memantau perubahan dan laporan terbaru
             </p>
           </div>
-          <Badge variant="outline" className="text-xs px-2 py-0.5 bg-white border-slate-200 text-slate-600 font-medium shadow-sm">
+          <Badge variant="outline" className="w-fit text-xs px-2 py-0.5 bg-white border-slate-200 text-slate-600 font-medium shadow-sm">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
             Live Updates
           </Badge>

@@ -18,6 +18,7 @@ export interface DashboardStats {
     unverifiedUnits: number;
     totalReports: number;
     reportsThisMonth: number;
+    reportsLastMonth: number;
     reportsToday: number;
 }
 
@@ -57,6 +58,7 @@ async function fetchDashboardStats(): Promise<DashboardStats> {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
 
     // Execute all queries in parallel for performance
     const [
@@ -67,6 +69,7 @@ async function fetchDashboardStats(): Promise<DashboardStats> {
         unverifiedUnits,
         totalReports,
         reportsThisMonth,
+        reportsLastMonth,
         reportsToday,
     ] = await Promise.all([
         prisma.pjutsUnit.count(),
@@ -76,6 +79,14 @@ async function fetchDashboardStats(): Promise<DashboardStats> {
         prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.UNVERIFIED } }),
         prisma.report.count(),
         prisma.report.count({ where: { createdAt: { gte: startOfMonth } } }),
+        prisma.report.count({
+            where: {
+                createdAt: {
+                    gte: startOfLastMonth,
+                    lt: startOfMonth
+                }
+            }
+        }),
         prisma.report.count({ where: { createdAt: { gte: startOfDay } } }),
     ]);
 
@@ -87,6 +98,7 @@ async function fetchDashboardStats(): Promise<DashboardStats> {
         unverifiedUnits,
         totalReports,
         reportsThisMonth,
+        reportsLastMonth,
         reportsToday,
     };
 }

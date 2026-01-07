@@ -69,28 +69,38 @@ export function StatCard({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-md p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+        "group relative overflow-hidden rounded-2xl border border-slate-200/60 bg-white/90 backdrop-blur-md p-4 sm:p-5 lg:p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
         colors.wrapper,
         className
       )}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
-      <div className="flex items-start justify-between relative z-10">
+      <div className="flex flex-col gap-3 sm:flex-row-reverse sm:justify-between sm:items-start sm:gap-0 relative z-10">
+        <div
+          className={cn(
+            "flex h-9 w-9 sm:h-12 sm:w-12 items-center justify-center rounded-xl sm:rounded-2xl transition-colors shadow-sm ring-1 ring-inset ring-black/5",
+            colors.iconBg,
+            colors.iconColor
+          )}
+        >
+          <Icon className="h-4.5 w-4.5 sm:h-6 sm:w-6 stroke-[2]" />
+        </div>
+
         <div>
-          <p className="text-sm font-medium text-slate-500">{title}</p>
-          <div className="mt-2 flex items-baseline gap-2">
-            <h3 className="text-3xl font-bold tracking-tight text-slate-900">
+          <p className="text-xs sm:text-sm font-medium text-slate-500">{title}</p>
+          <div className="mt-1 sm:mt-2 flex items-baseline gap-2">
+            <h3 className="text-xl sm:text-3xl font-bold tracking-tight text-slate-900">
               {typeof value === "number" ? value.toLocaleString("id-ID") : value}
             </h3>
           </div>
 
           {(description || trend) && (
-            <div className="mt-2 flex items-center gap-2">
+            <div className="mt-2 flex flex-wrap items-center gap-2">
               {trend && (
                 <span
                   className={cn(
-                    "flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-bold",
+                    "flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-bold",
                     trend.isPositive
                       ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100"
                       : "bg-red-50 text-red-600 ring-1 ring-red-100"
@@ -105,22 +115,12 @@ export function StatCard({
                 </span>
               )}
               {description && (
-                <p className="text-xs text-slate-400 truncate max-w-[120px]">
+                <p className="text-[10px] sm:text-xs text-slate-400 truncate max-w-[140px]">
                   {description}
                 </p>
               )}
             </div>
           )}
-        </div>
-
-        <div
-          className={cn(
-            "flex h-12 w-12 items-center justify-center rounded-2xl transition-colors shadow-sm ring-1 ring-inset ring-black/5",
-            colors.iconBg,
-            colors.iconColor
-          )}
-        >
-          <Icon className="h-6 w-6 stroke-[2]" />
         </div>
       </div>
     </div>

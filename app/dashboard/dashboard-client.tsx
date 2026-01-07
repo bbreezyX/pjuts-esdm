@@ -41,6 +41,20 @@ export function DashboardClient({
   provinces,
   activities,
 }: DashboardClientProps) {
+  // Stats Calculations
+  const totalUnits = stats?.totalUnits || 0;
+  const operationalUnits = stats?.operationalUnits || 0;
+  const operationalPercentage = totalUnits > 0
+    ? Math.round((operationalUnits / totalUnits) * 100)
+    : 0;
+
+  const reportsThisMonth = stats?.reportsThisMonth || 0;
+  const reportsLastMonth = stats?.reportsLastMonth || 0;
+  const reportsGrowth = reportsLastMonth > 0
+    ? Math.round(((reportsThisMonth - reportsLastMonth) / reportsLastMonth) * 100)
+    : (reportsThisMonth > 0 ? 100 : 0);
+  const isGrowthPositive = reportsGrowth >= 0;
+
   return (
     <>
       <PageHeader
@@ -57,7 +71,7 @@ export function DashboardClient({
       </PageHeader>
 
       {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
         <StatCard
           title="Total Unit"
           value={stats?.totalUnits || 0}
@@ -70,7 +84,7 @@ export function DashboardClient({
           value={stats?.operationalUnits || 0}
           icon={CheckCircle2}
           color="green"
-          trend={{ value: 98, isPositive: true }}
+          trend={{ value: operationalPercentage, isPositive: true }}
           description="Unit berfungsi normal"
         />
         <StatCard
@@ -87,6 +101,21 @@ export function DashboardClient({
           color="red"
           description="Tidak terhubung ke sistem"
         />
+      </div>
+
+      {/* Modern Divider */}
+      <div className="relative my-8">
+        <div className="absolute inset-0 flex items-center" aria-hidden="true">
+          <div className="w-full border-t border-slate-200/60 shadow-sm"></div>
+        </div>
+        <div className="relative flex justify-center">
+          <div className="flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-200/60 shadow-sm text-slate-500">
+            <FileBarChart className="h-3.5 w-3.5" />
+            <span className="text-xs font-medium uppercase tracking-wider">
+              Statistik Laporan
+            </span>
+          </div>
+        </div>
       </div>
 
       {/* Report Stats */}
@@ -129,8 +158,14 @@ export function DashboardClient({
               </div>
             </div>
             <div className="flex items-center gap-2 mt-3">
-              <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
-                +24% dari bulan lalu
+              <Badge
+                variant="outline"
+                className={`text-xs border ${isGrowthPositive
+                    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                    : "bg-red-50 text-red-700 border-red-200"
+                  }`}
+              >
+                {isGrowthPositive ? '+' : ''}{reportsGrowth}% dari bulan lalu
               </Badge>
             </div>
           </CardContent>
