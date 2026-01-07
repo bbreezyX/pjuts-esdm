@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getMapPoints, getClusterData } from "@/app/actions/map";
-import { getDashboardStats } from "@/app/actions/dashboard";
-import { AppShell, PageHeader } from "@/components/layout";
+import { getMapPoints } from "@/app/actions/map";
+import { getDashboardStats } from "@/app/actions/dashboard-cached";
+import { AppShell } from "@/components/layout";
 import { MapPageClient } from "./map-client";
 
 export default async function MapPage() {
@@ -12,6 +12,7 @@ export default async function MapPage() {
     redirect("/login");
   }
 
+  // Fetch map points and stats in parallel
   const [pointsResult, statsResult] = await Promise.all([
     getMapPoints(),
     getDashboardStats(),
@@ -40,4 +41,3 @@ export default async function MapPage() {
     </AppShell>
   );
 }
-

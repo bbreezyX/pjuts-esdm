@@ -4,10 +4,11 @@ import {
   getDashboardStats,
   getStatsByProvince,
   getRecentActivity,
-} from "@/app/actions/dashboard";
+} from "@/app/actions/dashboard-cached";
 import { AppShell } from "@/components/layout";
-import { PageHeader } from "@/components/layout";
 import { DashboardClient } from "./dashboard-client";
+import { Suspense } from "react";
+import { DashboardSkeleton } from "./dashboard-skeleton";
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -16,6 +17,7 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
+  // Parallel data fetching with cached actions
   const [statsResult, provinceResult, activityResult] = await Promise.all([
     getDashboardStats(),
     getStatsByProvince(),

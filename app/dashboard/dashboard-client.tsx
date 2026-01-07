@@ -16,7 +16,7 @@ import {
 import { PageHeader } from "@/components/layout";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
-import { ProvinceChart, StatusDonutChart } from "@/components/dashboard/province-chart";
+import { ProvinceChart, StatusDonutChart } from "@/components/dashboard/charts-lazy";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
