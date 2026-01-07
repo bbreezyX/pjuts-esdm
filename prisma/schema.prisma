@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum Role {
+  ADMIN
+  FIELD_STAFF
+}
+
+enum UnitStatus {
+  OPERATIONAL
+  MAINTENANCE_NEEDED
+  OFFLINE
+  UNVERIFIED
+}
+
+// ============================================
+// USER MODEL
+// ============================================
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  role          Role      @default(FIELD_STAFF)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  reports       Report[]
+
+  @@index([email])
+  @@index([role])
+}
+
+// ============================================
+// PJUTS UNIT MODEL (Solar Street Light Unit)
+// ============================================
+
+model PjutsUnit {
+  id            String      @id @default(cuid())
+  serialNumber  String      @unique
+  latitude      Float
+  longitude     Float
+  province      String
+  regency       String
+  district      String?
+  village       String?
+  address       String?
+  installDate   DateTime?
+  lastStatus    UnitStatus  @default(UNVERIFIED)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  reports       Report[]
+
+  @@index([serialNumber])
+  @@index([province])
+  @@index([regency])
+  @@index([lastStatus])
+  @@index([latitude, longitude])
+}
+
+// ============================================
+// REPORT MODEL
+// ============================================
+
+model Report {
+  id              String      @id @default(cuid())
+  unitId          String
+  unit            PjutsUnit   @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  
+  // Image from R2
+  imageUrl        String
+  imagePath       String      // R2 path for deletion purposes
+  
+  // Field data
+  batteryVoltage  Float
+  latitude        Float       // GPS location when report was made
+  longitude       Float
+  notes           String?
+  
+  // Metadata
+  submittedBy     String
+  user            User        @relation(fields: [submittedBy], references: [id], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+
+  @@index([unitId])
+  @@index([submittedBy])
+  @@index([createdAt])
+}
+
