@@ -7,8 +7,6 @@ import {
 } from "@/app/actions/dashboard";
 import { AppShell } from "@/components/layout";
 import { DashboardClient } from "./dashboard-client";
-import { Suspense } from "react";
-import { DashboardSkeleton } from "./dashboard-skeleton";
 
 export default async function DashboardPage() {
   const session = await auth();

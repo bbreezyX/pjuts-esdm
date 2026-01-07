@@ -11,4 +11,5 @@ export * from "./progress";
 export * from "./separator";
 export * from "./scroll-area";
 export * from "./skeleton";
+export * from "./spinner";
 

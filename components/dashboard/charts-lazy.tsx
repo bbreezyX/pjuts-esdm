@@ -4,9 +4,38 @@ import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
-// Lazy load the heavy Recharts-based components
-export const ProvinceChart = dynamic(
-    () => import("./province-chart-impl").then((mod) => mod.ProvinceChartImpl),
+// Type definitions for the chart components
+export interface ProvinceData {
+    province: string;
+    totalUnits: number;
+    operational: number;
+    maintenanceNeeded: number;
+    offline: number;
+    totalReports?: number;
+}
+
+export interface ProvinceChartProps {
+    data: ProvinceData[];
+}
+
+export interface StatusDistribution {
+    operational: number;
+    maintenanceNeeded: number;
+    offline: number;
+    unverified: number;
+}
+
+export interface StatusDonutChartProps {
+    data: StatusDistribution;
+}
+
+// Lazy load the heavy Recharts-based components with proper typing
+// Using dynamic import with explicit typing to fix TypeScript module resolution
+export const ProvinceChart = dynamic<ProvinceChartProps>(
+    async () => {
+        const mod = await import("./province-chart-impl");
+        return mod.ProvinceChartImpl;
+    },
     {
         ssr: false,
         loading: () => (
@@ -26,8 +55,11 @@ export const ProvinceChart = dynamic(
     }
 );
 
-export const StatusDonutChart = dynamic(
-    () => import("./province-chart-impl").then((mod) => mod.StatusDonutChartImpl),
+export const StatusDonutChart = dynamic<StatusDonutChartProps>(
+    async () => {
+        const mod = await import("./province-chart-impl");
+        return mod.StatusDonutChartImpl;
+    },
     {
         ssr: false,
         loading: () => (
