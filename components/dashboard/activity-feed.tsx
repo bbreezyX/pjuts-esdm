@@ -4,6 +4,7 @@ import { MapPin, FileText, Clock } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { UnitStatus } from "@prisma/client";
 import { getRelativeTime, getStatusLabel, cn } from "@/lib/utils";
 
 interface Activity {
@@ -13,7 +14,7 @@ interface Activity {
   timestamp: Date;
   user: string;
   province?: string;
-  status?: string;
+  status?: UnitStatus;
 }
 
 interface ActivityFeedProps {
