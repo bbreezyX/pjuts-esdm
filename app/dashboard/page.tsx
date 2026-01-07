@@ -4,7 +4,7 @@ import {
   getDashboardStats,
   getStatsByProvince,
   getRecentActivity,
-} from "@/app/actions/dashboard-cached";
+} from "@/app/actions/dashboard";
 import { AppShell } from "@/components/layout";
 import { DashboardClient } from "./dashboard-client";
 import { Suspense } from "react";

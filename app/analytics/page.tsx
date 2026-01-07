@@ -17,7 +17,7 @@ export default async function AnalyticsPage() {
   const [statsResult, provinceResult, trendResult] = await Promise.all([
     getDashboardStats(),
     getStatsByProvince(),
-    getMonthlyReportTrend(12),
+    getMonthlyReportTrend(),
   ]);
 
   const stats = statsResult.data;

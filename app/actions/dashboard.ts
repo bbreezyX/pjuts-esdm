@@ -3,93 +3,63 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { UnitStatus } from "@prisma/client";
+import { unstable_cache } from "next/cache";
+import { CacheTags, CacheDurations } from "@/lib/cache";
 
 // ============================================
 // TYPES
 // ============================================
 
 export interface DashboardStats {
-  totalUnits: number;
-  operationalUnits: number;
-  maintenanceNeeded: number;
-  offlineUnits: number;
-  unverifiedUnits: number;
-  totalReports: number;
-  reportsThisMonth: number;
-  reportsToday: number;
+    totalUnits: number;
+    operationalUnits: number;
+    maintenanceNeeded: number;
+    offlineUnits: number;
+    unverifiedUnits: number;
+    totalReports: number;
+    reportsThisMonth: number;
+    reportsToday: number;
 }
 
 export interface ProvinceStats {
-  province: string;
-  totalUnits: number;
-  operational: number;
-  maintenanceNeeded: number;
-  offline: number;
-  unverified: number;
-  totalReports: number;
+    province: string;
+    totalUnits: number;
+    operational: number;
+    maintenanceNeeded: number;
+    offline: number;
+    unverified: number;
+    totalReports: number;
 }
 
 export interface RecentActivity {
-  id: string;
-  type: "report" | "unit_added" | "status_change";
-  description: string;
-  timestamp: Date;
-  user: string;
-  province?: string;
+    id: string;
+    type: "report" | "unit_added" | "status_change";
+    description: string;
+    timestamp: Date;
+    user: string;
+    province?: string;
 }
 
 export interface ActionResult<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
+    success: boolean;
+    data?: T;
+    error?: string;
 }
 
 // ============================================
-// GET DASHBOARD STATS
+// OPTIMIZED & CACHED: GET DASHBOARD STATS
 // ============================================
 
 /**
- * Get aggregated statistics for the dashboard "at a glance" view
+ * Internal function that fetches dashboard stats (no auth check - for caching)
  */
-export async function getDashboardStats(): Promise<ActionResult<DashboardStats>> {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "Authentication required",
-      };
-    }
-
-    // Get current date boundaries
+async function fetchDashboardStats(): Promise<DashboardStats> {
     const now = new Date();
     const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
     // Execute all queries in parallel for performance
     const [
-      totalUnits,
-      operationalUnits,
-      maintenanceNeeded,
-      offlineUnits,
-      unverifiedUnits,
-      totalReports,
-      reportsThisMonth,
-      reportsToday,
-    ] = await Promise.all([
-      prisma.pjutsUnit.count(),
-      prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.OPERATIONAL } }),
-      prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.MAINTENANCE_NEEDED } }),
-      prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.OFFLINE } }),
-      prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.UNVERIFIED } }),
-      prisma.report.count(),
-      prisma.report.count({ where: { createdAt: { gte: startOfMonth } } }),
-      prisma.report.count({ where: { createdAt: { gte: startOfDay } } }),
-    ]);
-
-    return {
-      success: true,
-      data: {
         totalUnits,
         operationalUnits,
         maintenanceNeeded,
@@ -98,231 +68,306 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
         totalReports,
         reportsThisMonth,
         reportsToday,
-      },
-    };
-  } catch (error) {
-    console.error("Get dashboard stats error:", error);
+    ] = await Promise.all([
+        prisma.pjutsUnit.count(),
+        prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.OPERATIONAL } }),
+        prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.MAINTENANCE_NEEDED } }),
+        prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.OFFLINE } }),
+        prisma.pjutsUnit.count({ where: { lastStatus: UnitStatus.UNVERIFIED } }),
+        prisma.report.count(),
+        prisma.report.count({ where: { createdAt: { gte: startOfMonth } } }),
+        prisma.report.count({ where: { createdAt: { gte: startOfDay } } }),
+    ]);
+
     return {
-      success: false,
-      error: "Failed to fetch dashboard statistics",
+        totalUnits,
+        operationalUnits,
+        maintenanceNeeded,
+        offlineUnits,
+        unverifiedUnits,
+        totalReports,
+        reportsThisMonth,
+        reportsToday,
     };
-  }
+}
+
+// Cached version - refreshes every 60 seconds
+const getCachedDashboardStats = unstable_cache(
+    fetchDashboardStats,
+    ["dashboard-stats"],
+    {
+        revalidate: CacheDurations.SHORT,
+        tags: [CacheTags.DASHBOARD_STATS],
+    }
+);
+
+/**
+ * Get aggregated statistics for the dashboard (CACHED)
+ */
+export async function getDashboardStats(): Promise<ActionResult<DashboardStats>> {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return {
+                success: false,
+                error: "Authentication required",
+            };
+        }
+
+        const data = await getCachedDashboardStats();
+        return { success: true, data };
+    } catch (error) {
+        console.error("Get dashboard stats error:", error);
+        return {
+            success: false,
+            error: "Failed to fetch dashboard statistics",
+        };
+    }
 }
 
 // ============================================
-// GET STATS BY PROVINCE
+// OPTIMIZED: GET STATS BY PROVINCE
+// Uses single aggregated query instead of 3 queries
 // ============================================
 
 /**
- * Get unit and report counts grouped by province
+ * Internal function to fetch province stats with optimized single query
  */
-export async function getStatsByProvince(): Promise<ActionResult<ProvinceStats[]>> {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "Authentication required",
-      };
-    }
+async function fetchStatsByProvince(): Promise<ProvinceStats[]> {
+    // Single query with joins instead of 3 separate queries
+    const provinceData = await prisma.$queryRaw<Array<{
+        province: string;
+        lastStatus: string;
+        unit_count: bigint;
+        report_count: bigint;
+    }>>`
+    SELECT 
+      u."province",
+      u."lastStatus",
+      COUNT(DISTINCT u."id") as unit_count,
+      COUNT(r."id") as report_count
+    FROM "PjutsUnit" u
+    LEFT JOIN "Report" r ON r."unitId" = u."id"
+    GROUP BY u."province", u."lastStatus"
+    ORDER BY u."province"
+  `;
 
-    // Get all provinces with unit counts
-    const provinceUnits = await prisma.pjutsUnit.groupBy({
-      by: ["province", "lastStatus"],
-      _count: {
-        id: true,
-      },
-    });
-
-    // Get report counts by province (through unit relation)
-    const provinceReports = await prisma.report.groupBy({
-      by: ["unitId"],
-      _count: {
-        id: true,
-      },
-    });
-
-    // Get unit provinces for report counting
-    const unitProvinces = await prisma.pjutsUnit.findMany({
-      select: {
-        id: true,
-        province: true,
-      },
-    });
-
-    // Create a map of unitId to province
-    const unitProvinceMap = new Map(
-      unitProvinces.map((u) => [u.id, u.province])
-    );
-
-    // Aggregate data by province
+    // Efficiently aggregate into province stats
     const provinceMap = new Map<string, ProvinceStats>();
 
-    // Initialize from unit data
-    for (const row of provinceUnits) {
-      const existing = provinceMap.get(row.province) || {
-        province: row.province,
-        totalUnits: 0,
-        operational: 0,
-        maintenanceNeeded: 0,
-        offline: 0,
-        unverified: 0,
-        totalReports: 0,
-      };
+    for (const row of provinceData) {
+        const existing = provinceMap.get(row.province) || {
+            province: row.province,
+            totalUnits: 0,
+            operational: 0,
+            maintenanceNeeded: 0,
+            offline: 0,
+            unverified: 0,
+            totalReports: 0,
+        };
 
-      existing.totalUnits += row._count.id;
+        const unitCount = Number(row.unit_count);
+        existing.totalUnits += unitCount;
 
-      switch (row.lastStatus) {
-        case UnitStatus.OPERATIONAL:
-          existing.operational += row._count.id;
-          break;
-        case UnitStatus.MAINTENANCE_NEEDED:
-          existing.maintenanceNeeded += row._count.id;
-          break;
-        case UnitStatus.OFFLINE:
-          existing.offline += row._count.id;
-          break;
-        case UnitStatus.UNVERIFIED:
-          existing.unverified += row._count.id;
-          break;
-      }
-
-      provinceMap.set(row.province, existing);
-    }
-
-    // Add report counts
-    for (const row of provinceReports) {
-      const province = unitProvinceMap.get(row.unitId);
-      if (province) {
-        const existing = provinceMap.get(province);
-        if (existing) {
-          existing.totalReports += row._count.id;
+        switch (row.lastStatus) {
+            case "OPERATIONAL":
+                existing.operational += unitCount;
+                break;
+            case "MAINTENANCE_NEEDED":
+                existing.maintenanceNeeded += unitCount;
+                break;
+            case "OFFLINE":
+                existing.offline += unitCount;
+                break;
+            case "UNVERIFIED":
+                existing.unverified += unitCount;
+                break;
         }
-      }
+
+        // Only count reports once per province-status combo
+        existing.totalReports += Number(row.report_count);
+        provinceMap.set(row.province, existing);
     }
 
     // Sort by total units descending
-    const stats = Array.from(provinceMap.values()).sort(
-      (a, b) => b.totalUnits - a.totalUnits
+    return Array.from(provinceMap.values()).sort(
+        (a, b) => b.totalUnits - a.totalUnits
     );
+}
 
-    return {
-      success: true,
-      data: stats,
-    };
-  } catch (error) {
-    console.error("Get stats by province error:", error);
-    return {
-      success: false,
-      error: "Failed to fetch province statistics",
-    };
-  }
+// Cached version - refreshes every 5 minutes
+const getCachedStatsByProvince = unstable_cache(
+    fetchStatsByProvince,
+    ["province-stats"],
+    {
+        revalidate: CacheDurations.MEDIUM,
+        tags: [CacheTags.PROVINCE_STATS],
+    }
+);
+
+/**
+ * Get unit and report counts grouped by province (CACHED & OPTIMIZED)
+ */
+export async function getStatsByProvince(): Promise<ActionResult<ProvinceStats[]>> {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return {
+                success: false,
+                error: "Authentication required",
+            };
+        }
+
+        const data = await getCachedStatsByProvince();
+        return { success: true, data };
+    } catch (error) {
+        console.error("Get stats by province error:", error);
+        return {
+            success: false,
+            error: "Failed to fetch province statistics",
+        };
+    }
 }
 
 // ============================================
-// GET RECENT ACTIVITY
+// OPTIMIZED: GET MONTHLY REPORT TREND
+// Uses single query instead of 6 sequential queries
+// ============================================
+
+/**
+ * Internal function to fetch monthly trend with single query
+ */
+async function fetchMonthlyReportTrend(months: number = 6): Promise<{
+    labels: string[];
+    data: number[];
+}> {
+    const now = new Date();
+    const startDate = new Date(now.getFullYear(), now.getMonth() - months + 1, 1);
+
+    // Single query to get all monthly counts
+    const monthlyCounts = await prisma.$queryRaw<Array<{
+        month: Date;
+        count: bigint;
+    }>>`
+    SELECT 
+      DATE_TRUNC('month', "createdAt") as month,
+      COUNT(*) as count
+    FROM "Report"
+    WHERE "createdAt" >= ${startDate}
+    GROUP BY DATE_TRUNC('month', "createdAt")
+    ORDER BY month ASC
+  `;
+
+    // Create a map for quick lookup
+    const countMap = new Map<string, number>();
+    for (const row of monthlyCounts) {
+        const key = new Date(row.month).toISOString().slice(0, 7); // YYYY-MM format
+        countMap.set(key, Number(row.count));
+    }
+
+    // Build arrays for the last N months
+    const labels: string[] = [];
+    const data: number[] = [];
+
+    for (let i = months - 1; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const key = date.toISOString().slice(0, 7);
+
+        labels.push(date.toLocaleDateString("id-ID", { month: "short", year: "numeric" }));
+        data.push(countMap.get(key) || 0);
+    }
+
+    return { labels, data };
+}
+
+// Cached version - refreshes every 15 minutes
+const getCachedMonthlyTrend = unstable_cache(
+    () => fetchMonthlyReportTrend(6),
+    ["monthly-trend"],
+    {
+        revalidate: CacheDurations.LONG,
+        tags: [CacheTags.MONTHLY_TREND],
+    }
+);
+
+/**
+ * Get report counts for the last N months (CACHED & OPTIMIZED)
+ */
+export async function getMonthlyReportTrend(): Promise<ActionResult<{
+    labels: string[];
+    data: number[];
+}>> {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return {
+                success: false,
+                error: "Authentication required",
+            };
+        }
+
+        const data = await getCachedMonthlyTrend();
+        return { success: true, data };
+    } catch (error) {
+        console.error("Get monthly trend error:", error);
+        return {
+            success: false,
+            error: "Failed to fetch monthly trend",
+        };
+    }
+}
+
+// ============================================
+// GET RECENT ACTIVITY (no change needed, already efficient)
 // ============================================
 
 /**
  * Get recent activity for the activity feed
  */
 export async function getRecentActivity(limit: number = 10): Promise<ActionResult<RecentActivity[]>> {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "Authentication required",
-      };
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return {
+                success: false,
+                error: "Authentication required",
+            };
+        }
+
+        // Get recent reports - already optimized with limit
+        const recentReports = await prisma.report.findMany({
+            take: limit,
+            orderBy: { createdAt: "desc" },
+            select: {
+                id: true,
+                createdAt: true,
+                user: {
+                    select: { name: true },
+                },
+                unit: {
+                    select: { serialNumber: true, province: true },
+                },
+            },
+        });
+
+        const activities: RecentActivity[] = recentReports.map((report) => ({
+            id: report.id,
+            type: "report" as const,
+            description: `Report submitted for ${report.unit.serialNumber}`,
+            timestamp: report.createdAt,
+            user: report.user.name,
+            province: report.unit.province,
+        }));
+
+        return {
+            success: true,
+            data: activities,
+        };
+    } catch (error) {
+        console.error("Get recent activity error:", error);
+        return {
+            success: false,
+            error: "Failed to fetch recent activity",
+        };
     }
-
-    // Get recent reports
-    const recentReports = await prisma.report.findMany({
-      take: limit,
-      orderBy: { createdAt: "desc" },
-      include: {
-        user: {
-          select: { name: true },
-        },
-        unit: {
-          select: { serialNumber: true, province: true },
-        },
-      },
-    });
-
-    const activities: RecentActivity[] = recentReports.map((report) => ({
-      id: report.id,
-      type: "report" as const,
-      description: `Report submitted for ${report.unit.serialNumber}`,
-      timestamp: report.createdAt,
-      user: report.user.name,
-      province: report.unit.province,
-    }));
-
-    return {
-      success: true,
-      data: activities,
-    };
-  } catch (error) {
-    console.error("Get recent activity error:", error);
-    return {
-      success: false,
-      error: "Failed to fetch recent activity",
-    };
-  }
 }
-
-// ============================================
-// GET MONTHLY REPORT TREND
-// ============================================
-
-/**
- * Get report counts for the last N months for trend charts
- */
-export async function getMonthlyReportTrend(months: number = 6): Promise<ActionResult<{
-  labels: string[];
-  data: number[];
-}>> {
-  try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: "Authentication required",
-      };
-    }
-
-    const now = new Date();
-    const labels: string[] = [];
-    const data: number[] = [];
-
-    for (let i = months - 1; i >= 0; i--) {
-      const startDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const endDate = new Date(now.getFullYear(), now.getMonth() - i + 1, 0, 23, 59, 59);
-
-      const count = await prisma.report.count({
-        where: {
-          createdAt: {
-            gte: startDate,
-            lte: endDate,
-          },
-        },
-      });
-
-      labels.push(startDate.toLocaleDateString("id-ID", { month: "short", year: "numeric" }));
-      data.push(count);
-    }
-
-    return {
-      success: true,
-      data: { labels, data },
-    };
-  } catch (error) {
-    console.error("Get monthly trend error:", error);
-    return {
-      success: false,
-      error: "Failed to fetch monthly trend",
-    };
-  }
-}
-

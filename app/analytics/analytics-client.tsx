@@ -120,8 +120,8 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
             <p className="text-2xl font-bold text-slate-900">
               {trend.data.length > 0
                 ? Math.round(
-                    trend.data.reduce((a, b) => a + b, 0) / trend.data.length
-                  ).toLocaleString("id-ID")
+                  trend.data.reduce((a, b) => a + b, 0) / trend.data.length
+                ).toLocaleString("id-ID")
                 : 0}
             </p>
           </CardContent>
@@ -330,8 +330,8 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
                             operationalPercent >= 80
                               ? "success"
                               : operationalPercent >= 60
-                              ? "warning"
-                              : "destructive"
+                                ? "warning"
+                                : "destructive"
                           }
                         >
                           {operationalPercent}%

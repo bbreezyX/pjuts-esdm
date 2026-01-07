@@ -90,22 +90,22 @@ export function DashboardClient({
 
       {/* Report Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <Card className="bg-gradient-to-br from-primary-600 to-primary-800 text-white border-0">
+        <Card>
           <CardContent className="p-5">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-primary-200 text-sm font-medium">
+                <p className="text-slate-500 text-sm font-medium">
                   Total Laporan
                 </p>
-                <p className="text-3xl font-bold mt-1">
+                <p className="text-3xl font-bold text-primary-600 mt-1">
                   {stats?.totalReports?.toLocaleString("id-ID") || 0}
                 </p>
               </div>
-              <div className="p-2 bg-white/20 rounded-lg">
-                <FileBarChart className="h-6 w-6" />
+              <div className="p-2 bg-primary-100 rounded-lg">
+                <FileBarChart className="h-6 w-6 text-primary-600" />
               </div>
             </div>
-            <div className="flex items-center gap-2 mt-3 text-sm text-primary-200">
+            <div className="flex items-center gap-2 mt-3 text-sm text-slate-500">
               <TrendingUp className="h-4 w-4" />
               <span>Sejak sistem diluncurkan</span>
             </div>

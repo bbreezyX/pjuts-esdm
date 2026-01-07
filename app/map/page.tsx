@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getMapPoints } from "@/app/actions/map";
-import { getDashboardStats } from "@/app/actions/dashboard-cached";
+import { getDashboardStats } from "@/app/actions/dashboard";
 import { AppShell } from "@/components/layout";
 import { MapPageClient } from "./map-client";
 
