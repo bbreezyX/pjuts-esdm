@@ -2,14 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -35,6 +27,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Plus, MoreHorizontal, Pencil, Trash2, Shield, User } from "lucide-react";
 import { UserData, createUser, updateUser, deleteUser } from "@/app/actions/users";
 import { useToast } from "@/components/ui/use-toast";
@@ -237,50 +230,59 @@ export function UsersClient({ users }: UsersClientProps) {
         </Dialog>
       </div>
 
-      <div className="rounded-md border bg-white shadow-sm overflow-hidden">
+      <Card className="overflow-hidden">
         <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="font-semibold text-slate-900 whitespace-nowrap pl-6">Nama</TableHead>
-                <TableHead className="font-semibold text-slate-900 whitespace-nowrap">Email</TableHead>
-                <TableHead className="font-semibold text-slate-900 whitespace-nowrap">Role</TableHead>
-                <TableHead className="font-semibold text-slate-900 whitespace-nowrap">Terdaftar</TableHead>
-                <TableHead className="w-[50px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Email</th>
+                <th className="text-center">Role</th>
+                <th>Terdaftar</th>
+                <th className="text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
               {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell className="font-medium text-slate-900 whitespace-nowrap pl-6">{user.name}</TableCell>
-                  <TableCell className="text-slate-700 whitespace-nowrap">{user.email}</TableCell>
-                  <TableCell className="whitespace-nowrap">
+                <tr key={user.id}>
+                  <td>
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                        <span className="text-xs font-semibold text-slate-600">
+                          {user.name.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                      <span className="font-medium text-slate-900">{user.name}</span>
+                    </div>
+                  </td>
+                  <td className="text-slate-600">{user.email}</td>
+                  <td className="text-center">
                     <Badge variant={user.role === "ADMIN" ? "default" : "secondary"}>
                       <div className="flex items-center gap-1">
                         {user.role === "ADMIN" ? <Shield className="w-3 h-3" /> : <User className="w-3 h-3" />}
                         {user.role === "ADMIN" ? "Admin" : "Petugas"}
                       </div>
                     </Badge>
-                  </TableCell>
-                  <TableCell className="text-slate-700 whitespace-nowrap">{new Date(user.createdAt).toLocaleDateString("id-ID")}</TableCell>
-                  <TableCell>
+                  </td>
+                  <td className="text-slate-600">{new Date(user.createdAt).toLocaleDateString("id-ID")}</td>
+                  <td className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0 text-slate-500 hover:text-slate-900">
+                        <Button variant="ghost" size="icon-sm">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40">
-                        <DropdownMenuLabel className="text-slate-900">Aksi</DropdownMenuLabel>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
                         <DropdownMenuItem onClick={() => {
                           setEditingUser(user);
                           setIsDialogOpen(true);
-                        }} className="text-slate-700 focus:text-slate-900 cursor-pointer">
+                        }}>
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem 
-                          className="text-red-600 focus:text-red-700 cursor-pointer"
+                          className="text-red-600"
                           onClick={() => handleDelete(user.id)}
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
@@ -288,13 +290,13 @@ export function UsersClient({ users }: UsersClientProps) {
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                  </td>
+                </tr>
               ))}
-            </TableBody>
-          </Table>
+            </tbody>
+          </table>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }

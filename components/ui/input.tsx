@@ -17,7 +17,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-slate-700 dark:text-slate-200"
+            className="block text-sm font-medium text-slate-700"
           >
             {label}
             {props.required && <span className="text-red-500 ml-0.5">*</span>}
@@ -27,10 +27,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           type={type}
           id={inputId}
           className={cn(
-            "flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 ring-offset-white transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500 dark:bg-slate-950 dark:border-slate-800 dark:text-slate-100 dark:ring-offset-slate-950 dark:placeholder:text-slate-400",
+            "flex h-10 w-full rounded-lg border bg-white px-3 py-2 text-sm text-slate-900 ring-offset-white transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-slate-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500",
             error
-              ? "border-red-300 focus-visible:ring-red-500 dark:border-red-900"
-              : "border-slate-200 focus-visible:ring-primary-500 dark:border-slate-800",
+              ? "border-red-300 focus-visible:ring-red-500"
+              : "border-slate-200 focus-visible:ring-primary-500",
             className
           )}
           ref={ref}
@@ -40,7 +40,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <p className="text-sm text-red-600">{error}</p>
         )}
         {hint && !error && (
-          <p className="text-sm text-slate-500 dark:text-slate-400">{hint}</p>
+          <p className="text-sm text-slate-500">{hint}</p>
         )}
       </div>
     );

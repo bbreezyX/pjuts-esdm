@@ -1,9 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getPjutsUnits, getProvinces } from "@/app/actions/units";
-import { AppShell, PageHeader } from "@/components/layout";
-import { Button } from "@/components/ui/button";
-import { Plus, Download, Upload } from "lucide-react";
+import { AppShell } from "@/components/layout";
 import { UnitsPageClient } from "./units-client";
 
 interface SearchParams {
@@ -53,28 +51,6 @@ export default async function UnitsPage({
         role: session.user.role,
       }}
     >
-      <PageHeader
-        title="Unit PJUTS"
-        description="Kelola unit penerangan jalan umum tenaga surya"
-      >
-        {session.user.role === "ADMIN" && (
-          <>
-            <Button variant="outline" size="sm">
-              <Upload className="h-4 w-4 mr-2" />
-              Import
-            </Button>
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-2" />
-              Export
-            </Button>
-            <Button size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Tambah Unit
-            </Button>
-          </>
-        )}
-      </PageHeader>
-
       <UnitsPageClient
         initialUnits={units}
         total={total}
@@ -89,4 +65,5 @@ export default async function UnitsPage({
     </AppShell>
   );
 }
+
 

@@ -20,6 +20,9 @@ import {
   AlertTriangle,
   XCircle,
   HelpCircle,
+  Plus,
+  Download,
+  Upload,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -40,6 +43,9 @@ import {
 import { PjutsUnitData } from "@/app/actions/units";
 import { getStatusLabel, formatDate } from "@/lib/utils";
 import { UnitStatus } from "@prisma/client";
+import { PageHeader } from "@/components/layout";
+import { UnitDialog } from "@/components/units/unit-dialog";
+import { DeleteUnitDialog } from "@/components/units/delete-unit-dialog";
 
 interface UnitsPageClientProps {
   initialUnits: PjutsUnitData[];
@@ -80,6 +86,12 @@ export function UnitsPageClient({
   const [selectedProvince, setSelectedProvince] = useState(initialProvince);
   const [selectedStatus, setSelectedStatus] = useState(initialStatus);
 
+  // Dialog states
+  const [isUnitDialogOpen, setIsUnitDialogOpen] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState<PjutsUnitData | undefined>(undefined);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [unitToDelete, setUnitToDelete] = useState<PjutsUnitData | null>(null);
+
   const updateURL = (updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
 
@@ -117,10 +129,47 @@ export function UnitsPageClient({
     }
   };
 
+  const handleEdit = (unit: PjutsUnitData) => {
+    setSelectedUnit(unit);
+    setIsUnitDialogOpen(true);
+  };
+
+  const handleDelete = (unit: PjutsUnitData) => {
+    setUnitToDelete(unit);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleCreate = () => {
+    setSelectedUnit(undefined);
+    setIsUnitDialogOpen(true);
+  };
+
   const hasActiveFilters = selectedProvince || selectedStatus || searchQuery;
 
   return (
     <div className="space-y-4">
+      <PageHeader
+        title="Unit PJUTS"
+        description="Kelola unit penerangan jalan umum tenaga surya"
+      >
+        {isAdmin && (
+          <>
+            <Button variant="outline" size="sm">
+              <Upload className="h-4 w-4 mr-2" />
+              Import
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+            <Button size="sm" onClick={handleCreate}>
+              <Plus className="h-4 w-4 mr-2" />
+              Tambah Unit
+            </Button>
+          </>
+        )}
+      </PageHeader>
+
       {/* Search and Filters */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-3">
@@ -317,11 +366,11 @@ export function UnitsPageClient({
                             </DropdownMenuItem>
                             {isAdmin && (
                               <>
-                                <DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleEdit(unit)}>
                                   <Edit className="h-4 w-4 mr-2" />
                                   Edit Unit
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="text-red-600">
+                                <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(unit)}>
                                   <Trash2 className="h-4 w-4 mr-2" />
                                   Hapus
                                 </DropdownMenuItem>
@@ -426,6 +475,18 @@ export function UnitsPageClient({
           </div>
         )}
       </div>
+
+      <UnitDialog 
+        open={isUnitDialogOpen} 
+        onOpenChange={setIsUnitDialogOpen} 
+        unit={selectedUnit} 
+      />
+      
+      <DeleteUnitDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        unit={unitToDelete}
+      />
     </div>
   );
 }
