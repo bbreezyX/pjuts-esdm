@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
 import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { UnitStatus } from "@prisma/client";
 
 // ============================================
@@ -131,7 +131,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     // 6. Process and upload image to R2
     const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
     const processedImage = await processImage(imageBuffer);
-    
+
     const uploadResult = await uploadReportImage(
       processedImage,
       "image/webp",
@@ -193,6 +193,11 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     revalidatePath("/reports");
     revalidatePath("/map");
 
+    // Invalidate cache tags for server-side caching
+    revalidateTag("map-points");
+    revalidateTag("dashboard-stats");
+    revalidateTag("recent-activity");
+
     return {
       success: true,
       data: report as ReportData,
@@ -239,15 +244,15 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
 
     // Build where clause
     const where: Record<string, unknown> = {};
-    
+
     if (unitId) {
       where.unitId = unitId;
     }
-    
+
     if (province) {
       where.unit = { province };
     }
-    
+
     if (startDate || endDate) {
       where.createdAt = {};
       if (startDate) {
