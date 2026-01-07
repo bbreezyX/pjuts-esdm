@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
@@ -66,20 +67,18 @@ export function Navbar({ user }: NavbarProps) {
             <div className="flex items-center gap-3">
               <Link href="/dashboard" className="flex items-center gap-3 group">
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-xl bg-esdm-gradient flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
-                    <svg
-                      className="w-6 h-6 text-amber-400"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z" />
-                    </svg>
-                  </div>
+                  <Image
+                    src="/logo-esdm.png"
+                    alt="Logo ESDM"
+                    width={40}
+                    height={40}
+                    className="w-10 h-10 object-contain drop-shadow-md transition-transform group-hover:scale-105"
+                  />
                   <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white" />
                 </div>
                 <div className="block">
                   <h1 className="text-lg font-bold text-slate-900 tracking-tight">
-                    PJUTS <span className="text-primary-600">ESDM</span>
+                    PJUTS <span className="text-amber-400">ESDM</span>
                   </h1>
                   <p className="text-[10px] text-slate-500 -mt-0.5">
                     Sistem Monitoring Terpadu
