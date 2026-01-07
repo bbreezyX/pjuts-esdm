@@ -258,7 +258,7 @@ export function Navbar({ user }: NavbarProps) {
           />
           <div className="fixed top-20 left-1/2 -translate-x-1/2 w-full max-w-xl mx-4">
             <div className="bg-white rounded-xl shadow-2xl overflow-hidden animate-fade-in">
-              <div className="flex items-center gap-3 p-4 border-b">
+              <div className="flex items-center gap-3 p-4">
                 <Search className="w-5 h-5 text-slate-400" />
                 <input
                   type="text"

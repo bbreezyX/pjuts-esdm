@@ -9,6 +9,13 @@ import {
   ToastViewport,
 } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
+import {
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Info,
+  AlertCircle
+} from "lucide-react"
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -16,13 +23,33 @@ export function Toaster() {
   return (
     <ToastProvider>
       {toasts.map(function ({ id, title, description, action, ...props }) {
+        const variant = props.variant || "default"
+
         return (
           <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
+            <div className="flex gap-3 items-start">
+              {variant === "success" && (
+                <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
               )}
+              {variant === "warning" && (
+                <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+              )}
+              {variant === "destructive" && (
+                <XCircle className="h-5 w-5 mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
+              )}
+              {variant === "info" && (
+                <Info className="h-5 w-5 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+              )}
+              {variant === "default" && (
+                <AlertCircle className="h-5 w-5 mt-0.5 shrink-0 text-slate-500 opacity-0 w-0 h-0 hidden" />
+              )}
+
+              <div className="grid gap-1">
+                {title && <ToastTitle>{title}</ToastTitle>}
+                {description && (
+                  <ToastDescription>{description}</ToastDescription>
+                )}
+              </div>
             </div>
             {action}
             <ToastClose />

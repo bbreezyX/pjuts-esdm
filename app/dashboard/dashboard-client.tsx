@@ -11,7 +11,6 @@ import {
   Clock,
   TrendingUp,
   MapPin,
-  Download,
   ChevronRight,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout";
@@ -22,6 +21,7 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DashboardStats, ProvinceStats } from "@/app/actions/dashboard";
+import { ExportDashboardButton } from "./export-button";
 
 interface DashboardClientProps {
   stats: DashboardStats | undefined;
@@ -47,10 +47,7 @@ export function DashboardClient({
         title="Dashboard"
         description="Pantau status PJUTS secara real-time di seluruh Indonesia"
       >
-        <Button variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-2" />
-          Export
-        </Button>
+        <ExportDashboardButton stats={stats} provinces={provinces} />
         <Link href="/report/new">
           <Button size="sm">
             <FileBarChart className="h-4 w-4 mr-2" />

@@ -4,9 +4,10 @@ import { getReports } from "@/app/actions/reports";
 import { getProvinces } from "@/app/actions/units";
 import { AppShell, PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Download, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { ReportsPageClient } from "./reports-client";
+import { ExportReportsButton } from "./export-button";
 
 interface SearchParams {
   page?: string;
@@ -60,10 +61,11 @@ export default async function ReportsPage({
         title="Laporan"
         description="Kelola dan pantau semua laporan petugas lapangan"
       >
-        <Button variant="outline" size="sm">
-          <Download className="h-4 w-4 mr-2" />
-          Export Excel
-        </Button>
+        <ExportReportsButton
+          province={province}
+          startDate={startDate}
+          endDate={endDate}
+        />
         <Link href="/report/new">
           <Button size="sm">
             <Plus className="h-4 w-4 mr-2" />
