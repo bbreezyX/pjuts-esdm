@@ -53,7 +53,7 @@ export default function LoginPage() {
               <Lightbulb className="w-7 h-7 text-amber-400" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-black">
+              <h1 className="text-xl font-bold text-white">
                 PJUTS <span className="text-amber-400">ESDM</span>
               </h1>
               <p className="text-xs text-blue-200">Kementerian ESDM RI</p>
@@ -105,14 +105,14 @@ export default function LoginPage() {
                 <Lightbulb className="w-7 h-7 text-amber-400" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-900 text-black">PJUTS ESDM</h1>
+                <h1 className="text-xl font-bold text-primary-600">PJUTS ESDM</h1>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Kementerian ESDM RI</p>
               </div>
             </div>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 text-black">
+            <h2 className="text-2xl font-bold text-primary-600">
               Selamat Datang 👋
             </h2>
             <p className="text-slate-500 dark:text-slate-400 mt-2">
