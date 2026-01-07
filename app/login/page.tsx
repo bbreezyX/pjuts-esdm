@@ -96,7 +96,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           {/* Mobile Header */}
           <div className="lg:hidden mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 text-primary-600 mb-6">
+            <Link href="/" className="inline-flex items-center gap-2 text-primary-600 dark:text-primary-400 mb-6">
               <ArrowLeft className="w-4 h-4" />
               <span className="text-sm font-medium">Kembali</span>
             </Link>
@@ -105,17 +105,17 @@ export default function LoginPage() {
                 <Lightbulb className="w-7 h-7 text-amber-400" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-slate-900">PJUTS ESDM</h1>
-                <p className="text-xs text-slate-500">Kementerian ESDM RI</p>
+                <h1 className="text-xl font-bold text-slate-900 dark:text-white">PJUTS ESDM</h1>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Kementerian ESDM RI</p>
               </div>
             </div>
           </div>
 
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
               Selamat Datang 👋
             </h2>
-            <p className="text-slate-500 mt-2">
+            <p className="text-slate-500 dark:text-slate-400 mt-2">
               Masuk ke akun Anda untuk melanjutkan
             </p>
           </div>

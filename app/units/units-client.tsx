@@ -286,7 +286,7 @@ export function UnitsPageClient({
                         </Badge>
                       </td>
                       <td>
-                        <code className="text-xs bg-slate-100 px-2 py-1 rounded">
+                        <code className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded">
                           {unit.latitude.toFixed(4)}, {unit.longitude.toFixed(4)}
                         </code>
                       </td>
