@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  AlertTriangle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -125,8 +126,8 @@ export function ReportsTable({
                           report.batteryVoltage >= 20
                             ? "success"
                             : report.batteryVoltage >= 10
-                            ? "warning"
-                            : "destructive"
+                              ? "warning"
+                              : "destructive"
                         }
                       >
                         {report.batteryVoltage}V
@@ -230,8 +231,8 @@ export function ReportsTable({
                         report.batteryVoltage >= 20
                           ? "success"
                           : report.batteryVoltage >= 10
-                          ? "warning"
-                          : "destructive"
+                            ? "warning"
+                            : "destructive"
                       }
                     >
                       {report.batteryVoltage}V
@@ -399,22 +400,33 @@ export function ReportsTable({
         open={!!deleteConfirm}
         onOpenChange={() => setDeleteConfirm(null)}
       >
-        <DialogContent>
+        <DialogContent className="w-[95vw] max-w-[425px] rounded-2xl sm:rounded-lg p-4 sm:p-6 gap-6">
           <DialogHeader>
-            <DialogTitle>Hapus Laporan</DialogTitle>
-            <DialogDescription>
-              Apakah Anda yakin ingin menghapus laporan ini? Tindakan ini tidak
-              dapat dibatalkan.
-            </DialogDescription>
+            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+              <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
+                <AlertTriangle className="h-6 w-6 text-red-600" />
+              </div>
+              <div className="space-y-1">
+                <DialogTitle className="text-red-600 text-lg sm:text-xl">Hapus Laporan</DialogTitle>
+                <DialogDescription className="text-sm sm:text-base">
+                  Apakah Anda yakin ingin menghapus laporan ini? Tindakan ini tidak dapat dibatalkan.
+                </DialogDescription>
+              </div>
+            </div>
           </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteConfirm(null)}>
+          <DialogFooter className="gap-2 sm:gap-2 flex-col-reverse sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={() => setDeleteConfirm(null)}
+              className="w-full sm:w-auto h-11 sm:h-10 text-base sm:text-sm rounded-xl sm:rounded-md"
+            >
               Batal
             </Button>
             <Button
               variant="destructive"
               onClick={handleDelete}
               loading={deleting}
+              className="w-full sm:w-auto h-11 sm:h-10 text-base sm:text-sm rounded-xl sm:rounded-md shadow-sm"
             >
               Hapus
             </Button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -116,6 +116,17 @@ export function UnitsPageClient({
     updateURL({ search: searchQuery || undefined });
   };
 
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      const currentSearch = searchParams.get("search") || "";
+      if (searchQuery !== currentSearch) {
+        handleSearch();
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery, searchParams]);
+
   const getStatusBadgeVariant = (status: UnitStatus) => {
     switch (status) {
       case "OPERATIONAL":
@@ -185,9 +196,9 @@ export function UnitsPageClient({
             />
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleSearch}>Cari</Button>
+
             <Button
-              variant={showFilters ? "secondary" : "outline"}
+              variant={showFilters ? "secondary" : "ghost"}
               onClick={() => setShowFilters(!showFilters)}
             >
               <Filter className="h-4 w-4 mr-2" />
@@ -425,19 +436,59 @@ export function UnitsPageClient({
                       {unit._count.reports} laporan
                     </span>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() =>
-                      window.open(
-                        `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
-                        "_blank"
-                      )
-                    }
-                  >
-                    <ExternalLink className="h-4 w-4 mr-1" />
-                    Maps
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        window.open(
+                          `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
+                          "_blank"
+                        )
+                      }
+                    >
+                      <ExternalLink className="h-4 w-4 mr-1" />
+                      Maps
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon-sm">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() =>
+                            window.open(
+                              `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
+                              "_blank"
+                            )
+                          }
+                        >
+                          <MapPin className="h-4 w-4 mr-2" />
+                          Lihat di Maps
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link href={`/report/new?unitId=${unit.id}`}>
+                            <FileText className="h-4 w-4 mr-2" />
+                            Buat Laporan
+                          </Link>
+                        </DropdownMenuItem>
+                        {isAdmin && (
+                          <>
+                            <DropdownMenuItem onClick={() => handleEdit(unit)}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Unit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(unit)}>
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Hapus
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
               </Card>
             ))
@@ -476,12 +527,12 @@ export function UnitsPageClient({
         )}
       </div>
 
-      <UnitDialog 
-        open={isUnitDialogOpen} 
-        onOpenChange={setIsUnitDialogOpen} 
-        unit={selectedUnit} 
+      <UnitDialog
+        open={isUnitDialogOpen}
+        onOpenChange={setIsUnitDialogOpen}
+        unit={selectedUnit}
       />
-      
+
       <DeleteUnitDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}

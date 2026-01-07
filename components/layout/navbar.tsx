@@ -28,6 +28,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Notifications } from "./notifications";
 import { cn } from "@/lib/utils";
 
 interface NavbarProps {
@@ -126,12 +127,7 @@ export function Navbar({ user }: NavbarProps) {
               </Button>
 
               {/* Notifications */}
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5 text-slate-500" />
-                <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  3
-                </span>
-              </Button>
+              <Notifications />
 
               {/* User Menu */}
               <DropdownMenu>
