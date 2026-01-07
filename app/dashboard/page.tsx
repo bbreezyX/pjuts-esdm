@@ -41,7 +41,10 @@ export default async function DashboardPage() {
           id: a.id,
           type: a.type,
           description: a.description,
-          timestamp: a.timestamp.toISOString(),
+          // Handle both Date objects and strings (from cache)
+          timestamp: typeof a.timestamp === 'string'
+            ? a.timestamp
+            : a.timestamp.toISOString(),
           user: a.user,
           province: a.province,
         }))}
