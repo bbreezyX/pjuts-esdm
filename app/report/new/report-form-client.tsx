@@ -35,6 +35,54 @@ import { PjutsUnitData } from "@/app/actions/units";
 import { submitReport } from "@/app/actions/reports";
 import { cn } from "@/lib/utils";
 
+// --- HELPER KOMPRESI GAMBAR ---
+const compressImage = async (file: File): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = document.createElement('img');
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        
+        // REKOMENDASI: Balanced HD (Max 1600px)
+        const MAX_WIDTH = 1600; 
+        const scaleSize = MAX_WIDTH / img.width;
+        
+        if (scaleSize >= 1) {
+            canvas.width = img.width;
+            canvas.height = img.height;
+        } else {
+            canvas.width = MAX_WIDTH;
+            canvas.height = img.height * scaleSize;
+        }
+
+        const ctx = canvas.getContext('2d');
+        ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        // REKOMENDASI: JPEG Quality 80% (0.8)
+        canvas.toBlob((blob) => {
+          if (blob) {
+            // Ganti ekstensi ke .jpg
+            const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+            const newFile = new File([blob], newFileName, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(newFile);
+          } else {
+            reject(new Error('Gagal kompresi gambar'));
+          }
+        }, 'image/jpeg', 0.8); 
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+// ------------------------------
+
 interface ReportFormClientProps {
   units: PjutsUnitData[];
   preselectedUnitId?: string;
@@ -176,13 +224,27 @@ export function ReportFormClient({
     setSubmitResult(null);
 
     try {
+      // 1. KOMPRESI GAMBAR SEBELUM UPLOAD
+      let imageToUpload = formData.image;
+      
+      // Jika file > 1MB, lakukan kompresi
+      if (imageToUpload.size > 1024 * 1024) {
+          try {
+             // console.log("Mengompresi gambar...", (imageToUpload.size / 1024 / 1024).toFixed(2), "MB");
+             imageToUpload = await compressImage(imageToUpload);
+             // console.log("Hasil kompresi:", (imageToUpload.size / 1024 / 1024).toFixed(2), "MB");
+          } catch (error) {
+             console.error("Gagal mengompresi gambar, menggunakan file asli", error);
+          }
+      }
+
       const fd = new FormData();
       fd.append("unitId", formData.unitId);
       fd.append("latitude", formData.latitude.toString());
       fd.append("longitude", formData.longitude.toString());
       fd.append("batteryVoltage", formData.batteryVoltage);
       fd.append("notes", formData.notes);
-      fd.append("image", formData.image);
+      fd.append("image", imageToUpload); // Gunakan file hasil kompresi
 
       const result = await submitReport(fd);
 
@@ -214,7 +276,7 @@ export function ReportFormClient({
   const progressValue = (currentStep / 4) * 100;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200 safe-area-pt">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
@@ -235,7 +297,7 @@ export function ReportFormClient({
       </header>
 
       {/* Step Indicators */}
-      <div className="max-w-lg mx-auto px-4 py-4">
+      <div className="max-w-lg mx-auto px-4 py-4 w-full">
         <div className="flex items-center justify-between">
           {steps.map((step, index) => {
             const Icon = step.icon;
@@ -275,7 +337,7 @@ export function ReportFormClient({
       </div>
 
       {/* Form Content */}
-      <div className="max-w-lg mx-auto px-4 pb-24">
+      <div className="max-w-lg mx-auto px-4 pb-32 flex-grow w-full">
         {/* Step 1: Select Unit */}
         {currentStep === 1 && (
           <div className="space-y-4 animate-fade-in">
@@ -621,14 +683,14 @@ export function ReportFormClient({
         )}
       </div>
 
-      {/* Fixed Bottom Navigation */}
+      {/* Fixed Bottom Navigation - Improved UI/UX */}
       {!submitResult && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 safe-area-pb">
-          <div className="max-w-lg mx-auto px-4 py-4 flex gap-3">
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] safe-area-pb">
+          <div className="max-w-lg mx-auto px-4 py-3 flex gap-3">
             {currentStep > 1 && (
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 border-slate-300 text-slate-700 hover:bg-slate-50 active:scale-[0.98] transition-all"
                 onClick={() => setCurrentStep((s) => (s - 1) as Step)}
                 disabled={isSubmitting}
               >
@@ -638,7 +700,7 @@ export function ReportFormClient({
             )}
             {currentStep < 4 ? (
               <Button
-                className="flex-1"
+                className="flex-1 bg-primary-600 hover:bg-primary-700 text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all"
                 onClick={() => setCurrentStep((s) => (s + 1) as Step)}
                 disabled={!canProceed()}
               >
@@ -647,7 +709,7 @@ export function ReportFormClient({
               </Button>
             ) : (
               <Button
-                className="flex-1"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all"
                 onClick={handleSubmit}
                 loading={isSubmitting}
                 disabled={isSubmitting}
@@ -661,4 +723,3 @@ export function ReportFormClient({
     </div>
   );
 }
-
