@@ -50,6 +50,11 @@ export function Navbar({ user }: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
 
+  const handleLogout = async () => {
+    await signOut({ redirect: false });
+    window.location.href = "/login";
+  };
+
   return (
     <>
       {/* Desktop Navbar */}
@@ -165,7 +170,7 @@ export function Navbar({ user }: NavbarProps) {
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     className="text-red-600 focus:text-red-600 cursor-pointer"
-                    onClick={() => signOut({ callbackUrl: "/login" })}
+                    onClick={handleLogout}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
                     Keluar
@@ -229,7 +234,7 @@ export function Navbar({ user }: NavbarProps) {
             </nav>
             <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
               <button
-                onClick={() => signOut({ callbackUrl: "/login" })}
+                onClick={handleLogout}
                 className="flex w-full items-center gap-2 text-red-600 font-medium"
               >
                 <LogOut className="w-5 h-5" />
