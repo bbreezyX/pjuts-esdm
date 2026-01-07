@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   Map,
@@ -162,14 +163,12 @@ export function Navbar({ user }: NavbarProps) {
                     Profil Saya
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link
-                      href="/api/auth/signout"
-                      className="text-red-600 focus:text-red-600"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Keluar
-                    </Link>
+                  <DropdownMenuItem
+                    className="text-red-600 focus:text-red-600 cursor-pointer"
+                    onClick={() => signOut({ callbackUrl: "/login" })}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Keluar
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -229,13 +228,13 @@ export function Navbar({ user }: NavbarProps) {
               })}
             </nav>
             <div className="absolute bottom-0 left-0 right-0 p-4 border-t">
-              <Link
-                href="/api/auth/signout"
-                className="flex items-center gap-2 text-red-600 font-medium"
+              <button
+                onClick={() => signOut({ callbackUrl: "/login" })}
+                className="flex w-full items-center gap-2 text-red-600 font-medium"
               >
                 <LogOut className="w-5 h-5" />
                 Keluar
-              </Link>
+              </button>
             </div>
           </div>
         </div>
