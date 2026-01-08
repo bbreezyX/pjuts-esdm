@@ -26,19 +26,32 @@ export interface UserData {
   createdAt: Date;
 }
 
+// Strong password requirements:
+// - Minimum 8 characters
+// - At least one uppercase letter
+// - At least one lowercase letter
+// - At least one number
+const passwordSchema = z
+  .string()
+  .min(8, "Password minimal 8 karakter")
+  .regex(/[a-z]/, "Password harus mengandung huruf kecil")
+  .regex(/[A-Z]/, "Password harus mengandung huruf besar")
+  .regex(/[0-9]/, "Password harus mengandung angka");
+
 const createUserSchema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter"),
   email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
+  password: passwordSchema,
   role: z.nativeEnum(Role),
 });
 
 const updateUserSchema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter"),
   email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter").optional().or(z.literal("")),
+  password: passwordSchema.optional().or(z.literal("")),
   role: z.nativeEnum(Role),
 });
+
 
 // ============================================
 // GET USERS
@@ -160,7 +173,7 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
     const { name, email, password, role } = validation.data;
 
     const dataToUpdate: any = { name, email, role };
-    if (password && password.length >= 6) {
+    if (password && password.length >= 8) {
       dataToUpdate.password = await bcrypt.hash(password, 12);
     }
 
@@ -196,7 +209,7 @@ export async function deleteUser(userId: string): Promise<ActionResult> {
     }
 
     if (session.user.id === userId) {
-        return { success: false, error: "Tidak dapat menghapus akun sendiri" };
+      return { success: false, error: "Tidak dapat menghapus akun sendiri" };
     }
 
     await prisma.user.delete({ where: { id: userId } });

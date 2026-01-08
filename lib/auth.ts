@@ -3,12 +3,29 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import prisma from "./db";
+import {
+  checkRateLimit,
+  incrementRateLimit,
+  resetRateLimit,
+  getLoginRateLimitKey,
+} from "./rate-limit";
+
+// Password requirements for enhanced security
+// - Minimum 8 characters
+// - At least one uppercase letter
+// - At least one lowercase letter  
+// - At least one number
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 // Validation schema for sign in
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
+
+// Dummy hash for timing attack prevention
+// Pre-computed bcrypt hash of a random string
+const DUMMY_HASH = "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.E/XxH1d.sXuCGG";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
@@ -23,6 +40,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Validate credentials with Zod
           const { email, password } = await signInSchema.parseAsync(credentials);
 
+          // Check rate limit before processing
+          const rateLimitKey = getLoginRateLimitKey(email);
+          const rateLimitCheck = checkRateLimit(rateLimitKey);
+
+          if (!rateLimitCheck.success) {
+            console.warn(`Rate limit exceeded for: ${email}`);
+            // Still run bcrypt to prevent timing attacks
+            await bcrypt.compare(password, DUMMY_HASH);
+            return null;
+          }
+
           // Find user in database
           const user = await prisma.user.findUnique({
             where: { email },
@@ -35,16 +63,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
           });
 
-          if (!user) {
+          // TIMING ATTACK PREVENTION:
+          // Always compare password hash, even if user doesn't exist
+          // This ensures consistent response time regardless of user existence
+          const passwordToCompare = user?.password ?? DUMMY_HASH;
+          const isValidPassword = await bcrypt.compare(password, passwordToCompare);
+
+          if (!user || !isValidPassword) {
+            // Increment rate limit counter on failed attempt
+            incrementRateLimit(rateLimitKey);
             return null;
           }
 
-          // Verify password
-          const isValidPassword = await bcrypt.compare(password, user.password);
-
-          if (!isValidPassword) {
-            return null;
-          }
+          // Reset rate limit on successful login
+          resetRateLimit(rateLimitKey);
 
           // Return user object (password excluded)
           return {

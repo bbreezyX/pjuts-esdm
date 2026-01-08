@@ -24,27 +24,54 @@ const nextConfig: NextConfig = {
     // Enable optimistic client cache for faster navigation
     optimisticClientCache: true,
   },
-  // Security headers
+  // Enhanced Security headers
   async headers() {
     return [
       {
         source: "/(.*)",
         headers: [
+          // Prevent clickjacking
           {
             key: "X-Frame-Options",
             value: "DENY",
           },
+          // Prevent MIME type sniffing
           {
             key: "X-Content-Type-Options",
             value: "nosniff",
           },
+          // Control referrer information
           {
             key: "Referrer-Policy",
             value: "strict-origin-when-cross-origin",
           },
+          // Restrict browser features
           {
             key: "Permissions-Policy",
             value: "camera=(self), microphone=(), geolocation=(self)",
+          },
+          // XSS Protection (legacy browsers)
+          {
+            key: "X-XSS-Protection",
+            value: "1; mode=block",
+          },
+          // HSTS - Force HTTPS (enable in production)
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains",
+          },
+          // Content Security Policy
+          {
+            key: "Content-Security-Policy",
+            value: [
+              "default-src 'self'",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Required for Next.js
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "font-src 'self' https://fonts.gstatic.com",
+              "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org",
+              "connect-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com",
+              "frame-ancestors 'none'",
+            ].join("; "),
           },
         ],
       },
