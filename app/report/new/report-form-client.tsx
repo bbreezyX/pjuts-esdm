@@ -526,9 +526,15 @@ export function ReportFormClient({
                     </Button>
                   </div>
                 ) : formData.latitude && formData.longitude ? (
-                  <code className="text-sm text-slate-600">
-                    {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
-                  </code>
+                  <div className="flex items-center justify-between">
+                    <code className="text-sm text-slate-600">
+                      {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                    </code>
+                    <Button variant="ghost" size="sm" onClick={getLocation}>
+                      <RefreshCw className="h-4 w-4 mr-1" />
+                      Perbarui
+                    </Button>
+                  </div>
                 ) : (
                   <Button variant="outline" size="sm" onClick={getLocation}>
                     <MapPin className="h-4 w-4 mr-2" />
