@@ -316,11 +316,14 @@ export function UnitsPageClient({
                             <p className="font-medium text-slate-900">
                               {unit.serialNumber}
                             </p>
-                            {unit.installDate && (
-                              <p className="text-xs text-slate-500">
-                                Dipasang: {formatDate(unit.installDate)}
-                              </p>
-                            )}
+                            <p className="text-xs text-slate-500">
+                              {unit.installDate 
+                                ? `Dipasang: ${formatDate(unit.installDate)}`
+                                : unit.lastStatus === "UNVERIFIED"
+                                  ? "Belum diverifikasi"
+                                  : "Tanggal tidak tersedia"
+                              }
+                            </p>
                           </div>
                         </div>
                       </td>
