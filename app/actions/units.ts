@@ -3,8 +3,7 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { createPjutsUnitSchema, type CreatePjutsUnitInput } from "@/lib/validations";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { CacheTags } from "@/lib/cache";
+import { revalidatePath } from "next/cache";
 import { UnitStatus } from "@prisma/client";
 
 // ============================================
@@ -110,7 +109,6 @@ export async function createPjutsUnit(
     revalidatePath("/dashboard");
     revalidatePath("/units");
     revalidatePath("/map");
-    revalidateTag(CacheTags.MAP_POINTS);
 
     return {
       success: true,
@@ -270,7 +268,6 @@ export async function updatePjutsUnit(
     revalidatePath("/dashboard");
     revalidatePath("/units");
     revalidatePath("/map");
-    revalidateTag(CacheTags.MAP_POINTS);
 
     return {
       success: true,
@@ -337,7 +334,6 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
     revalidatePath("/dashboard");
     revalidatePath("/units");
     revalidatePath("/map");
-    revalidateTag(CacheTags.MAP_POINTS);
 
     return { success: true };
   } catch (error) {
