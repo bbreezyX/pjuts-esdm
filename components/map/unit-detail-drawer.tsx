@@ -302,20 +302,29 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                           <div className="bg-white hover:border-primary-200 rounded-3xl p-4 hover:shadow-sm transition-all group-hover:-translate-y-0.5 duration-300">
                             <div className="flex gap-4">
                               {/* Image Thumbnail */}
-                              <div
-                                className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 cursor-pointer bg-slate-100 group/image"
-                                onClick={() => setSelectedImage(report.imageUrl)}
-                              >
-                                <Image
-                                  src={report.imageUrl}
-                                  alt="Report"
-                                  fill
-                                  className="object-cover transition-transform duration-500 group-hover/image:scale-110"
-                                />
-                                <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover/image:opacity-100">
-                                  <ExternalLink className="w-5 h-5 text-white drop-shadow-md" />
+                              {report.imageUrl ? (
+                                <div
+                                  className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 cursor-pointer bg-slate-100 group/image"
+                                  onClick={() => setSelectedImage(report.imageUrl)}
+                                >
+                                  <Image
+                                    src={report.imageUrl}
+                                    alt="Report"
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover/image:scale-110"
+                                  />
+                                  <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover/image:opacity-100">
+                                    <ExternalLink className="w-5 h-5 text-white drop-shadow-md" />
+                                  </div>
                                 </div>
-                              </div>
+                              ) : (
+                                <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
+                                  <div className="text-center text-slate-400">
+                                    <Calendar className="w-6 h-6 mx-auto mb-1" />
+                                    <span className="text-[10px]">Tanpa Foto</span>
+                                  </div>
+                                </div>
+                              )}
 
                               {/* Details */}
                               <div className="flex-1 min-w-0 py-1">
@@ -366,7 +375,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
       </div>
 
       {/* Image Lightbox */}
-      {selectedImage && (
+      {selectedImage && selectedImage.length > 0 && (
         <div
           className="fixed inset-0 bg-black/95 backdrop-blur-sm z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setSelectedImage(null)}

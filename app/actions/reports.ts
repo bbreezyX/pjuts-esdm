@@ -4,7 +4,8 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
 import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { CacheTags } from "@/lib/cache";
 import { UnitStatus } from "@prisma/client";
 
 // ============================================
@@ -225,12 +226,13 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
       newStatus = UnitStatus.MAINTENANCE_NEEDED;
     }
 
+    // Only update the unit's status, NOT the coordinates
+    // PJUTS units are fixed installations - their location shouldn't change
+    // The report stores the reporter's GPS location separately for verification
     await prisma.pjutsUnit.update({
       where: { id: validatedData.unitId },
       data: {
         lastStatus: newStatus,
-        latitude: validatedData.latitude,
-        longitude: validatedData.longitude
       },
     });
 
@@ -239,6 +241,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     revalidatePath("/reports");
     revalidatePath("/units");
     revalidatePath("/map");
+    revalidateTag(CacheTags.MAP_POINTS);
 
     // Format response to match ReportData interface
     const reportData: ReportData = {

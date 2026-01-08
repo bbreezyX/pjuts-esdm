@@ -42,6 +42,7 @@ export interface ActionResult<T> {
  * Internal function to fetch all map points (for caching)
  */
 async function fetchAllMapPoints(): Promise<MapPoint[]> {
+  console.log("[Map] Fetching all map points from database...");
   const units = await prisma.pjutsUnit.findMany({
     select: {
       id: true,
@@ -70,7 +71,7 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
     },
   });
 
-  return units.map((unit) => ({
+  const mapPoints = units.map((unit) => ({
     id: unit.id,
     serialNumber: unit.serialNumber,
     latitude: unit.latitude,
@@ -88,6 +89,9 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
       }
       : undefined,
   }));
+
+  console.log(`[Map] Fetched ${mapPoints.length} map points:`, mapPoints.map(p => `${p.serialNumber} (${p.latitude}, ${p.longitude})`));
+  return mapPoints;
 }
 
 // Cached version - refreshes every 5 minutes
@@ -126,6 +130,31 @@ export async function getMapPointsCached(): Promise<ActionResult<MapPoint[]>> {
 }
 
 /**
+ * Get all PJUTS units as map points (FRESH - no cache)
+ * Always fetches fresh data from the database
+ */
+export async function getMapPointsFresh(): Promise<ActionResult<MapPoint[]>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: "Authentication required",
+      };
+    }
+
+    const data = await fetchAllMapPoints();
+    return { success: true, data };
+  } catch (error) {
+    console.error("Get fresh map points error:", error);
+    return {
+      success: false,
+      error: "Failed to fetch map points",
+    };
+  }
+}
+
+/**
  * Get all PJUTS units as map points with optional bounds filtering
  * 
  * @param bounds - Optional map bounds to filter visible units
@@ -140,9 +169,9 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
       };
     }
 
-    // If no bounds, use cached version for better performance
+    // Always fetch fresh data to ensure accuracy
     if (!bounds) {
-      return getMapPointsCached();
+      return getMapPointsFresh();
     }
 
     // Build where clause for bounds filtering
