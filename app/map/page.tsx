@@ -15,14 +15,9 @@ export default async function MapPage() {
     redirect("/login");
   }
 
-  // Fetch map points and stats in parallel
-  const [pointsResult, statsResult] = await Promise.all([
-    getMapPoints(),
-    getDashboardStats(),
-  ]);
-
-  const points = pointsResult.data || [];
-  const stats = statsResult.data;
+  // Start fetching data - DO NOT AWAIT to enable streaming
+  const pointsPromise = getMapPoints();
+  const statsPromise = getDashboardStats();
 
   return (
     <AppShell
@@ -33,13 +28,8 @@ export default async function MapPage() {
       }}
     >
       <MapPageClient
-        initialPoints={points}
-        counts={{
-          operational: stats?.operationalUnits || 0,
-          maintenanceNeeded: stats?.maintenanceNeeded || 0,
-          offline: stats?.offlineUnits || 0,
-          unverified: stats?.unverifiedUnits || 0,
-        }}
+        pointsPromise={pointsPromise}
+        statsPromise={statsPromise}
       />
     </AppShell>
   );
