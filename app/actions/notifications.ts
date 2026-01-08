@@ -13,7 +13,7 @@ export type NotificationItem = {
     link?: string;
 };
 
-export async function getNotifications(): Promise<{ success: boolean; data: NotificationItem[]; lastRead?: Date }> {
+export async function getNotifications(limit: number = 10): Promise<{ success: boolean; data: NotificationItem[]; lastRead?: Date }> {
     try {
         const session = await auth();
         if (!session?.user?.id) {
@@ -42,13 +42,13 @@ export async function getNotifications(): Promise<{ success: boolean; data: Noti
                 regency: true,
                 updatedAt: true,
             },
-            take: 5,
+            take: Math.ceil(limit / 2),
             orderBy: { updatedAt: 'desc' }
         });
 
         // 2. Fetch Recent Reports (Info)
         const recentReports = await prisma.report.findMany({
-            take: 5,
+            take: Math.ceil(limit / 2),
             orderBy: { createdAt: 'desc' },
             include: {
                 user: {
@@ -95,7 +95,7 @@ export async function getNotifications(): Promise<{ success: boolean; data: Noti
 
         return {
             success: true,
-            data: notifications.slice(0, 10), // Limit total to 10
+            data: notifications.slice(0, limit), // Limit total to requested limit
             // @ts-ignore - Prisma client might be locked/stale in dev
             lastRead: user?.lastNotificationCheck ?? new Date(0),
         };

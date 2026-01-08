@@ -88,7 +88,7 @@ export function Notifications() {
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80 p-0" align="end">
+            <PopoverContent className="w-[min(20rem,calc(100vw-4rem))] p-0 fixed left-1/2 -translate-x-1/2 mr-[120px]" align="center" sideOffset={16}>
                 <div className="flex items-center justify-between p-4 border-b border-slate-100">
                     <h4 className="font-semibold text-sm text-slate-900">Notifikasi</h4>
                     {unreadCount > 0 && (
@@ -152,7 +152,14 @@ export function Notifications() {
                     )}
                 </ScrollArea>
                 <div className="p-2 border-t border-slate-100 bg-slate-50">
-                    <Button variant="ghost" className="w-full h-8 text-xs text-slate-500">
+                    <Button
+                        variant="ghost"
+                        className="w-full h-8 text-xs text-slate-500 hover:text-primary-600 hover:bg-slate-100"
+                        onClick={() => {
+                            setOpen(false);
+                            router.push("/notifications");
+                        }}
+                    >
                         Lihat Semua Notifikasi
                     </Button>
                 </div>
