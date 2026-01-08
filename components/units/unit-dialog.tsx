@@ -56,8 +56,8 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       serialNumber: "",
-      latitude: 0,
-      longitude: 0,
+      latitude: undefined,
+      longitude: undefined,
       province: "",
       regency: "",
       district: "",
@@ -84,8 +84,8 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
     } else {
       form.reset({
         serialNumber: "",
-        latitude: 0,
-        longitude: 0,
+        latitude: undefined,
+        longitude: undefined,
         province: "",
         regency: "",
         district: "",
@@ -103,14 +103,14 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
         // Update mode
         // Filter out serialNumber as it's not updatable
         const { serialNumber, ...updateData } = values;
-        
+
         // Ensure optional strings are undefined if empty strings, if backend expects that
         // But our schema says optional strings. updatePjutsUnit takes string | undefined.
         // We'll pass them as is, empty string is valid if we want to clear it?
         // Actually updatePjutsUnit type definition:
         // district?: string;
         // village?: string;
-        
+
         const result = await updatePjutsUnit(unit.id, updateData);
 
         if (result.success) {
@@ -183,10 +183,10 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                   <FormItem>
                     <FormLabel className="text-sm font-medium text-slate-700">Serial Number</FormLabel>
                     <FormControl>
-                      <Input 
-                        placeholder="PJUTS-XXX-000" 
-                        {...field} 
-                        disabled={isEdit || isSubmitting} 
+                      <Input
+                        placeholder="PJUTS-XXX-000"
+                        {...field}
+                        disabled={isEdit || isSubmitting}
                         className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                       />
                     </FormControl>
@@ -202,8 +202,8 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel className="text-sm font-medium text-slate-700">Status</FormLabel>
-                      <Select 
-                        onValueChange={field.onChange} 
+                      <Select
+                        onValueChange={field.onChange}
                         defaultValue={field.value}
                         disabled={isSubmitting}
                       >
@@ -226,51 +226,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="latitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">Latitude</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="any" 
-                        placeholder="-6.2088" 
-                        {...field}
-                        onChange={e => field.onChange(parseFloat(e.target.value))}
-                        disabled={isSubmitting}
-                        className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
-              <FormField
-                control={form.control}
-                name="longitude"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">Longitude</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="number" 
-                        step="any" 
-                        placeholder="106.8456" 
-                        {...field}
-                        onChange={e => field.onChange(parseFloat(e.target.value))}
-                        disabled={isSubmitting}
-                        className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
@@ -347,17 +303,17 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
             />
 
             <DialogFooter className="flex justify-end gap-3 pt-4">
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => onOpenChange(false)} 
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
                 disabled={isSubmitting}
                 className="bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
               >
                 Batal
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isSubmitting}
                 className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm"
               >

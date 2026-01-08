@@ -109,15 +109,29 @@ export function ReportsTable({
                     </td>
                     <td>
                       <div
-                        className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary-500"
+                        className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary-500 group"
                         onClick={() => setSelectedReport(report)}
                       >
                         <Image
-                          src={report.imageUrl}
+                          src={
+                            (report.images && report.images.length > 0
+                              ? report.images[0].url
+                              : report.imageUrl) || "/placeholder-image.jpg" // Fallback or handle empty
+                          }
                           alt="Report"
                           fill
                           className="object-cover"
                         />
+                        {report.images && report.images.length > 1 && (
+                          <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center transition-all">
+                            <span className="text-white text-[10px] font-bold">+{report.images.length - 1}</span>
+                          </div>
+                        )}
+                        {report.images && report.images.length > 1 && (
+                          <div className="absolute bottom-0 right-0 bg-black/50 px-1 py-0.5 rounded-tl-md group-hover:hidden">
+                            <span className="text-white text-[8px] font-medium leading-none block">+{report.images.length - 1}</span>
+                          </div>
+                        )}
                       </div>
                     </td>
                     <td className="text-center">
@@ -205,15 +219,24 @@ export function ReportsTable({
             >
               <div className="flex gap-3">
                 <div
-                  className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 cursor-pointer"
+                  className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all"
                   onClick={() => setSelectedReport(report)}
                 >
                   <Image
-                    src={report.imageUrl}
+                    src={
+                      (report.images && report.images.length > 0
+                        ? report.images[0].url
+                        : report.imageUrl) || "/placeholder-image.jpg"
+                    }
                     alt="Report"
                     fill
                     className="object-cover"
                   />
+                  {report.images && report.images.length > 1 && (
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center sm:hidden">
+                      <span className="text-white text-xs font-medium">+{report.images.length - 1}</span>
+                    </div>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between">
@@ -273,6 +296,26 @@ export function ReportsTable({
                   </div>
                 </div>
               </div>
+
+              {/* Additional Images for Mobile */}
+              {report.images && report.images.length > 1 && (
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
+                  {report.images.slice(1).map((img, idx) => (
+                    <div
+                      key={img.id}
+                      className="relative w-20 h-20 rounded-lg overflow-hidden shrink-0 cursor-pointer hover:ring-2 hover:ring-primary-500 transition-all border border-slate-100"
+                      onClick={() => setSelectedReport(report)}
+                    >
+                      <Image
+                        src={img.url}
+                        alt={`Report Additional ${idx + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </Card>
           ))
         )}
@@ -328,14 +371,42 @@ export function ReportsTable({
               </DialogHeader>
 
               <div className="grid gap-4">
-                {/* Image */}
-                <div className="relative w-full aspect-video rounded-lg overflow-hidden bg-slate-100">
-                  <Image
-                    src={selectedReport.imageUrl}
-                    alt="Report Image"
-                    fill
-                    className="object-contain"
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                  {selectedReport.images && selectedReport.images.length > 0 ? (
+                    selectedReport.images.map((img, idx) => (
+                      <div key={img.id} className="relative aspect-video rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                        <Image
+                          src={img.url}
+                          alt={`Report Image ${idx + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute bottom-1 right-1">
+                          <Button
+                            size="icon-sm"
+                            variant="secondary"
+                            className="bg-white/80 hover:bg-white h-6 w-6"
+                            onClick={() => window.open(img.url, "_blank")}
+                          >
+                            <Download className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  ) : selectedReport.imageUrl ? (
+                    <div className="relative aspect-video rounded-lg overflow-hidden bg-slate-100 border border-slate-200">
+                      <Image
+                        src={selectedReport.imageUrl}
+                        alt="Report Image"
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ) : (
+                    <div className="relative aspect-video rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
+                      <span className="text-slate-400 text-sm">Tidak ada gambar</span>
+                    </div>
+                  )}
                 </div>
 
                 {/* Details */}
@@ -382,13 +453,7 @@ export function ReportsTable({
                   <MapPin className="h-4 w-4 mr-2" />
                   Buka di Maps
                 </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => window.open(selectedReport.imageUrl, "_blank")}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Download Foto
-                </Button>
+                {/* Download button moved to individual images */}
               </DialogFooter>
             </>
           )}

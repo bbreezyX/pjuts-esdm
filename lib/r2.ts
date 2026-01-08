@@ -73,10 +73,11 @@ export interface ImageUploadOptions {
  */
 function generateFilePath(region: string, unitId: string): string {
   const timestamp = Date.now();
+  const random = Math.floor(Math.random() * 10000).toString().padStart(4, "0");
   const sanitizedRegion = region.toLowerCase().replace(/\s+/g, "-");
   const sanitizedUnitId = unitId.replace(/[^a-zA-Z0-9-]/g, "_");
 
-  return `reports/${sanitizedRegion}/${sanitizedUnitId}/${timestamp}.webp`;
+  return `reports/${sanitizedRegion}/${sanitizedUnitId}/${timestamp}-${random}.webp`;
 }
 
 /**

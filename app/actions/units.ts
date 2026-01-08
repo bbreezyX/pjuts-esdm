@@ -90,8 +90,8 @@ export async function createPjutsUnit(
     const unit = await prisma.pjutsUnit.create({
       data: {
         serialNumber: validatedData.serialNumber,
-        latitude: validatedData.latitude,
-        longitude: validatedData.longitude,
+        latitude: validatedData.latitude ?? 0,
+        longitude: validatedData.longitude ?? 0,
         province: validatedData.province,
         regency: validatedData.regency,
         district: validatedData.district,

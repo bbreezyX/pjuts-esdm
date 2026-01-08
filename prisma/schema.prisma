@@ -78,27 +78,37 @@ model PjutsUnit {
 // ============================================
 
 model Report {
-  id              String      @id @default(cuid())
+  id              String        @id @default(cuid())
   unitId          String
-  unit            PjutsUnit   @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  unit            PjutsUnit     @relation(fields: [unitId], references: [id], onDelete: Cascade)
   
-  // Image from R2
-  imageUrl        String
-  imagePath       String      // R2 path for deletion purposes
+  // Images (Relation to new table)
+  images          ReportImage[]
   
   // Field data
   batteryVoltage  Float
-  latitude        Float       // GPS location when report was made
+  latitude        Float         // GPS location when report was made
   longitude       Float
   notes           String?
   
   // Metadata
   submittedBy     String
-  user            User        @relation(fields: [submittedBy], references: [id], onDelete: Cascade)
-  createdAt       DateTime    @default(now())
+  user            User          @relation(fields: [submittedBy], references: [id], onDelete: Cascade)
+  createdAt       DateTime      @default(now())
 
   @@index([unitId])
   @@index([submittedBy])
   @@index([createdAt])
+}
+
+model ReportImage {
+  id        String   @id @default(cuid())
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  url       String
+  path      String   // R2 path
+  createdAt DateTime @default(now())
+
+  @@index([reportId])
 }
 

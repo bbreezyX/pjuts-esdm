@@ -21,7 +21,11 @@ export interface ActionResult<T = void> {
 export interface ReportData {
   id: string;
   unitId: string;
-  imageUrl: string;
+  imageUrl: string; // Maintain for backward compatibility (points to first image)
+  images: {
+    id: string;
+    url: string;
+  }[];
   batteryVoltage: number;
   latitude: number;
   longitude: number;
@@ -43,15 +47,7 @@ export interface ReportData {
 // ============================================
 
 /**
- * Submit a new field report with image upload to R2
- * 
- * @param formData - Multi-part form data containing:
- *   - unitId: The PJUTS unit being reported
- *   - latitude: GPS latitude from field device
- *   - longitude: GPS longitude from field device
- *   - batteryVoltage: Current battery voltage reading
- *   - notes: Optional notes from field worker
- *   - image: The captured photo file
+ * Submit a new field report with multiple image uploads to R2
  */
 export async function submitReport(formData: FormData): Promise<ActionResult<ReportData>> {
   try {
@@ -73,7 +69,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
       notes: formData.get("notes") as string | undefined,
     };
 
-    // 3. Validate with Zod schema (including geospatial bounds)
+    // 3. Validate with Zod schema
     const validationResult = submitReportSchema.safeParse(rawData);
     if (!validationResult.success) {
       return {
@@ -103,46 +99,82 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
       };
     }
 
-    // 5. Handle image upload
-    const imageFile = formData.get("image") as File | null;
-    if (!imageFile || imageFile.size === 0) {
+    // 5. Handle image uploads
+    // We expect "images" key to have multiple files, but for backward compat also check "image"
+    let imageFiles = formData.getAll("images") as File[];
+    if (imageFiles.length === 0) {
+      const singleImage = formData.get("image") as File | null;
+      if (singleImage) imageFiles = [singleImage];
+    }
+
+    if (imageFiles.length === 0) {
       return {
         success: false,
-        error: "Image is required. Please capture a photo.",
+        error: "At least one image is required.",
       };
     }
 
-    // Validate image type and size
+    if (imageFiles.length > 3) {
+      return {
+        success: false,
+        error: "Maximum 3 images allowed per report.",
+      };
+    }
+
+    // Filter out empty files
+    imageFiles = imageFiles.filter(f => f.size > 0);
+    if (imageFiles.length === 0) {
+      return {
+        success: false,
+        error: "Invalid image files.",
+      };
+    }
+
+    // Validate image types and sizes
     const validTypes = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
-    if (!validTypes.includes(imageFile.type)) {
-      return {
-        success: false,
-        error: "Invalid image type. Please use JPEG, PNG, or WebP.",
-      };
+    for (const file of imageFiles) {
+      if (!validTypes.includes(file.type)) {
+        return {
+          success: false,
+          error: `Invalid image type for ${file.name}. Please use JPEG, PNG, or WebP.`,
+        };
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        return {
+          success: false,
+          error: `Image ${file.name} too large. Maximum size is 10MB.`,
+        };
+      }
     }
 
-    if (imageFile.size > 10 * 1024 * 1024) {
+    // 6. Process and upload images to R2 in parallel
+    const uploadPromises = imageFiles.map(async (file) => {
+      const buffer = Buffer.from(await file.arrayBuffer());
+      const processedImage = await processImage(buffer);
+
+      return uploadReportImage(
+        processedImage,
+        "image/webp",
+        unit.province,
+        unit.serialNumber
+      );
+    });
+
+    const uploadResults = await Promise.all(uploadPromises);
+
+    // Check if any failed
+    const failedUpload = uploadResults.find(r => !r.success);
+    if (failedUpload) {
+      // Cleanup any successful uploads
+      await Promise.all(
+        uploadResults
+          .filter(r => r.success && r.path)
+          .map(r => deleteFromR2(r.path!))
+      );
+
       return {
         success: false,
-        error: "Image too large. Maximum size is 10MB.",
-      };
-    }
-
-    // 6. Process and upload image to R2
-    const imageBuffer = Buffer.from(await imageFile.arrayBuffer());
-    const processedImage = await processImage(imageBuffer);
-
-    const uploadResult = await uploadReportImage(
-      processedImage,
-      "image/webp",
-      unit.province,
-      unit.serialNumber
-    );
-
-    if (!uploadResult.success || !uploadResult.url || !uploadResult.path) {
-      return {
-        success: false,
-        error: uploadResult.error || "Failed to upload image. Please try again.",
+        error: failedUpload.error || "Failed to upload one or more images.",
       };
     }
 
@@ -150,13 +182,17 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     const report = await prisma.report.create({
       data: {
         unitId: validatedData.unitId,
-        imageUrl: uploadResult.url,
-        imagePath: uploadResult.path,
         batteryVoltage: validatedData.batteryVoltage,
         latitude: validatedData.latitude,
         longitude: validatedData.longitude,
         notes: validatedData.notes || null,
         submittedBy: session.user.id,
+        images: {
+          create: uploadResults.map(r => ({
+            url: r.url!,
+            path: r.path!
+          }))
+        }
       },
       include: {
         unit: {
@@ -172,6 +208,12 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
             email: true,
           },
         },
+        images: {
+          select: {
+            id: true,
+            url: true
+          }
+        }
       },
     });
 
@@ -185,17 +227,28 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
 
     await prisma.pjutsUnit.update({
       where: { id: validatedData.unitId },
-      data: { lastStatus: newStatus },
+      data: {
+        lastStatus: newStatus,
+        latitude: validatedData.latitude,
+        longitude: validatedData.longitude
+      },
     });
 
     // 9. Revalidate cached data
     revalidatePath("/dashboard");
     revalidatePath("/reports");
+    revalidatePath("/units");
     revalidatePath("/map");
+
+    // Format response to match ReportData interface
+    const reportData: ReportData = {
+      ...report,
+      imageUrl: report.images[0]?.url || "",
+    };
 
     return {
       success: true,
-      data: report as ReportData,
+      data: reportData,
     };
   } catch (error) {
     console.error("Submit report error:", error);
@@ -283,15 +336,27 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
               email: true,
             },
           },
+          images: {
+            select: {
+              id: true,
+              url: true
+            }
+          }
         },
       }),
       prisma.report.count({ where }),
     ]);
 
+    // Map to ReportData
+    const mappedReports: ReportData[] = reports.map(r => ({
+      ...r,
+      imageUrl: r.images[0]?.url || "",
+    }));
+
     return {
       success: true,
       data: {
-        reports: reports as ReportData[],
+        reports: mappedReports,
         total,
         page,
         totalPages: Math.ceil(total / limit),
@@ -328,10 +393,10 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
       };
     }
 
-    // Get report to find image path
+    // Get report to find image paths
     const report = await prisma.report.findUnique({
       where: { id: reportId },
-      select: { imagePath: true },
+      include: { images: true },
     });
 
     if (!report) {
@@ -341,10 +406,12 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
       };
     }
 
-    // Delete image from R2
-    await deleteFromR2(report.imagePath);
+    // Delete all images from R2
+    await Promise.all(
+      report.images.map(img => deleteFromR2(img.path))
+    );
 
-    // Delete report from database
+    // Delete report from database (Cascade will delete ReportImage records)
     await prisma.report.delete({
       where: { id: reportId },
     });

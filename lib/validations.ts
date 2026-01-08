@@ -58,11 +58,11 @@ export const submitReportSchema = z.object({
       required_error: "Unit ID is required",
     })
     .min(1, { message: "Unit ID cannot be empty" }),
-  
+
   latitude: latitudeSchema,
   longitude: longitudeSchema,
   batteryVoltage: batteryVoltageSchema,
-  
+
   notes: z
     .string()
     .max(1000, { message: "Notes cannot exceed 1000 characters" })
@@ -82,10 +82,10 @@ export const createPjutsUnitSchema = z.object({
     .regex(/^PJUTS-[A-Z]{3}-\d{3}$/, {
       message: "Serial number must follow format: PJUTS-XXX-000",
     }),
-  
-  latitude: latitudeSchema,
-  longitude: longitudeSchema,
-  
+
+  latitude: latitudeSchema.optional(),
+  longitude: longitudeSchema.optional(),
+
   province: z.string().min(1, { message: "Province is required" }),
   regency: z.string().min(1, { message: "Regency is required" }),
   district: z.string().optional(),
@@ -160,22 +160,22 @@ export function isWithinIndonesia(lat: number, lng: number): boolean {
   );
 }
 
-export function validateCoordinates(lat: unknown, lng: unknown): { 
-  valid: boolean; 
-  errors?: string[] 
+export function validateCoordinates(lat: unknown, lng: unknown): {
+  valid: boolean;
+  errors?: string[]
 } {
   const errors: string[] = [];
-  
+
   const latResult = latitudeSchema.safeParse(lat);
   const lngResult = longitudeSchema.safeParse(lng);
-  
+
   if (!latResult.success) {
     errors.push(...latResult.error.errors.map(e => e.message));
   }
   if (!lngResult.success) {
     errors.push(...lngResult.error.errors.map(e => e.message));
   }
-  
+
   return {
     valid: errors.length === 0,
     errors: errors.length > 0 ? errors : undefined,

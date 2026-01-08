@@ -17,6 +17,8 @@ import {
   AlertCircle,
   CheckCircle2,
   X,
+  Trash2,
+  Plus,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,17 +47,17 @@ const compressImage = async (file: File): Promise<File> => {
       img.src = event.target?.result as string;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        
+
         // REKOMENDASI: Balanced HD (Max 1600px)
-        const MAX_WIDTH = 1600; 
+        const MAX_WIDTH = 1600;
         const scaleSize = MAX_WIDTH / img.width;
-        
+
         if (scaleSize >= 1) {
-            canvas.width = img.width;
-            canvas.height = img.height;
+          canvas.width = img.width;
+          canvas.height = img.height;
         } else {
-            canvas.width = MAX_WIDTH;
-            canvas.height = img.height * scaleSize;
+          canvas.width = MAX_WIDTH;
+          canvas.height = img.height * scaleSize;
         }
 
         const ctx = canvas.getContext('2d');
@@ -74,7 +76,7 @@ const compressImage = async (file: File): Promise<File> => {
           } else {
             reject(new Error('Gagal kompresi gambar'));
           }
-        }, 'image/jpeg', 0.8); 
+        }, 'image/jpeg', 0.8);
       };
       img.onerror = (err) => reject(err);
     };
@@ -95,8 +97,8 @@ interface FormData {
   unitId: string;
   latitude: number | null;
   longitude: number | null;
-  image: File | null;
-  imagePreview: string | null;
+  images: File[];
+  imagePreviews: string[];
   batteryVoltage: string;
   notes: string;
 }
@@ -129,8 +131,8 @@ export function ReportFormClient({
     unitId: preselectedUnitId || "",
     latitude: null,
     longitude: null,
-    image: null,
-    imagePreview: null,
+    images: [],
+    imagePreviews: [],
     batteryVoltage: "",
     notes: "",
   });
@@ -191,13 +193,42 @@ export function ReportFormClient({
   const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      if (formData.images.length >= 3) {
+        alert("Maksimal 3 foto per laporan.");
+        return;
+      }
+
       const preview = URL.createObjectURL(file);
       setFormData((prev) => ({
         ...prev,
-        image: file,
-        imagePreview: preview,
+        images: [...prev.images, file],
+        imagePreviews: [...prev.imagePreviews, preview],
       }));
+
+      // Reset input value so same file can be selected again if needed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
+  };
+
+  const removeImage = (index: number) => {
+    setFormData((prev) => {
+      const newImages = [...prev.images];
+      const newPreviews = [...prev.imagePreviews];
+
+      // Revoke object URL to avoid memory leaks
+      URL.revokeObjectURL(newPreviews[index]);
+
+      newImages.splice(index, 1);
+      newPreviews.splice(index, 1);
+
+      return {
+        ...prev,
+        images: newImages,
+        imagePreviews: newPreviews,
+      };
+    });
   };
 
   // Validate current step
@@ -206,7 +237,7 @@ export function ReportFormClient({
       case 1:
         return !!formData.unitId;
       case 2:
-        return !!formData.image && formData.latitude !== null && formData.longitude !== null;
+        return formData.images.length > 0 && formData.latitude !== null && formData.longitude !== null;
       case 3:
         return !!formData.batteryVoltage && parseFloat(formData.batteryVoltage) > 0;
       default:
@@ -216,7 +247,7 @@ export function ReportFormClient({
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (!selectedUnit || !formData.image || formData.latitude === null || formData.longitude === null) {
+    if (!selectedUnit || formData.images.length === 0 || formData.latitude === null || formData.longitude === null) {
       return;
     }
 
@@ -224,27 +255,28 @@ export function ReportFormClient({
     setSubmitResult(null);
 
     try {
-      // 1. KOMPRESI GAMBAR SEBELUM UPLOAD
-      let imageToUpload = formData.image;
-      
-      // Jika file > 1MB, lakukan kompresi
-      if (imageToUpload.size > 1024 * 1024) {
-          try {
-             // console.log("Mengompresi gambar...", (imageToUpload.size / 1024 / 1024).toFixed(2), "MB");
-             imageToUpload = await compressImage(imageToUpload);
-             // console.log("Hasil kompresi:", (imageToUpload.size / 1024 / 1024).toFixed(2), "MB");
-          } catch (error) {
-             console.error("Gagal mengompresi gambar, menggunakan file asli", error);
-          }
-      }
-
       const fd = new FormData();
       fd.append("unitId", formData.unitId);
       fd.append("latitude", formData.latitude.toString());
       fd.append("longitude", formData.longitude.toString());
       fd.append("batteryVoltage", formData.batteryVoltage);
       fd.append("notes", formData.notes);
-      fd.append("image", imageToUpload); // Gunakan file hasil kompresi
+
+      // 1. KOMPRESI GAMBAR SEBELUM UPLOAD
+      for (const file of formData.images) {
+        let imageToUpload = file;
+
+        // Jika file > 1MB, lakukan kompresi
+        if (imageToUpload.size > 1024 * 1024) {
+          try {
+            imageToUpload = await compressImage(imageToUpload);
+          } catch (error) {
+            console.error("Gagal mengompresi gambar, menggunakan file asli", error);
+          }
+        }
+
+        fd.append("images", imageToUpload);
+      }
 
       const result = await submitReport(fd);
 
@@ -312,8 +344,8 @@ export function ReportFormClient({
                     isCompleted
                       ? "bg-emerald-500 text-white"
                       : isCurrent
-                      ? "bg-primary-600 text-white"
-                      : "bg-slate-200 text-slate-500"
+                        ? "bg-primary-600 text-white"
+                        : "bg-slate-200 text-slate-500"
                   )}
                 >
                   {isCompleted ? (
@@ -400,9 +432,14 @@ export function ReportFormClient({
         {currentStep === 2 && (
           <div className="space-y-4 animate-fade-in">
             <Card className="p-4">
-              <h2 className="text-lg font-semibold text-slate-900 mb-4">
-                Ambil Foto Unit
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold text-slate-900">
+                  Ambil Foto Unit
+                </h2>
+                <Badge variant="outline">
+                  {formData.images.length}/3 Foto
+                </Badge>
+              </div>
 
               <input
                 ref={fileInputRef}
@@ -413,41 +450,49 @@ export function ReportFormClient({
                 className="hidden"
               />
 
-              {formData.imagePreview ? (
-                <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
-                  <Image
-                    src={formData.imagePreview}
-                    alt="Captured"
-                    fill
-                    className="object-cover"
-                  />
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    className="absolute bottom-2 right-2"
+              {/* Image Grid */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {formData.imagePreviews.map((preview, idx) => (
+                  <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 shadow-sm group">
+                    <Image
+                      src={preview}
+                      alt={`Foto ${idx + 1}`}
+                      fill
+                      className="object-cover"
+                    />
+                    <button
+                      onClick={() => removeImage(idx)}
+                      className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-80 hover:opacity-100 transition-opacity"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-2 py-1">
+                      Foto {idx + 1}
+                    </div>
+                  </div>
+                ))}
+
+                {/* Add Button */}
+                {formData.images.length < 3 && (
+                  <button
                     onClick={() => fileInputRef.current?.click()}
+                    className="aspect-video rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 hover:border-primary-300 transition-colors"
                   >
-                    <RefreshCw className="h-4 w-4 mr-1" />
-                    Ganti
-                  </Button>
+                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                      <Plus className="h-5 w-5 text-primary-600" />
+                    </div>
+                    <span className="text-xs font-medium text-slate-600">
+                      Tambah ({3 - formData.images.length})
+                    </span>
+                  </button>
+                )}
+              </div>
+
+              {formData.images.length === 0 && (
+                <div className="text-center p-4 bg-slate-50 rounded-lg border border-slate-100 mb-4">
+                  <Camera className="h-8 w-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-sm text-slate-500">Belum ada foto diambil.</p>
                 </div>
-              ) : (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full aspect-video rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center gap-3 hover:bg-slate-100 hover:border-primary-300 transition-colors"
-                >
-                  <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center">
-                    <Camera className="h-8 w-8 text-primary-600" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-medium text-slate-700">
-                      Ketuk untuk mengambil foto
-                    </p>
-                    <p className="text-sm text-slate-500">
-                      Gunakan kamera untuk foto langsung
-                    </p>
-                  </div>
-                </button>
               )}
 
               {/* Location */}
@@ -617,17 +662,19 @@ export function ReportFormClient({
                   Konfirmasi Laporan
                 </h2>
 
-                {/* Preview Image */}
-                {formData.imagePreview && (
-                  <div className="relative aspect-video rounded-lg overflow-hidden mb-4">
-                    <Image
-                      src={formData.imagePreview}
-                      alt="Preview"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                )}
+                {/* Preview Images Grid */}
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  {formData.imagePreviews.map((preview, idx) => (
+                    <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-slate-200">
+                      <Image
+                        src={preview}
+                        alt={`Preview ${idx}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  ))}
+                </div>
 
                 {/* Summary */}
                 <div className="space-y-3">
@@ -657,8 +704,8 @@ export function ReportFormClient({
                         parseFloat(formData.batteryVoltage) >= 20
                           ? "success"
                           : parseFloat(formData.batteryVoltage) >= 10
-                          ? "warning"
-                          : "destructive"
+                            ? "warning"
+                            : "destructive"
                       }
                     >
                       {formData.batteryVoltage}V

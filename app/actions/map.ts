@@ -56,7 +56,10 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
         orderBy: { createdAt: "desc" },
         select: {
           id: true,
-          imageUrl: true,
+          images: {
+            take: 1,
+            select: { url: true }
+          },
           batteryVoltage: true,
           createdAt: true,
           user: {
@@ -78,7 +81,7 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
     lastReport: unit.reports[0]
       ? {
         id: unit.reports[0].id,
-        imageUrl: unit.reports[0].imageUrl,
+        imageUrl: unit.reports[0].images[0]?.url || "",
         batteryVoltage: unit.reports[0].batteryVoltage,
         createdAt: unit.reports[0].createdAt,
         user: unit.reports[0].user.name,
@@ -181,7 +184,10 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
           orderBy: { createdAt: "desc" },
           select: {
             id: true,
-            imageUrl: true,
+            images: {
+              take: 1,
+              select: { url: true }
+            },
             batteryVoltage: true,
             createdAt: true,
             user: {
@@ -204,7 +210,7 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
       lastReport: unit.reports[0]
         ? {
           id: unit.reports[0].id,
-          imageUrl: unit.reports[0].imageUrl,
+          imageUrl: unit.reports[0].images[0]?.url || "",
           batteryVoltage: unit.reports[0].batteryVoltage,
           createdAt: unit.reports[0].createdAt,
           user: unit.reports[0].user.name,
@@ -257,7 +263,10 @@ export async function getMapPointsByStatus(status: UnitStatus): Promise<ActionRe
           orderBy: { createdAt: "desc" },
           select: {
             id: true,
-            imageUrl: true,
+            images: {
+              take: 1,
+              select: { url: true }
+            },
             batteryVoltage: true,
             createdAt: true,
             user: {
@@ -279,7 +288,7 @@ export async function getMapPointsByStatus(status: UnitStatus): Promise<ActionRe
       lastReport: unit.reports[0]
         ? {
           id: unit.reports[0].id,
-          imageUrl: unit.reports[0].imageUrl,
+          imageUrl: unit.reports[0].images[0]?.url || "",
           batteryVoltage: unit.reports[0].batteryVoltage,
           createdAt: unit.reports[0].createdAt,
           user: unit.reports[0].user.name,
@@ -349,6 +358,10 @@ export async function getUnitDetail(unitId: string): Promise<ActionResult<{
           take: 5,
           orderBy: { createdAt: "desc" },
           include: {
+            images: {
+              take: 1,
+              select: { url: true }
+            },
             user: {
               select: { name: true },
             },
@@ -385,7 +398,7 @@ export async function getUnitDetail(unitId: string): Promise<ActionResult<{
         },
         recentReports: unit.reports.map((r) => ({
           id: r.id,
-          imageUrl: r.imageUrl,
+          imageUrl: r.images[0]?.url || "",
           batteryVoltage: r.batteryVoltage,
           latitude: r.latitude,
           longitude: r.longitude,

@@ -19,17 +19,37 @@ import {
   Search,
   ChevronDown,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Notifications } from "./notifications";
 import { cn } from "@/lib/utils";
+
+const Notifications = dynamic(
+  () => import("./notifications").then((mod) => mod.Notifications),
+  {
+    ssr: false,
+    loading: () => (
+      <Button variant="ghost" size="icon" className="relative text-slate-500">
+        <Bell className="h-5 w-5" />
+      </Button>
+    ),
+  }
+);
+
+const UserNav = dynamic(
+  () => import("./user-nav").then((mod) => mod.UserNav),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center gap-2 px-2">
+        <div className="w-8 h-8 rounded-full bg-slate-200 animate-pulse" />
+        <div className="hidden lg:block space-y-1">
+          <div className="w-20 h-4 bg-slate-200 rounded animate-pulse" />
+          <div className="w-16 h-3 bg-slate-200 rounded animate-pulse" />
+        </div>
+      </div>
+    ),
+  }
+);
 
 interface NavbarProps {
   user: {
@@ -130,52 +150,7 @@ export function Navbar({ user }: NavbarProps) {
               <Notifications />
 
               {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex items-center gap-2 px-2 hover:bg-slate-100"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                      <span className="text-white text-sm font-semibold">
-                        {user.name.charAt(0).toUpperCase()}
-                      </span>
-                    </div>
-                    <div className="hidden lg:block text-left">
-                      <p className="text-sm font-medium text-slate-900">
-                        {user.name}
-                      </p>
-                      <p className="text-xs text-slate-500">
-                        {user.role === "ADMIN" ? "Administrator" : "Petugas Lapangan"}
-                      </p>
-                    </div>
-                    <ChevronDown className="h-4 w-4 text-slate-400 hidden lg:block" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col">
-                      <span>{user.name}</span>
-                      <span className="text-xs font-normal text-slate-500">
-                        {user.email}
-                      </span>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Profil Saya
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="text-red-600 focus:text-red-600 cursor-pointer"
-                    onClick={handleLogout}
-                  >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Keluar
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <UserNav user={user} />
 
               {/* Mobile Menu Button */}
               <Button
@@ -212,6 +187,9 @@ export function Navbar({ user }: NavbarProps) {
             </div>
             <nav className="p-2 space-y-1">
               {navItems.map((item) => {
+                // Skip admin-only items if user is not admin
+                if (item.adminOnly && user.role !== "ADMIN") return null;
+
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
                 return (
