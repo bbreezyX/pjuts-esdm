@@ -91,6 +91,8 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
         regency: true,
         lastStatus: true,
         installDate: true,
+        latitude: true,
+        longitude: true,
       },
     });
 
@@ -227,20 +229,24 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
       newStatus = UnitStatus.MAINTENANCE_NEEDED;
     }
 
-    // Only update the unit's status, NOT the coordinates
-    // PJUTS units are fixed installations - their location shouldn't change
-    // The report stores the reporter's GPS location separately for verification
+    // Check if this is the first verification (unit was UNVERIFIED)
+    // On first verification, we update: status, installDate, and coordinates
+    const isFirstVerification = unit.lastStatus === UnitStatus.UNVERIFIED;
     
-    // If unit was UNVERIFIED and has no installDate, set installDate to now
-    // This marks when the unit was first verified in the field
-    const isFirstVerification = unit.lastStatus === UnitStatus.UNVERIFIED && !unit.installDate;
+    // Check if unit has default/empty coordinates (0,0)
+    const hasDefaultCoordinates = unit.latitude === 0 && unit.longitude === 0;
     
     await prisma.pjutsUnit.update({
       where: { id: validatedData.unitId },
       data: {
         lastStatus: newStatus,
-        // Set installDate only on first verification (when unit was UNVERIFIED)
-        ...(isFirstVerification && { installDate: new Date() }),
+        // Set installDate on first verification (when unit was UNVERIFIED)
+        ...(isFirstVerification && !unit.installDate && { installDate: new Date() }),
+        // Update coordinates on first verification OR if unit has default coordinates (0,0)
+        ...((isFirstVerification || hasDefaultCoordinates) && {
+          latitude: validatedData.latitude,
+          longitude: validatedData.longitude,
+        }),
       },
     });
 
