@@ -4,8 +4,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
 import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
-import { revalidatePath, revalidateTag } from "next/cache";
-import { CacheTags } from "@/lib/cache";
+import { revalidatePath } from "next/cache";
 import { UnitStatus } from "@prisma/client";
 
 // ============================================
@@ -241,7 +240,6 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     revalidatePath("/reports");
     revalidatePath("/units");
     revalidatePath("/map");
-    revalidateTag(CacheTags.MAP_POINTS);
 
     // Format response to match ReportData interface
     const reportData: ReportData = {
