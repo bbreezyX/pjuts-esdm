@@ -108,14 +108,51 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/login",
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      // Initial sign in - set user data in token
       if (user) {
         token.id = user.id ?? "";
         token.role = user.role ?? "FIELD_STAFF";
+        token.lastActiveCheck = Date.now();
       }
+
+      // On subsequent requests, periodically check if user is still active
+      // Check every 30 seconds to balance security vs database load
+      const CHECK_INTERVAL = 30 * 1000; // 30 seconds
+      const lastCheck = (token.lastActiveCheck as number) || 0;
+      const shouldCheck = Date.now() - lastCheck > CHECK_INTERVAL;
+
+      if (shouldCheck && token.id) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { isActive: true },
+          });
+
+          // If user is disabled or deleted, invalidate the session
+          if (!dbUser || !dbUser.isActive) {
+            console.warn(`Session invalidated for disabled/deleted user: ${token.id}`);
+            // Return an empty token to invalidate the session
+            return { ...token, isActive: false };
+          }
+
+          token.lastActiveCheck = Date.now();
+          token.isActive = true;
+        } catch (error) {
+          console.error("Error checking user active status:", error);
+          // On error, keep the current token to avoid locking out users due to DB issues
+        }
+      }
+
       return token;
     },
     async session({ session, token }) {
+      // If user is marked as inactive, return null to invalidate session
+      if (token.isActive === false) {
+        // This will cause the session to be null on the client
+        throw new Error("ACCOUNT_DISABLED");
+      }
+
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
@@ -145,6 +182,8 @@ declare module "@auth/core/jwt" {
   interface JWT {
     id: string;
     role: string;
+    lastActiveCheck?: number;
+    isActive?: boolean;
   }
 }
 
