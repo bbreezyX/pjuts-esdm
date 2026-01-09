@@ -10,17 +10,17 @@ import {
   Check,
   MapPin,
   Camera,
-  Zap,
-  Lightbulb,
-  Loader2,
-  RefreshCw,
-  AlertCircle,
-  CheckCircle2,
-  X,
-  Trash2,
+  Flash,
+  LightBulb,
+  SystemRestart,
+  Refresh,
+  WarningCircle,
+  CheckCircle,
+  Xmark,
+  Trash,
   Plus,
-  Save,
-} from "lucide-react";
+  FloppyDisk,
+} from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -117,9 +117,9 @@ interface FormData {
 }
 
 const steps = [
-  { id: 1, title: "Pilih Unit", icon: Lightbulb },
+  { id: 1, title: "Pilih Unit", icon: LightBulb },
   { id: 2, title: "Ambil Foto", icon: Camera },
-  { id: 3, title: "Data Teknis", icon: Zap },
+  { id: 3, title: "Data Teknis", icon: Flash },
   { id: 4, title: "Konfirmasi", icon: Check },
 ];
 
@@ -393,7 +393,7 @@ export function ReportFormClient({
           <div className="w-9 flex items-center justify-end">
             {draftSaved && (
               <div className="flex items-center gap-1 text-emerald-600">
-                <Save className="h-4 w-4" />
+                <FloppyDisk className="h-4 w-4" />
               </div>
             )}
           </div>
@@ -477,7 +477,7 @@ export function ReportFormClient({
                 <div className="mt-4 p-3 bg-primary-50 rounded-lg border border-primary-100">
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center shrink-0">
-                      <Lightbulb className="h-5 w-5 text-primary-600" />
+                      <LightBulb className="h-5 w-5 text-primary-600" />
                     </div>
                     <div>
                       <p className="font-medium text-slate-900">
@@ -537,7 +537,7 @@ export function ReportFormClient({
                       onClick={() => removeImage(idx)}
                       className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-80 hover:opacity-100 transition-opacity"
                     >
-                      <X className="h-3 w-3" />
+                      <Xmark className="h-3 w-3" />
                     </button>
                     <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[10px] px-2 py-1">
                       Foto {idx + 1}
@@ -576,7 +576,7 @@ export function ReportFormClient({
                   </span>
                   {formData.latitude && formData.longitude && (
                     <Badge variant="success">
-                      <CheckCircle2 className="h-3 w-3 mr-1" />
+                      <CheckCircle className="h-3 w-3 mr-1" />
                       Terkunci
                     </Badge>
                   )}
@@ -584,17 +584,17 @@ export function ReportFormClient({
 
                 {geoLoading ? (
                   <div className="flex items-center gap-2 text-sm text-slate-600">
-                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <SystemRestart className="h-4 w-4 animate-spin" />
                     Mendapatkan lokasi...
                   </div>
                 ) : geoError ? (
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-red-600">
-                      <AlertCircle className="h-4 w-4" />
+                      <WarningCircle className="h-4 w-4" />
                       {geoError}
                     </div>
                     <Button variant="outline" size="sm" onClick={getLocation}>
-                      <RefreshCw className="h-4 w-4 mr-2" />
+                      <Refresh className="h-4 w-4 mr-2" />
                       Coba Lagi
                     </Button>
                   </div>
@@ -604,7 +604,7 @@ export function ReportFormClient({
                       {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
                     </code>
                     <Button variant="ghost" size="sm" onClick={getLocation}>
-                      <RefreshCw className="h-4 w-4 mr-1" />
+                      <Refresh className="h-4 w-4 mr-1" />
                       Perbarui
                     </Button>
                   </div>
@@ -706,7 +706,7 @@ export function ReportFormClient({
                 {submitResult.success ? (
                   <>
                     <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4">
-                      <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+                      <CheckCircle className="h-8 w-8 text-emerald-600" />
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">
                       Berhasil!
@@ -719,7 +719,7 @@ export function ReportFormClient({
                 ) : (
                   <>
                     <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                      <X className="h-8 w-8 text-red-600" />
+                      <Xmark className="h-8 w-8 text-red-600" />
                     </div>
                     <h3 className="text-xl font-semibold text-slate-900 mb-2">
                       Gagal
@@ -816,7 +816,7 @@ export function ReportFormClient({
           {!isOnline && currentStep === 4 && (
             <div className="max-w-lg mx-auto px-4 pt-2">
               <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg">
-                <AlertCircle className="h-4 w-4 shrink-0" />
+                <WarningCircle className="h-4 w-4 shrink-0" />
                 <span>Anda sedang offline. Form tersimpan otomatis, kirim saat online.</span>
               </div>
             </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, CheckCircle2, AlertTriangle, XCircle, FileText } from "lucide-react";
+import { Bell, CheckCircle, WarningTriangle, XmarkCircle, Notes } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import {
     Popover,
@@ -66,13 +66,13 @@ export function Notifications() {
     const getIcon = (type: string) => {
         switch (type) {
             case "CRITICAL":
-                return <XCircle className="h-4 w-4 text-red-600" />;
+                return <XmarkCircle className="h-4 w-4 text-red-600" />;
             case "WARNING":
-                return <AlertTriangle className="h-4 w-4 text-amber-600" />;
+                return <WarningTriangle className="h-4 w-4 text-amber-600" />;
             case "INFO":
-                return <FileText className="h-4 w-4 text-primary-600" />;
+                return <Notes className="h-4 w-4 text-primary-600" />;
             default:
-                return <CheckCircle2 className="h-4 w-4 text-slate-500" />;
+                return <CheckCircle className="h-4 w-4 text-slate-500" />;
         }
     };
 

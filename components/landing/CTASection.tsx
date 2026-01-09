@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ScaleIn } from "@/components/ui/motion";

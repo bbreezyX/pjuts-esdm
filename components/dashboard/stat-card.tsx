@@ -1,13 +1,13 @@
 "use client";
 
 import { ReactNode } from "react";
-import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
+import { GraphUp, GraphDown } from "iconoir-react";
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
   title: string;
   value: number | string;
-  icon: LucideIcon;
+  icon: React.ComponentType<any>;
   description?: string;
   trend?: {
     value: number;
@@ -107,9 +107,9 @@ export function StatCard({
                   )}
                 >
                   {trend.isPositive ? (
-                    <TrendingUp className="h-3 w-3" />
+                    <GraphUp className="h-3 w-3" />
                   ) : (
-                    <TrendingDown className="h-3 w-3" />
+                    <GraphDown className="h-3 w-3" />
                   )}
                   {trend.value}%
                 </span>

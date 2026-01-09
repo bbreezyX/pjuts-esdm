@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { deletePjutsUnit, PjutsUnitData } from "@/app/actions/units";
-import { AlertTriangle } from "lucide-react";
+import { WarningTriangle } from "iconoir-react";
 
 interface DeleteUnitDialogProps {
   open: boolean;
@@ -64,7 +64,7 @@ export function DeleteUnitDialog({ open, onOpenChange, unit }: DeleteUnitDialogP
         <DialogHeader>
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
             <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
-              <AlertTriangle className="h-6 w-6 text-red-600" />
+              <WarningTriangle className="h-6 w-6 text-red-600" />
             </div>
             <div className="space-y-1">
               <DialogTitle className="text-red-600 text-lg sm:text-xl">Hapus Unit PJUTS</DialogTitle>
@@ -84,7 +84,7 @@ export function DeleteUnitDialog({ open, onOpenChange, unit }: DeleteUnitDialogP
             {unit._count.reports > 0 && (
               <div className="mt-3 bg-red-50 p-2.5 rounded-lg border border-red-100">
                 <p className="text-xs text-red-600 font-medium flex items-center justify-center sm:justify-start gap-1.5">
-                  <AlertTriangle className="h-3 w-3" />
+                  <WarningTriangle className="h-3 w-3" />
                   Peringatan: {unit._count.reports} laporan terkait juga akan dihapus.
                 </p>
               </div>

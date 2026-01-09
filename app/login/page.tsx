@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Eye, EyeOff, ArrowLeft, Clock } from "lucide-react";
+import { Eye, EyeClosed, ArrowLeft, Clock } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -100,7 +100,7 @@ function LoginFormContent() {
             tabIndex={-1}
           >
             {showPassword ? (
-              <EyeOff className="h-5 w-5" />
+              <EyeClosed className="h-5 w-5" />
             ) : (
               <Eye className="h-5 w-5" />
             )}

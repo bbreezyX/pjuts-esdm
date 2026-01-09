@@ -4,7 +4,7 @@ import { getReports } from "@/app/actions/reports";
 import { getProvinces } from "@/app/actions/units";
 import { AppShell, PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus } from "iconoir-react";
 import Link from "next/link";
 import { ReportsPageClient } from "./reports-client";
 import { ExportReportsButton } from "./export-button";

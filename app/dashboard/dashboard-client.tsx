@@ -3,17 +3,17 @@
 import { use, Suspense } from "react";
 import Link from "next/link";
 import {
-  Lightbulb,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
-  FileBarChart,
+  LightBulb,
+  CheckCircle,
+  WarningTriangle,
+  XmarkCircle,
+  StatsReport,
   Calendar,
   Clock,
-  TrendingUp,
+  GraphUp,
   MapPin,
-  ChevronRight,
-} from "lucide-react";
+  NavArrowRight,
+} from "iconoir-react";
 import { PageHeader } from "@/components/layout";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
@@ -67,14 +67,14 @@ function StatsGrid({ dataPromise }: { dataPromise: StatsPromise }) {
       <StatCard
         title="Total Unit"
         value={stats?.totalUnits || 0}
-        icon={Lightbulb}
+        icon={LightBulb}
         color="blue"
         description="Unit PJUTS terpasang"
       />
       <StatCard
         title="Operasional"
         value={stats?.operationalUnits || 0}
-        icon={CheckCircle2}
+        icon={CheckCircle}
         color="green"
         trend={{ value: operationalPercentage, isPositive: true }}
         description="Unit berfungsi normal"
@@ -82,14 +82,14 @@ function StatsGrid({ dataPromise }: { dataPromise: StatsPromise }) {
       <StatCard
         title="Perlu Perawatan"
         value={stats?.maintenanceNeeded || 0}
-        icon={AlertTriangle}
+        icon={WarningTriangle}
         color="yellow"
         description="Membutuhkan tindakan"
       />
       <StatCard
         title="Offline"
         value={stats?.offlineUnits || 0}
-        icon={XCircle}
+        icon={XmarkCircle}
         color="red"
         description="Tidak terhubung ke sistem"
       />
@@ -121,11 +121,11 @@ function ReportStats({ dataPromise }: { dataPromise: StatsPromise }) {
               </p>
             </div>
             <div className="p-2 bg-primary-100 rounded-lg shadow-sm">
-              <FileBarChart className="h-6 w-6 text-primary-600" />
+              <StatsReport className="h-6 w-6 text-primary-600" />
             </div>
           </div>
           <div className="flex items-center gap-2 mt-3 text-sm text-slate-500">
-            <TrendingUp className="h-4 w-4" />
+            <GraphUp className="h-4 w-4" />
             <span>Sejak sistem diluncurkan</span>
           </div>
         </CardContent>
@@ -335,7 +335,7 @@ export function DashboardClient({
 
         <Link href="/report/new">
           <Button size="sm">
-            <FileBarChart className="h-4 w-4 mr-2" />
+            <StatsReport className="h-4 w-4 mr-2" />
             Buat Laporan
           </Button>
         </Link>
@@ -353,7 +353,7 @@ export function DashboardClient({
         </div>
         <div className="relative flex justify-center">
           <div className="flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-200/60 shadow-sm text-slate-500">
-            <FileBarChart className="h-3.5 w-3.5" />
+            <StatsReport className="h-3.5 w-3.5" />
             <span className="text-xs font-medium uppercase tracking-wider">
               Statistik Laporan
             </span>
@@ -388,11 +388,11 @@ export function DashboardClient({
               <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-primary-100 hover:bg-primary-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary-600 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
-                    <FileBarChart className="h-5 w-5" />
+                    <StatsReport className="h-5 w-5" />
                   </div>
                   <span className="font-medium text-slate-700 group-hover:text-primary-700 transition-colors">Buat Laporan Baru</span>
                 </div>
-                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
+                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
               </div>
             </Link>
             <Link href="/map" className="block">
@@ -403,18 +403,18 @@ export function DashboardClient({
                   </div>
                   <span className="font-medium text-slate-700 group-hover:text-emerald-700 transition-colors">Lihat Peta PJUTS</span>
                 </div>
-                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
               </div>
             </Link>
             <Link href="/units" className="block">
               <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-amber-100 hover:bg-amber-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-100 group-hover:scale-105 transition-all">
-                    <Lightbulb className="h-5 w-5" />
+                    <LightBulb className="h-5 w-5" />
                   </div>
                   <span className="font-medium text-slate-700 group-hover:text-amber-700 transition-colors">Kelola Unit</span>
                 </div>
-                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
               </div>
             </Link>
             <Link href="/reports" className="block">
@@ -425,7 +425,7 @@ export function DashboardClient({
                   </div>
                   <span className="font-medium text-slate-700 group-hover:text-slate-900 transition-colors">Riwayat Laporan</span>
                 </div>
-                <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
+                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
               </div>
             </Link>
           </CardContent>

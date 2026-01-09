@@ -5,25 +5,25 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   Search,
-  Filter,
-  X,
+  FilterList,
+  Xmark,
   MapPin,
-  Lightbulb,
-  FileText,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  MoreHorizontal,
-  Edit,
-  Trash2,
-  CheckCircle2,
-  AlertTriangle,
-  XCircle,
+  LightBulb,
+  Notes,
+  NavArrowLeft,
+  NavArrowRight,
+  OpenNewWindow,
+  MoreHoriz,
+  EditPencil,
+  Trash,
+  CheckCircle,
+  WarningTriangle,
+  XmarkCircle,
   HelpCircle,
   Plus,
   Download,
   Upload,
-} from "lucide-react";
+} from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -60,9 +60,9 @@ interface UnitsPageClientProps {
 }
 
 const statusOptions = [
-  { value: "OPERATIONAL", label: "Operasional", icon: CheckCircle2, color: "text-emerald-600" },
-  { value: "MAINTENANCE_NEEDED", label: "Perlu Perawatan", icon: AlertTriangle, color: "text-amber-600" },
-  { value: "OFFLINE", label: "Offline", icon: XCircle, color: "text-red-600" },
+  { value: "OPERATIONAL", label: "Operasional", icon: CheckCircle, color: "text-emerald-600" },
+  { value: "MAINTENANCE_NEEDED", label: "Perlu Perawatan", icon: WarningTriangle, color: "text-amber-600" },
+  { value: "OFFLINE", label: "Offline", icon: XmarkCircle, color: "text-red-600" },
   { value: "UNVERIFIED", label: "Belum Verifikasi", icon: HelpCircle, color: "text-slate-500" },
 ];
 
@@ -201,7 +201,7 @@ export function UnitsPageClient({
               variant={showFilters ? "secondary" : "ghost"}
               onClick={() => setShowFilters(!showFilters)}
             >
-              <Filter className="h-4 w-4 mr-2" />
+              <FilterList className="h-4 w-4 mr-2" />
               Filter
             </Button>
             {hasActiveFilters && (
@@ -218,7 +218,7 @@ export function UnitsPageClient({
                   });
                 }}
               >
-                <X className="h-4 w-4 mr-2" />
+                <Xmark className="h-4 w-4 mr-2" />
                 Reset
               </Button>
             )}
@@ -310,7 +310,7 @@ export function UnitsPageClient({
                       <td>
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                            <Lightbulb className="h-5 w-5 text-primary-600" />
+                            <LightBulb className="h-5 w-5 text-primary-600" />
                           </div>
                           <div>
                             <p className="font-medium text-slate-900">
@@ -357,7 +357,7 @@ export function UnitsPageClient({
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button variant="ghost" size="icon-sm">
-                              <MoreHorizontal className="h-4 w-4" />
+                              <MoreHoriz className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
@@ -374,18 +374,18 @@ export function UnitsPageClient({
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                               <Link href={`/report/new?unitId=${unit.id}`}>
-                                <FileText className="h-4 w-4 mr-2" />
+                                <Notes className="h-4 w-4 mr-2" />
                                 Buat Laporan
                               </Link>
                             </DropdownMenuItem>
                             {isAdmin && (
                               <>
                                 <DropdownMenuItem onClick={() => handleEdit(unit)}>
-                                  <Edit className="h-4 w-4 mr-2" />
+                                  <EditPencil className="h-4 w-4 mr-2" />
                                   Edit Unit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(unit)}>
-                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  <Trash className="h-4 w-4 mr-2" />
                                   Hapus
                                 </DropdownMenuItem>
                               </>
@@ -417,7 +417,7 @@ export function UnitsPageClient({
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-lg bg-primary-100 flex items-center justify-center">
-                      <Lightbulb className="h-5 w-5 text-primary-600" />
+                      <LightBulb className="h-5 w-5 text-primary-600" />
                     </div>
                     <div>
                       <p className="font-medium text-slate-900">
@@ -435,7 +435,7 @@ export function UnitsPageClient({
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-4 text-slate-500">
                     <span className="flex items-center gap-1">
-                      <FileText className="h-3 w-3" />
+                      <Notes className="h-3 w-3" />
                       {unit._count.reports} laporan
                     </span>
                   </div>
@@ -450,13 +450,13 @@ export function UnitsPageClient({
                         )
                       }
                     >
-                      <ExternalLink className="h-4 w-4 mr-1" />
+                      <OpenNewWindow className="h-4 w-4 mr-1" />
                       Maps
                     </Button>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon-sm">
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHoriz className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -473,18 +473,18 @@ export function UnitsPageClient({
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
                           <Link href={`/report/new?unitId=${unit.id}`}>
-                            <FileText className="h-4 w-4 mr-2" />
+                            <Notes className="h-4 w-4 mr-2" />
                             Buat Laporan
                           </Link>
                         </DropdownMenuItem>
                         {isAdmin && (
                           <>
                             <DropdownMenuItem onClick={() => handleEdit(unit)}>
-                              <Edit className="h-4 w-4 mr-2" />
+                              <EditPencil className="h-4 w-4 mr-2" />
                               Edit Unit
                             </DropdownMenuItem>
                             <DropdownMenuItem className="text-red-600" onClick={() => handleDelete(unit)}>
-                              <Trash2 className="h-4 w-4 mr-2" />
+                              <Trash className="h-4 w-4 mr-2" />
                               Hapus
                             </DropdownMenuItem>
                           </>
@@ -512,7 +512,7 @@ export function UnitsPageClient({
                 onClick={() => updateURL({ page: (page - 1).toString() })}
                 disabled={page <= 1}
               >
-                <ChevronLeft className="h-4 w-4" />
+                <NavArrowLeft className="h-4 w-4" />
               </Button>
               <span className="text-sm text-slate-600 px-2">
                 {page} / {totalPages}
@@ -523,7 +523,7 @@ export function UnitsPageClient({
                 onClick={() => updateURL({ page: (page + 1).toString() })}
                 disabled={page >= totalPages}
               >
-                <ChevronRight className="h-4 w-4" />
+                <NavArrowRight className="h-4 w-4" />
               </Button>
             </div>
           </div>

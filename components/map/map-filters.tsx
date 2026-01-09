@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle2, AlertTriangle, XCircle, HelpCircle, Map as MapIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle, WarningTriangle, XmarkCircle, HelpCircle, Map, NavArrowDown, NavArrowUp } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +20,7 @@ const statusFilters = [
   {
     value: "OPERATIONAL",
     label: "Operasional",
-    icon: CheckCircle2,
+    icon: CheckCircle,
     color: "text-emerald-600",
     bgColor: "bg-emerald-50 hover:bg-emerald-100 border-emerald-200",
     activeColor: "bg-emerald-600 text-white hover:bg-emerald-700",
@@ -29,7 +29,7 @@ const statusFilters = [
   {
     value: "MAINTENANCE_NEEDED",
     label: "Perlu Perawatan",
-    icon: AlertTriangle,
+    icon: WarningTriangle,
     color: "text-amber-600",
     bgColor: "bg-amber-50 hover:bg-amber-100 border-amber-200",
     activeColor: "bg-amber-600 text-white hover:bg-amber-700",
@@ -38,7 +38,7 @@ const statusFilters = [
   {
     value: "OFFLINE",
     label: "Offline",
-    icon: XCircle,
+    icon: XmarkCircle,
     color: "text-red-600",
     bgColor: "bg-red-50 hover:bg-red-100 border-red-200",
     activeColor: "bg-red-600 text-white hover:bg-red-700",
@@ -167,7 +167,7 @@ export function MapLegend() {
         className="absolute bottom-4 left-4 bg-white/90 backdrop-blur-md border border-slate-200/60 shadow-lg rounded-full p-3 z-[1000] transition-all hover:shadow-xl hover:scale-105 active:scale-95 text-slate-700"
         aria-label="Lihat Legenda"
       >
-        <MapIcon className="w-5 h-5" />
+        <Map className="w-5 h-5" />
       </button>
     );
   }
@@ -181,7 +181,7 @@ export function MapLegend() {
             onClick={() => setIsExpanded(false)}
             className="text-slate-400 hover:text-slate-600 p-0.5 rounded-full hover:bg-slate-100 transition-colors"
           >
-            <ChevronDown className="w-4 h-4" />
+            <NavArrowDown className="w-4 h-4" />
           </button>
         )}
       </div>

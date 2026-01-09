@@ -2,14 +2,14 @@
 
 import {
   MapPin,
-  Smartphone,
+  SmartphoneDevice,
   Activity,
-  CheckCircle2,
-  ScanLine,
-  FileImage,
+  CheckCircle,
+  ScanQrCode,
+  MediaImage,
   Database,
-  Globe2,
-} from "lucide-react";
+  Globe,
+} from "iconoir-react";
 import { FadeIn, StaggerContainer, FadeInItem } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
 
@@ -73,7 +73,7 @@ export default function WorkflowSection() {
               
               <div className="relative z-10 mb-8">
                 <div className="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center mb-6">
-                  <ScanLine className="w-6 h-6" />
+                  <ScanQrCode className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Identifikasi Aset</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
@@ -143,7 +143,7 @@ export default function WorkflowSection() {
                 <div className="flex items-start justify-between relative z-10">
                   <div>
                     <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
-                      <FileImage className="w-5 h-5" />
+                      <MediaImage className="w-5 h-5" />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">Dokumentasi Digital</h3>
                     <p className="text-slate-500 text-sm">Foto fisik dengan watermark timestamp & geotag otomatis.</p>
@@ -198,7 +198,7 @@ export default function WorkflowSection() {
               
               <div className="relative z-10 mb-8">
                 <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mb-6">
-                  <Globe2 className="w-6 h-6" />
+                  <Globe className="w-6 h-6" />
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">Real-time Sync</h3>
                 <p className="text-slate-500 text-sm leading-relaxed">

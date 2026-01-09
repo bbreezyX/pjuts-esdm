@@ -4,7 +4,7 @@ import { getDashboardStats, getStatsByProvince, getMonthlyReportTrend } from "@/
 import { AppShell, PageHeader } from "@/components/layout";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download } from "iconoir-react";
 import { AnalyticsCharts } from "./analytics-client";
 
 export default async function AnalyticsPage() {

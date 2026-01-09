@@ -2,13 +2,13 @@
 
 import {
   MapPin,
-  Smartphone,
-  BarChart3,
+  SmartphoneDevice,
+  StatsReport,
   Wifi,
   Shield,
-  Lightbulb,
+  LightBulb,
   ArrowRight,
-} from "lucide-react";
+} from "iconoir-react";
 import { FadeIn, StaggerContainer, FadeInItem } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
 
@@ -54,7 +54,7 @@ export default function FeaturesSection() {
           </FadeInItem>
           <FadeInItem className="col-span-1">
             <FeatureCard
-              icon={Smartphone}
+              icon={SmartphoneDevice}
               title="Aplikasi Lapangan"
               description="Antarmuka responsif untuk pelaporan petugas dari lokasi."
               variant="amber"
@@ -63,7 +63,7 @@ export default function FeaturesSection() {
           </FadeInItem>
           <FadeInItem className="col-span-1">
             <FeatureCard
-              icon={BarChart3}
+              icon={StatsReport}
               title="Analitik Data"
               description="Dashboard eksekutif dengan KPI dan statistik cerdas."
               variant="blue"
@@ -91,7 +91,7 @@ export default function FeaturesSection() {
           </FadeInItem>
           <FadeInItem className="col-span-1 md:col-span-2 lg:col-span-2">
             <FeatureCard
-              icon={Lightbulb}
+              icon={LightBulb}
               title="Manajemen Aset Terpadu"
               description="Siklus hidup lengkap unit PJUTS mulai dari instalasi, perawatan berkala, hingga penggantian komponen secara terintegrasi."
               variant="amber"

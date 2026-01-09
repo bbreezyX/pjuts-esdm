@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, RefreshCw } from "lucide-react";
+import { WarningCircle, Refresh } from "iconoir-react";
 
 export default function DashboardError({
     error,
@@ -21,7 +21,7 @@ export default function DashboardError({
             <Card className="w-full max-w-md border-red-200 bg-red-50/50">
                 <CardHeader className="text-center">
                     <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                        <AlertCircle className="w-6 h-6 text-red-600" />
+                        <WarningCircle className="w-6 h-6 text-red-600" />
                     </div>
                     <CardTitle className="text-red-900">Gagal Memuat Dashboard</CardTitle>
                 </CardHeader>
@@ -37,7 +37,7 @@ export default function DashboardError({
                         variant="outline"
                         className="w-full border-red-200 hover:bg-red-100 hover:text-red-900"
                     >
-                        <RefreshCw className="mr-2 h-4 w-4" />
+                        <Refresh className="mr-2 h-4 w-4" />
                         Coba Lagi
                     </Button>
                 </CardContent>

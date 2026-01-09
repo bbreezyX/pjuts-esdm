@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, X, Calendar } from "lucide-react";
+import { Search, Filter, Xmark, Calendar } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -75,7 +75,7 @@ export function ReportsFilters({
 
           {hasActiveFilters && (
             <Button variant="ghost" onClick={clearFilters} className="shrink-0">
-              <X className="h-4 w-4 mr-2" />
+              <Xmark className="h-4 w-4 mr-2" />
               Reset
             </Button>
           )}
@@ -173,7 +173,7 @@ export function ReportsFilters({
             <Badge variant="secondary" className="gap-1.5">
               Provinsi: {selectedProvince}
               <button onClick={() => onProvinceChange(undefined)}>
-                <X className="h-3 w-3" />
+                <Xmark className="h-3 w-3" />
               </button>
             </Badge>
           )}
@@ -183,7 +183,7 @@ export function ReportsFilters({
               <button
                 onClick={() => onDateRangeChange({ ...dateRange, start: undefined })}
               >
-                <X className="h-3 w-3" />
+                <Xmark className="h-3 w-3" />
               </button>
             </Badge>
           )}
@@ -193,7 +193,7 @@ export function ReportsFilters({
               <button
                 onClick={() => onDateRangeChange({ ...dateRange, end: undefined })}
               >
-                <X className="h-3 w-3" />
+                <Xmark className="h-3 w-3" />
               </button>
             </Badge>
           )}

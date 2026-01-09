@@ -3,14 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import {
-  Lightbulb,
+  LightBulb,
   MapPin,
-  BarChart3,
-  Shield,
+  StatsReport,
+  ShieldCheck,
   Activity,
-  Zap,
+  Flash,
   ArrowRight,
-} from "lucide-react";
+} from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { FadeIn, StaggerContainer, FadeInItem } from "@/components/ui/motion";
 import { motion } from "framer-motion";
@@ -146,7 +146,7 @@ export default function HeroSection() {
               <div className="mt-10 sm:mt-12 pt-8 border-t border-white/10 grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6 relative z-10 w-full">
                 <div className="flex items-center gap-3 group">
                   <div className="p-2 sm:p-2.5 bg-white/10 rounded-xl group-hover:bg-amber-500/20 transition-all duration-300 ring-1 ring-white/10 group-hover:scale-110 group-hover:ring-amber-500/50 shadow-lg shadow-black/10">
-                    <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
+                    <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">
@@ -174,7 +174,7 @@ export default function HeroSection() {
 
                 <div className="flex items-center gap-3 group col-span-2 sm:col-span-1">
                   <div className="p-2 sm:p-2.5 bg-white/10 rounded-xl group-hover:bg-amber-500/20 transition-all duration-300 ring-1 ring-white/10 group-hover:scale-110 group-hover:ring-amber-500/50 shadow-lg shadow-black/10">
-                    <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
+                    <Flash className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
                   </div>
                   <div className="flex flex-col">
                     <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">
@@ -199,20 +199,20 @@ export default function HeroSection() {
               <StatsCard
                 value="12,500+"
                 label="Unit Terpasang"
-                icon={Lightbulb}
+                icon={LightBulb}
               />
             </FadeInItem>
             <FadeInItem className="lg:translate-y-8">
               <StatsCard value="34" label="Provinsi" icon={MapPin} />
             </FadeInItem>
             <FadeInItem>
-              <StatsCard value="50k+" label="Laporan Masuk" icon={BarChart3} />
+              <StatsCard value="50k+" label="Laporan Masuk" icon={StatsReport} />
             </FadeInItem>
             <FadeInItem className="lg:translate-y-8">
               <StatsCard
                 value="24/7"
                 label="Monitoring Aktif"
-                icon={Zap}
+                icon={Flash}
                 className="bg-gradient-to-br from-amber-500/20 to-amber-600/20 border-amber-500/30"
                 valueColor="text-amber-400"
               />

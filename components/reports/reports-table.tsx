@@ -4,17 +4,17 @@ import { useState } from "react";
 import Image from "next/image";
 import {
   Eye,
-  Trash2,
+  Trash,
   MapPin,
-  Zap,
+  Flash,
   Calendar,
   User,
-  X,
-  ChevronLeft,
-  ChevronRight,
+  Xmark,
+  NavArrowLeft,
+  NavArrowRight,
   Download,
-  AlertTriangle,
-} from "lucide-react";
+  WarningTriangle,
+} from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -191,7 +191,7 @@ export function ReportsTable({
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             onClick={() => setDeleteConfirm(report)}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            <Trash className="h-4 w-4" />
                           </Button>
                         )}
                       </div>
@@ -283,7 +283,7 @@ export function ReportsTable({
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           onClick={() => setDeleteConfirm(report)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
@@ -335,7 +335,7 @@ export function ReportsTable({
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <NavArrowLeft className="h-4 w-4" />
             </Button>
             <span className="text-sm text-slate-600 px-2">
               {page} / {totalPages}
@@ -346,7 +346,7 @@ export function ReportsTable({
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
             >
-              <ChevronRight className="h-4 w-4" />
+              <NavArrowRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -413,7 +413,7 @@ export function ReportsTable({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-slate-50 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
-                      <Zap className="h-4 w-4 text-amber-500" />
+                      <Flash className="h-4 w-4 text-amber-500" />
                       <span className="text-sm text-slate-500">Tegangan</span>
                     </div>
                     <p className="text-xl font-bold text-slate-900">
@@ -469,7 +469,7 @@ export function ReportsTable({
           <DialogHeader>
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
               <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
-                <AlertTriangle className="h-6 w-6 text-red-600" />
+                <WarningTriangle className="h-6 w-6 text-red-600" />
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-red-600 text-lg sm:text-xl">Hapus Laporan</DialogTitle>

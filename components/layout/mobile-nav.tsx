@@ -3,20 +3,20 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
+  Dashboard,
   Map,
-  ClipboardList,
-  Lightbulb,
+  ClipboardCheck,
+  LightBulb,
   PlusCircle,
-} from "lucide-react";
+} from "iconoir-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: Dashboard },
   { href: "/map", label: "Peta", icon: Map },
   { href: "/report/new", label: "Lapor", icon: PlusCircle, isMain: true },
-  { href: "/units", label: "Unit", icon: Lightbulb },
-  { href: "/reports", label: "Laporan", icon: ClipboardList },
+  { href: "/units", label: "Unit", icon: LightBulb },
+  { href: "/reports", label: "Laporan", icon: ClipboardCheck },
 ];
 
 export function MobileNav() {

@@ -3,7 +3,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
+import { Download, SystemRestart } from "iconoir-react";
 import { utils, writeFile } from "xlsx";
 import { format } from "date-fns";
 import { ProvinceStats, DashboardStats } from "@/app/actions/dashboard";
@@ -92,7 +92,7 @@ export function ExportDashboardButton({
     return (
         <Button variant="outline" size="sm" onClick={handleExport} disabled={loading}>
             {loading ? (
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                <SystemRestart className="h-4 w-4 mr-2 animate-spin" />
             ) : (
                 <Download className="h-4 w-4 mr-2" />
             )}

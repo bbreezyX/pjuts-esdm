@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, FileText, Clock } from "lucide-react";
+import { MapPin, Notes, Clock } from "iconoir-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -26,7 +26,7 @@ export function ActivityFeed({ activities, maxHeight = "400px" }: ActivityFeedPr
   const getActivityIcon = (type: Activity["type"]) => {
     switch (type) {
       case "report":
-        return <FileText className="h-3.5 w-3.5" />;
+        return <Notes className="h-3.5 w-3.5" />;
       case "unit_added":
         return <MapPin className="h-3.5 w-3.5" />;
       default:

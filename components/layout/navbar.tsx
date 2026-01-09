@@ -6,19 +6,19 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
 import {
-  LayoutDashboard,
+  Dashboard,
   Map,
-  ClipboardList,
-  Lightbulb,
-  FileBarChart,
+  ClipboardCheck,
+  LightBulb,
+  StatsReport,
   Menu,
-  X,
+  Xmark,
   LogOut,
   User,
   Bell,
   Search,
-  ChevronDown,
-} from "lucide-react";
+  NavArrowDown,
+} from "iconoir-react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -60,11 +60,11 @@ interface NavbarProps {
 }
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/dashboard", label: "Dashboard", icon: Dashboard },
   { href: "/map", label: "Peta", icon: Map },
-  { href: "/units", label: "Unit PJUTS", icon: Lightbulb },
-  { href: "/reports", label: "Laporan", icon: ClipboardList },
-  { href: "/analytics", label: "Analitik", icon: FileBarChart },
+  { href: "/units", label: "Unit PJUTS", icon: LightBulb },
+  { href: "/reports", label: "Laporan", icon: ClipboardCheck },
+  { href: "/analytics", label: "Analitik", icon: StatsReport },
   { href: "/users", label: "Pengguna", icon: User, adminOnly: true },
 ];
 
@@ -182,7 +182,7 @@ export function Navbar({ user }: NavbarProps) {
                 className="h-8 w-8"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <X className="h-4 w-4" />
+                <Xmark className="h-4 w-4" />
               </Button>
             </div>
             <nav className="p-2 space-y-1">

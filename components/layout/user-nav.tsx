@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, User, ChevronDown } from "lucide-react";
+import { LogOut, User, NavArrowDown } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -44,7 +44,7 @@ export function UserNav({ user }: UserNavProps) {
                             {user.role === "ADMIN" ? "Administrator" : "Petugas Lapangan"}
                         </p>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-slate-400 hidden lg:block" />
+                    <NavArrowDown className="h-4 w-4 text-slate-400 hidden lg:block" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">

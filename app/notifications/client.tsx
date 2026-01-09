@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
-    CheckCircle2,
-    AlertTriangle,
-    XCircle,
-    FileText,
-    CheckCheck,
-    Bell
-} from "lucide-react";
+    CheckCircle,
+    WarningTriangle,
+    XmarkCircle,
+    Notes,
+    DoubleCheck,
+    BellNotification
+} from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { getNotifications, markAllRead, type NotificationItem } from "@/app/actions/notifications";
@@ -63,13 +63,13 @@ export function NotificationsClient({ initialNotifications, initialLastRead }: N
     const getIcon = (type: string) => {
         switch (type) {
             case "CRITICAL":
-                return <XCircle className="h-5 w-5 text-red-600" />;
+                return <XmarkCircle className="h-5 w-5 text-red-600" />;
             case "WARNING":
-                return <AlertTriangle className="h-5 w-5 text-amber-600" />;
+                return <WarningTriangle className="h-5 w-5 text-amber-600" />;
             case "INFO":
-                return <FileText className="h-5 w-5 text-primary-600" />;
+                return <Notes className="h-5 w-5 text-primary-600" />;
             default:
-                return <CheckCircle2 className="h-5 w-5 text-slate-500" />;
+                return <CheckCircle className="h-5 w-5 text-slate-500" />;
         }
     };
 
@@ -93,7 +93,7 @@ export function NotificationsClient({ initialNotifications, initialLastRead }: N
                         variant="outline"
                         className="shrink-0"
                     >
-                        <CheckCheck className="w-4 h-4 mr-2" />
+                        <DoubleCheck className="w-4 h-4 mr-2" />
                         Tandai semua dibaca
                     </Button>
                 )}
@@ -103,7 +103,7 @@ export function NotificationsClient({ initialNotifications, initialLastRead }: N
                 {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center p-12 text-center text-slate-500">
                         <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                            <Bell className="h-8 w-8 text-slate-400" />
+                            <BellNotification className="h-8 w-8 text-slate-400" />
                         </div>
                         <h3 className="text-lg font-medium text-slate-900 mb-1">Tidak ada notifikasi</h3>
                         <p>Anda belum memiliki notifikasi apapun saat ini.</p>

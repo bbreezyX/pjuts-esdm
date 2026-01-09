@@ -34,15 +34,15 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import {
   Plus,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Shield,
+  MoreHoriz,
+  EditPencil,
+  Trash,
+  ShieldCheck,
   User,
-  UserX,
-  UserCheck,
-  AlertTriangle,
-} from "lucide-react";
+  UserXmark,
+  UserBadgeCheck,
+  WarningTriangle,
+} from "iconoir-react";
 import {
   UserData,
   createUser,
@@ -320,7 +320,7 @@ export function UsersClient({ users }: UsersClientProps) {
                       className="text-slate-900 focus:bg-slate-100 cursor-pointer"
                     >
                       <div className="flex items-center gap-2">
-                        <Shield className="w-4 h-4 text-amber-500" />
+                        <ShieldCheck className="w-4 h-4 text-amber-500" />
                         <span>Administrator</span>
                       </div>
                     </SelectItem>
@@ -405,7 +405,7 @@ export function UsersClient({ users }: UsersClientProps) {
                     >
                       <div className="flex items-center gap-1">
                         {user.role === "ADMIN" ? (
-                          <Shield className="w-3 h-3" />
+                          <ShieldCheck className="w-3 h-3" />
                         ) : (
                           <User className="w-3 h-3" />
                         )}
@@ -440,7 +440,7 @@ export function UsersClient({ users }: UsersClientProps) {
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button variant="ghost" size="icon-sm">
-                          <MoreHorizontal className="h-4 w-4" />
+                          <MoreHoriz className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
@@ -451,7 +451,7 @@ export function UsersClient({ users }: UsersClientProps) {
                             setIsDialogOpen(true);
                           }}
                         >
-                          <Pencil className="mr-2 h-4 w-4" />
+                          <EditPencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
@@ -461,12 +461,12 @@ export function UsersClient({ users }: UsersClientProps) {
                         >
                           {user.isActive ? (
                             <>
-                              <UserX className="mr-2 h-4 w-4 text-orange-500" />
+                              <UserXmark className="mr-2 h-4 w-4 text-orange-500" />
                               <span className="text-orange-600">Nonaktifkan</span>
                             </>
                           ) : (
                             <>
-                              <UserCheck className="mr-2 h-4 w-4 text-emerald-500" />
+                              <UserBadgeCheck className="mr-2 h-4 w-4 text-emerald-500" />
                               <span className="text-emerald-600">Aktifkan</span>
                             </>
                           )}
@@ -475,7 +475,7 @@ export function UsersClient({ users }: UsersClientProps) {
                           className="text-red-600"
                           onClick={() => handleDelete(user.id)}
                         >
-                          <Trash2 className="mr-2 h-4 w-4" />
+                          <Trash className="mr-2 h-4 w-4" />
                           Hapus
                         </DropdownMenuItem>
                       </DropdownMenuContent>
@@ -493,7 +493,7 @@ export function UsersClient({ users }: UsersClientProps) {
         <DialogContent className="w-[95vw] max-w-[425px] bg-white text-slate-900 border-slate-200 shadow-xl rounded-xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              <WarningTriangle className="w-5 h-5 text-amber-500" />
               Nonaktifkan Pengguna?
             </DialogTitle>
             <DialogDescription className="text-slate-600">

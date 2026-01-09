@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Wifi, WifiOff } from "lucide-react";
+import { Wifi, WifiOff } from "iconoir-react";
 import { cn } from "@/lib/utils";
 
 /**

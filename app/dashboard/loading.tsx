@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { FileBarChart } from "lucide-react";
+import { StatsReport } from "iconoir-react";
 import {
     StatsGridSkeleton,
     ReportStatsSkeleton,
@@ -21,7 +21,7 @@ export default function DashboardLoading() {
                         Export Data
                     </Button>
                     <Button size="sm" disabled>
-                        <FileBarChart className="h-4 w-4 mr-2" />
+                        <StatsReport className="h-4 w-4 mr-2" />
                         Buat Laporan
                     </Button>
                 </div>
@@ -35,7 +35,7 @@ export default function DashboardLoading() {
                 </div>
                 <div className="relative flex justify-center">
                     <div className="flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-200/60 shadow-sm text-slate-500">
-                        <FileBarChart className="h-3.5 w-3.5" />
+                        <StatsReport className="h-3.5 w-3.5" />
                         <span className="text-xs font-medium uppercase tracking-wider">
                             Statistik Laporan
                         </span>
