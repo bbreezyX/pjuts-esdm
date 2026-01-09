@@ -1,211 +1,103 @@
-# PJUTS ESDM Backend
+# 🇮🇩 PJUTS Monitoring System
 
-Sistem backend untuk monitoring Penerangan Jalan Umum Tenaga Surya (PJUTS) - Kementerian Energi dan Sumber Daya Mineral Indonesia.
+**Illuminating the Archipelago, One Solar Light at a Time.**
 
-## 🏗️ Tech Stack
+---
 
-- **Runtime/API**: Next.js 15 with Server Actions (App Router)
-- **Database**: PostgreSQL with Prisma ORM
-- **Storage**: Cloudflare R2 (S3-compatible)
-- **Authentication**: NextAuth.js v5 (Auth.js)
-- **Validation**: Zod
-- **Styling**: Tailwind CSS
+In the vast expanse of Indonesia, from the bustling streets of Jakarta to the remote islands of the East, thousands of **Solar Public Street Lights (PJUTS)** stand as beacons of renewable energy directly serving the community. But with great scale comes a great challenge: **How do we ensure every single light remains operational?**
 
-## 📋 Features
+This project is the answer. It is a dedicated digital platform built for the **Ministry of Energy and Mineral Resources (Kementerian ESDM)** to monitor, manage, and maintain the nationwide network of solar street lights.
 
-- ✅ Type-safe API with Server Actions
-- ✅ High-resolution image upload to Cloudflare R2
-- ✅ PostgreSQL database with Prisma ORM
-- ✅ Indonesian geospatial validation (coordinates within Indonesia)
-- ✅ Role-based access control (Admin/Field Staff)
-- ✅ Dashboard statistics and province aggregation
-- ✅ Map points with status filtering
-- ✅ Report submission with automatic unit status updates
+## 📖 The Story
+
+Imagine manual reports lost in transit, uncertain maintenance schedules, and the difficulty of verifying repairs in remote locations. The **PJUTS Monitoring System** transforms this logistical nightmare into a streamlined, data-driven operation.
+
+We empower **Field Staff** with a simple, mobile-friendly tool to submit real-time reports—complete with GPS-verified coordinates and high-resolution photos—directly from the installation site. Meanwhile, **Admins** in the control center get a bird's-eye view of the entire country's infrastructure through an interactive dashboard, allowing them to spot outages instantly and deploy resources where they are needed most.
+
+It's not just a database; it is the nervous system of Indonesia's solar lighting infrastructure.
+
+## ✨ Key Features
+
+### For the Guardians on the Ground (Field Staff)
+- **📍 Precision Reporting**: Submit reports tagged with GPS coordinates. The system automatically verifies that you are actually at the unit's location.
+- **📸 Visual Proof**: Upload high-resolution evidence of repairs or issues, optimized automatically for fast transmission even in low-bandwidth areas.
+- **⚡ Battery Health Checks**: Log voltage readings to predict failures before they happen.
+
+### For the Command Center (Admins)
+- **🗺️ Interactive Situation Room**: A geospatial map visualizing the status of every unit in real-time—green for operational, red for critical.
+- **📊 Insightful Dashboards**: Aggregate data by province to identifying regional trends and maintenance hotspots.
+- **🛡️ Secure Management**: Robust role-based access control ensures data integrity.
+
+## 🛠️ Built With
+
+We chose a stack that prioritizes **performance**, **reliability**, and **scale**:
+
+- **Next.js 15 (App Router)**: For a fast, SEO-friendly, and modern frontend experience.
+- **TypeScript & Zod**: Ensuring end-to-end type safety and robust data validation.
+- **Prisma & PostgreSQL**: A powerful relational database to handle complex asset management.
+- **Cloudflare R2**: Cost-effective, robust object storage for thousands of field reports.
+- **Tailwind CSS**: Creating a beautiful, responsive interface that looks good on any device.
 
 ## 🚀 Getting Started
 
+Ready to light up the development environment? Follow these steps to deploy the system locally.
+
 ### Prerequisites
 
-- Node.js 18+
-- PostgreSQL database
-- Cloudflare R2 bucket
+- **Node.js 18+**
+- **PostgreSQL** database ready to accept connections.
+- **Cloudflare R2** bucket (or S3-compatible storage) for image handling.
 
-### 1. Clone & Install
+### 1. Installation
+
+Clone the repository and install the dependencies to get the grid online:
 
 ```bash
+git clone https://github.com/your-org/pjuts-esdm.git
 cd pjuts-esdm
 npm install
 ```
 
-### 2. Environment Setup
+### 2. Configuration
 
-Copy `env.example.txt` to `.env` and configure:
-
-```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/pjuts_esdm?schema=public"
-
-# NextAuth
-AUTH_SECRET="your-super-secret-key-generate-with-openssl-rand-base64-32"
-AUTH_URL="http://localhost:3000"
-
-# Cloudflare R2
-R2_ACCOUNT_ID="your-cloudflare-account-id"
-R2_ACCESS_KEY_ID="your-r2-access-key-id"
-R2_SECRET_ACCESS_KEY="your-r2-secret-access-key"
-R2_BUCKET_NAME="pjuts-esdm"
-R2_PUBLIC_URL="https://your-bucket.r2.dev"
-
-# Database Seed (only needed for initial setup)
-SEED_ADMIN_PASSWORD="your-secure-admin-password"
-SEED_STAFF_PASSWORD="your-secure-staff-password"
-```
-
-### 3. Database Setup
+Create your local environment configuration. Make sure to fill in your specific database and storage credentials.
 
 ```bash
-# Generate Prisma client
+cp env.example.txt .env
+```
+> **Pro Tip**: Update the `DATABASE_URL` and R2 credentials in your new `.env` file before proceeding.
+
+### 3. Database Initialization
+
+Wake up the database and plant the initial seed data.
+
+```bash
+# Generate the Prisma client
 npm run db:generate
 
-# Push schema to database
+# Push the schema to your local database
 npm run db:push
 
-# Seed with sample data
+# Seed the database with initial admin/staff accounts and demo units
 npm run db:seed
 ```
 
-### 4. Run Development Server
+> **Note**: The seed script will generate default admin and field staff accounts. Check the `prisma/seed.ts` file or your `.env` configuration to set their initial passwords.
+
+### 4. Ignite the Engine
+
+Launch the development server:
 
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Navigate to `http://localhost:3000` to access the command center.
 
-## 📦 Project Structure
+## 🤝 Contributing
 
-```
-├── app/
-│   ├── actions/           # Server Actions
-│   │   ├── reports.ts     # Report submission & retrieval
-│   │   ├── dashboard.ts   # Dashboard statistics
-│   │   ├── map.ts         # Map points & clusters
-│   │   └── units.ts       # PJUTS unit management
-│   ├── api/               # API Routes (REST)
-│   │   ├── auth/          # NextAuth handlers
-│   │   ├── dashboard/     # Dashboard API
-│   │   ├── map/           # Map API
-│   │   └── units/         # Units API
-│   ├── login/             # Login page
-│   └── page.tsx           # Landing page
-├── lib/
-│   ├── auth.ts            # NextAuth configuration
-│   ├── db.ts              # Prisma client
-│   ├── r2.ts              # Cloudflare R2 service
-│   └── validations.ts     # Zod schemas
-├── prisma/
-│   ├── schema.prisma      # Database schema
-│   └── seed.ts            # Seed data
-└── types/
-    └── index.ts           # TypeScript types
-```
+We welcome contributions to help keep the lights on! Whether it's optimizing the query performance or polishing the UI for field staff usage, feel free to open a Pull Request.
 
-## 🔐 Authentication
+## ⚖️ License
 
-### User Accounts
-
-After running `npm run db:seed`, the following accounts are created:
-
-| Role | Email |
-|------|-------|
-| Admin | admin@esdm.go.id |
-| Field Staff | petugas1@esdm.go.id |
-| Field Staff | petugas2@esdm.go.id |
-| Field Staff | petugas3@esdm.go.id |
-
-> **Note:** Passwords are set from environment variables `SEED_ADMIN_PASSWORD` and `SEED_STAFF_PASSWORD`.
-
-### Role Permissions
-
-- **Admin**: Full access to all features, can create/delete units and reports
-- **Field Staff**: Can submit reports and view their own submissions
-
-## 📡 API Reference
-
-### Server Actions (Recommended)
-
-Import from `@/app/actions`:
-
-```typescript
-import { 
-  submitReport,
-  getDashboardStats,
-  getMapPoints,
-  getPjutsUnits
-} from "@/app/actions";
-```
-
-### REST API Endpoints
-
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/api/dashboard` | GET | Dashboard statistics |
-| `/api/map` | GET | Map points (supports bounds & status filters) |
-| `/api/units` | GET | Paginated units list |
-| `/api/units/provinces` | GET | List of provinces |
-
-## 📊 Database Schema
-
-### Models
-
-- **User**: System users with roles
-- **PjutsUnit**: Solar street light units with location data
-- **Report**: Field reports with images and voltage readings
-
-### Unit Status Values
-
-- `OPERATIONAL` - Unit is working normally
-- `MAINTENANCE_NEEDED` - Unit needs maintenance (voltage 10-20V)
-- `OFFLINE` - Unit is not functioning (voltage < 10V)
-- `UNVERIFIED` - Newly added, not yet verified
-
-## 🗺️ Geospatial Validation
-
-All coordinates are validated to be within Indonesian boundaries:
-
-- **Latitude**: -11.0 to 6.0
-- **Longitude**: 95.0 to 141.0
-
-## 🖼️ Image Upload
-
-- Supports JPEG, PNG, WebP
-- Auto-converts to WebP for optimization
-- Max size: 10MB
-- Stored in R2 with path: `reports/{province}/{unit_id}/{timestamp}.webp`
-
-## 🛠️ Development
-
-### Prisma Commands
-
-```bash
-# Generate client after schema changes
-npm run db:generate
-
-# Push schema to database
-npm run db:push
-
-# Create migration
-npm run db:migrate
-
-# Open Prisma Studio
-npm run db:studio
-```
-
-### Type Generation
-
-Types are auto-generated by Prisma. Run `npm run db:generate` after schema changes.
-
-## 📝 License
-
-This project is developed for Kementerian ESDM Republik Indonesia.
-
+Developed for **Kementerian ESDM Republik Indonesia**. Example proprietary/private license.
