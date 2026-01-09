@@ -80,7 +80,7 @@ const styles = {
 function BaseLayout(props: { title: string; children: string; previewText: string }) {
   // Use a reliable placeholder if local dev, assuming public folder is served
   // In production, APP_URL should point to the actual domain where images are hosted
-  const logoUrl = `${APP_URL}/logo-esdm.png`; 
+  const logoUrl = `${APP_URL}/logo-esdm.png`;
 
   return `
 <!DOCTYPE html>
@@ -158,7 +158,7 @@ function getReportNotificationHtml(data: ReportNotificationData, recipientName: 
   let statusText = "Offline";
   let statusColor = "#e53e3e"; // red
   let statusBg = "#fff5f5";
-  
+
   if (data.batteryVoltage >= 20) {
     statusText = "Operasional";
     statusColor = "#38a169"; // green
@@ -288,9 +288,9 @@ export async function sendReportNotificationToAdmins(
     return { success: true };
   } catch (error) {
     console.error("Error sending report notification email:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Unknown error" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
     };
   }
 }
@@ -329,9 +329,168 @@ export async function sendUnitNotificationToFieldStaff(
     return { success: true };
   } catch (error) {
     console.error("Error sending unit notification email:", error);
-    return { 
-      success: false, 
-      error: error instanceof Error ? error.message : "Unknown error" 
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
     };
   }
 }
+
+// ============================================
+// ACCOUNT STATUS NOTIFICATION EMAILS
+// ============================================
+
+interface AccountStatusData {
+  userName: string;
+  userEmail: string;
+}
+
+function getAccountDisabledHtml(data: AccountStatusData): string {
+  const content = `
+    <p style="${styles.greeting}">Halo, ${data.userName}</p>
+    
+    <p style="${styles.text}">
+      Kami informasikan bahwa akun Anda dengan email <strong>${data.userEmail}</strong> 
+      telah <strong>dinonaktifkan</strong> oleh administrator sistem PJUTS ESDM.
+    </p>
+    
+    <div style="${styles.tableContainer}">
+      <table style="${styles.table}">
+        ${DataRow("Status Akun", "Dinonaktifkan")}
+        ${DataRow("Email", data.userEmail)}
+        ${DataRow("Waktu", new Date().toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" }))}
+      </table>
+    </div>
+    
+    <p style="${styles.text}">
+      Selama akun dinonaktifkan, Anda tidak akan dapat masuk ke sistem. 
+      Jika Anda merasa ini adalah kesalahan atau memerlukan informasi lebih lanjut, 
+      silakan hubungi administrator.
+    </p>
+    
+    <div style="${styles.buttonContainer}">
+      <a href="mailto:support@esdm.go.id" style="${styles.button}">
+        Hubungi Administrator
+      </a>
+    </div>
+  `;
+
+  return BaseLayout({
+    title: "Akun Anda Dinonaktifkan",
+    previewText: `Akun ${data.userEmail} telah dinonaktifkan oleh administrator.`,
+    children: content
+  });
+}
+
+function getAccountEnabledHtml(data: AccountStatusData): string {
+  const content = `
+    <p style="${styles.greeting}">Halo, ${data.userName}</p>
+    
+    <p style="${styles.text}">
+      Kabar baik! Akun Anda dengan email <strong>${data.userEmail}</strong> 
+      telah <strong>diaktifkan kembali</strong> oleh administrator sistem PJUTS ESDM.
+    </p>
+    
+    <div style="${styles.tableContainer}">
+      <table style="${styles.table}">
+        ${DataRow("Status Akun", "Aktif")}
+        ${DataRow("Email", data.userEmail)}
+        ${DataRow("Waktu", new Date().toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" }))}
+      </table>
+    </div>
+    
+    <p style="${styles.text}">
+      Anda sekarang dapat masuk ke sistem dan menggunakan semua fitur yang tersedia. 
+      Selamat bekerja kembali!
+    </p>
+    
+    <div style="${styles.buttonContainer}">
+      <a href="${APP_URL}/login" style="${styles.button}">
+        Masuk ke Sistem
+      </a>
+    </div>
+  `;
+
+  return BaseLayout({
+    title: "Akun Anda Diaktifkan Kembali",
+    previewText: `Selamat datang kembali! Akun ${data.userEmail} telah diaktifkan.`,
+    children: content
+  });
+}
+
+/**
+ * Send notification when user account is disabled
+ */
+export async function sendAccountDisabledEmail(
+  recipient: EmailRecipient
+): Promise<SendEmailResult> {
+  const client = getResendClient();
+  if (!client) {
+    console.warn("RESEND_API_KEY not configured, skipping email notification");
+    return { success: true };
+  }
+
+  try {
+    const { error } = await client.emails.send({
+      from: FROM_EMAIL,
+      to: recipient.email,
+      subject: "[PJUTS ESDM] Akun Anda Dinonaktifkan",
+      html: getAccountDisabledHtml({
+        userName: recipient.name,
+        userEmail: recipient.email,
+      }),
+    });
+
+    if (error) {
+      console.error("Error sending account disabled email:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending account disabled email:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    };
+  }
+}
+
+/**
+ * Send notification when user account is re-enabled
+ */
+export async function sendAccountEnabledEmail(
+  recipient: EmailRecipient
+): Promise<SendEmailResult> {
+  const client = getResendClient();
+  if (!client) {
+    console.warn("RESEND_API_KEY not configured, skipping email notification");
+    return { success: true };
+  }
+
+  try {
+    const { error } = await client.emails.send({
+      from: FROM_EMAIL,
+      to: recipient.email,
+      subject: "[PJUTS ESDM] Akun Anda Diaktifkan Kembali",
+      html: getAccountEnabledHtml({
+        userName: recipient.name,
+        userEmail: recipient.email,
+      }),
+    });
+
+    if (error) {
+      console.error("Error sending account enabled email:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending account enabled email:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error"
+    };
+  }
+}
+

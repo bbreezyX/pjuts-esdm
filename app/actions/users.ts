@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { sendAccountDisabledEmail, sendAccountEnabledEmail } from "@/lib/email";
 
 // ============================================
 // TYPES & SCHEMAS
@@ -23,6 +24,7 @@ export interface UserData {
   name: string;
   email: string;
   role: Role;
+  isActive: boolean;
   createdAt: Date;
 }
 
@@ -71,6 +73,7 @@ export async function getUsers(): Promise<ActionResult<UserData[]>> {
         name: true,
         email: true,
         role: true,
+        isActive: true,
         createdAt: true,
       },
     });
@@ -131,6 +134,7 @@ export async function createUser(formData: FormData): Promise<ActionResult<UserD
         name: true,
         email: true,
         role: true,
+        isActive: true,
         createdAt: true,
       },
     });
@@ -185,6 +189,7 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
         name: true,
         email: true,
         role: true,
+        isActive: true,
         createdAt: true,
       },
     });
@@ -222,3 +227,67 @@ export async function deleteUser(userId: string): Promise<ActionResult> {
   }
 }
 
+// ============================================
+// TOGGLE USER STATUS (Enable/Disable)
+// ============================================
+
+export async function toggleUserStatus(userId: string): Promise<ActionResult<UserData>> {
+  try {
+    const session = await auth();
+    if (session?.user?.role !== "ADMIN") {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Prevent admin from disabling themselves
+    if (session.user.id === userId) {
+      return { success: false, error: "Tidak dapat menonaktifkan akun sendiri" };
+    }
+
+    // Get current user status
+    const currentUser = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { isActive: true, name: true, email: true },
+    });
+
+    if (!currentUser) {
+      return { success: false, error: "Pengguna tidak ditemukan" };
+    }
+
+    // Toggle the status
+    const newStatus = !currentUser.isActive;
+
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: { isActive: newStatus },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        isActive: true,
+        createdAt: true,
+      },
+    });
+
+    // Send email notification
+    if (newStatus) {
+      // Account enabled
+      await sendAccountEnabledEmail({
+        email: currentUser.email,
+        name: currentUser.name,
+      });
+    } else {
+      // Account disabled
+      await sendAccountDisabledEmail({
+        email: currentUser.email,
+        name: currentUser.name,
+      });
+    }
+
+    revalidatePath("/users");
+    return { success: true, data: user };
+  } catch (error) {
+    console.error("Toggle user status error:", error);
+    return { success: false, error: "Gagal mengubah status pengguna" };
+  }
+}

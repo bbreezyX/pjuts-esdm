@@ -60,6 +60,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
               name: true,
               password: true,
               role: true,
+              isActive: true,
             },
           });
 
@@ -72,6 +73,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!user || !isValidPassword) {
             // Increment rate limit counter on failed attempt
             incrementRateLimit(rateLimitKey);
+            return null;
+          }
+
+          // Check if user account is disabled
+          if (!user.isActive) {
+            console.warn(`Login attempt from disabled account: ${email}`);
             return null;
           }
 

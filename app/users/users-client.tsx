@@ -8,6 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
   DropdownMenu,
@@ -15,6 +17,7 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
 import {
   Plus,
   MoreHorizontal,
@@ -35,12 +39,16 @@ import {
   Trash2,
   Shield,
   User,
+  UserX,
+  UserCheck,
+  AlertTriangle,
 } from "lucide-react";
 import {
   UserData,
   createUser,
   updateUser,
   deleteUser,
+  toggleUserStatus,
 } from "@/app/actions/users";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -52,6 +60,8 @@ export function UsersClient({ users }: UsersClientProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [confirmDisableUser, setConfirmDisableUser] = useState<UserData | null>(null);
+  const [togglingUserId, setTogglingUserId] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
 
@@ -143,6 +153,48 @@ export function UsersClient({ users }: UsersClientProps) {
         title: "Error",
         description: "Terjadi kesalahan sistem",
       });
+    }
+  };
+
+  const handleToggleStatus = async (user: UserData) => {
+    // If enabling, just do it. If disabling, show confirmation first
+    if (user.isActive) {
+      setConfirmDisableUser(user);
+      return;
+    }
+
+    await performToggle(user.id);
+  };
+
+  const performToggle = async (userId: string) => {
+    setTogglingUserId(userId);
+    setConfirmDisableUser(null);
+
+    try {
+      const result = await toggleUserStatus(userId);
+      if (result.success) {
+        toast({
+          title: "Berhasil",
+          description: result.data?.isActive
+            ? "Pengguna berhasil diaktifkan"
+            : "Pengguna berhasil dinonaktifkan",
+        });
+        router.refresh();
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Gagal",
+          description: result.error || "Gagal mengubah status pengguna",
+        });
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Terjadi kesalahan sistem",
+      });
+    } finally {
+      setTogglingUserId(null);
     }
   };
 
@@ -310,29 +362,46 @@ export function UsersClient({ users }: UsersClientProps) {
                 <th>Nama</th>
                 <th>Email</th>
                 <th className="text-center">Role</th>
+                <th className="text-center">Status</th>
                 <th>Terdaftar</th>
                 <th className="text-center">Aksi</th>
               </tr>
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id}>
+                <tr key={user.id} className={!user.isActive ? "opacity-50" : ""}>
                   <td>
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                        <span className="text-xs font-semibold text-slate-600">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                        !user.isActive ? "bg-slate-200" : "bg-slate-100"
+                      }`}>
+                        <span className={`text-xs font-semibold ${
+                          !user.isActive ? "text-slate-400" : "text-slate-600"
+                        }`}>
                           {user.name.charAt(0).toUpperCase()}
                         </span>
                       </div>
-                      <span className="font-medium text-slate-900">
-                        {user.name}
-                      </span>
+                      <div className="flex flex-col">
+                        <span className={`font-medium ${
+                          !user.isActive ? "text-slate-500" : "text-slate-900"
+                        }`}>
+                          {user.name}
+                        </span>
+                        {!user.isActive && (
+                          <span className="text-xs text-red-500 font-medium">
+                            Dinonaktifkan
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </td>
-                  <td className="text-slate-600">{user.email}</td>
+                  <td className={!user.isActive ? "text-slate-400" : "text-slate-600"}>
+                    {user.email}
+                  </td>
                   <td className="text-center">
                     <Badge
                       variant={user.role === "ADMIN" ? "default" : "secondary"}
+                      className={!user.isActive ? "opacity-50" : ""}
                     >
                       <div className="flex items-center gap-1">
                         {user.role === "ADMIN" ? (
@@ -344,7 +413,27 @@ export function UsersClient({ users }: UsersClientProps) {
                       </div>
                     </Badge>
                   </td>
-                  <td className="text-slate-600">
+                  <td className="text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Switch
+                        checked={user.isActive}
+                        onCheckedChange={() => handleToggleStatus(user)}
+                        disabled={togglingUserId === user.id}
+                        className="data-[state=checked]:bg-emerald-500"
+                      />
+                      <Badge
+                        variant={user.isActive ? "default" : "destructive"}
+                        className={`text-[10px] px-1.5 py-0 ${
+                          user.isActive
+                            ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-100"
+                            : "bg-red-100 text-red-700 hover:bg-red-100"
+                        }`}
+                      >
+                        {user.isActive ? "Aktif" : "Nonaktif"}
+                      </Badge>
+                    </div>
+                  </td>
+                  <td className={!user.isActive ? "text-slate-400" : "text-slate-600"}>
                     {new Date(user.createdAt).toLocaleDateString("id-ID")}
                   </td>
                   <td className="text-center">
@@ -365,6 +454,23 @@ export function UsersClient({ users }: UsersClientProps) {
                           <Pencil className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => handleToggleStatus(user)}
+                          disabled={togglingUserId === user.id}
+                        >
+                          {user.isActive ? (
+                            <>
+                              <UserX className="mr-2 h-4 w-4 text-orange-500" />
+                              <span className="text-orange-600">Nonaktifkan</span>
+                            </>
+                          ) : (
+                            <>
+                              <UserCheck className="mr-2 h-4 w-4 text-emerald-500" />
+                              <span className="text-emerald-600">Aktifkan</span>
+                            </>
+                          )}
+                        </DropdownMenuItem>
                         <DropdownMenuItem
                           className="text-red-600"
                           onClick={() => handleDelete(user.id)}
@@ -381,6 +487,52 @@ export function UsersClient({ users }: UsersClientProps) {
           </table>
         </div>
       </Card>
+
+      {/* Confirmation Dialog for Disabling User */}
+      <Dialog open={!!confirmDisableUser} onOpenChange={() => setConfirmDisableUser(null)}>
+        <DialogContent className="w-[95vw] max-w-[425px] bg-white text-slate-900 border-slate-200 shadow-xl rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-amber-500" />
+              Nonaktifkan Pengguna?
+            </DialogTitle>
+            <DialogDescription className="text-slate-600">
+              Pengguna yang dinonaktifkan tidak akan dapat masuk ke sistem.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-amber-50 border border-amber-100 rounded-lg p-4">
+              <p className="text-sm text-amber-800">
+                Anda akan menonaktifkan akun:
+              </p>
+              <p className="font-semibold text-amber-900 mt-1">
+                {confirmDisableUser?.name} ({confirmDisableUser?.email})
+              </p>
+              <p className="text-xs text-amber-700 mt-2">
+                Pengguna akan menerima notifikasi email tentang perubahan status akun mereka.
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="flex gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setConfirmDisableUser(null)}
+              className="bg-white text-slate-700 border-slate-300 hover:bg-slate-50"
+            >
+              Batal
+            </Button>
+            <Button
+              type="button"
+              onClick={() => confirmDisableUser && performToggle(confirmDisableUser.id)}
+              disabled={togglingUserId !== null}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
+              {togglingUserId ? "Memproses..." : "Ya, Nonaktifkan"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
