@@ -4,7 +4,8 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { createPjutsUnitSchema, type CreatePjutsUnitInput } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
-import { UnitStatus } from "@prisma/client";
+import { UnitStatus, Role } from "@prisma/client";
+import { sendUnitNotificationToFieldStaff } from "@/lib/email";
 
 // ============================================
 // TYPES
@@ -109,6 +110,29 @@ export async function createPjutsUnit(
     revalidatePath("/dashboard");
     revalidatePath("/units");
     revalidatePath("/map");
+
+    // Send email notification to field staff (non-blocking)
+    try {
+      const fieldStaff = await prisma.user.findMany({
+        where: { role: Role.FIELD_STAFF },
+        select: { email: true },
+      });
+      
+      const fieldStaffEmails = fieldStaff.map((f) => f.email);
+      
+      // Send notification in background (don't await to avoid slowing down response)
+      sendUnitNotificationToFieldStaff(fieldStaffEmails, {
+        unitSerial: unit.serialNumber,
+        unitProvince: unit.province,
+        unitRegency: unit.regency,
+        createdByName: session.user.name || "Admin",
+      }).catch((err) => {
+        console.error("Failed to send unit notification email:", err);
+      });
+    } catch (emailError) {
+      // Don't fail the unit creation if email fails
+      console.error("Error preparing unit notification:", emailError);
+    }
 
     return {
       success: true,

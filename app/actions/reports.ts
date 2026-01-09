@@ -5,7 +5,8 @@ import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
 import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
-import { UnitStatus } from "@prisma/client";
+import { UnitStatus, Role } from "@prisma/client";
+import { sendReportNotificationToAdmins } from "@/lib/email";
 
 // ============================================
 // TYPES
@@ -255,6 +256,31 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     revalidatePath("/reports");
     revalidatePath("/units");
     revalidatePath("/map");
+
+    // 10. Send email notification to admins (non-blocking)
+    try {
+      const admins = await prisma.user.findMany({
+        where: { role: Role.ADMIN },
+        select: { email: true },
+      });
+      
+      const adminEmails = admins.map((a) => a.email);
+      
+      // Send notification in background (don't await to avoid slowing down response)
+      sendReportNotificationToAdmins(adminEmails, {
+        unitSerial: report.unit.serialNumber,
+        unitProvince: report.unit.province,
+        unitRegency: report.unit.regency,
+        reporterName: report.user.name,
+        batteryVoltage: validatedData.batteryVoltage,
+        reportId: report.id,
+      }).catch((err) => {
+        console.error("Failed to send report notification email:", err);
+      });
+    } catch (emailError) {
+      // Don't fail the report submission if email fails
+      console.error("Error preparing report notification:", emailError);
+    }
 
     // Format response to match ReportData interface
     const reportData: ReportData = {
