@@ -16,9 +16,7 @@ export default function FeaturesSection() {
   return (
     <section id="features" className="pt-8 pb-24 lg:pt-12 lg:pb-32 relative overflow-hidden bg-slate-50/50">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] opacity-[0.4]" />
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 via-transparent to-slate-50/80" />
-
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e140_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e140_1px,transparent_1px)] bg-[size:40px_40px] bg-fixed" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center mb-20 max-w-3xl mx-auto">
           <FadeIn direction="up">

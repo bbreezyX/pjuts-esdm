@@ -8,7 +8,9 @@ import { ScaleIn } from "@/components/ui/motion";
 
 export default function CTASection() {
   return (
-    <section className="pt-8 pb-32 lg:pb-40 bg-slate-50 relative">
+    <section className="pt-8 pb-32 lg:pb-40 bg-slate-50 relative overflow-hidden">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e140_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e140_1px,transparent_1px)] bg-[size:40px_40px] bg-fixed" />
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
           {/* Floating Glow Behind Card */}
           <motion.div 
