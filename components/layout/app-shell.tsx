@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Navbar } from "./navbar";
 import { MobileNav } from "./mobile-nav";
 import { NavigationProgress } from "@/components/ui/navigation-progress";
+import { OfflineBanner } from "@/components/ui/connection-status";
 
 interface AppShellProps {
   children: ReactNode;
@@ -20,6 +21,9 @@ export function AppShell({ children, user }: AppShellProps) {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Offline banner for PWA */}
+      <OfflineBanner />
+      
       {/* Navigation progress bar for visual feedback */}
       <Suspense fallback={null}>
         <NavigationProgress />

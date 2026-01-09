@@ -19,6 +19,7 @@ import {
   X,
   Trash2,
   Plus,
+  Save,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,6 +37,18 @@ import {
 import { PjutsUnitData } from "@/app/actions/units";
 import { submitReport } from "@/app/actions/reports";
 import { cn } from "@/lib/utils";
+import {
+  cacheUnits,
+  getCachedUnits,
+  saveReportDraft,
+  getReportDraft,
+  clearReportDraft,
+  type CachedUnit,
+} from "@/lib/offline";
+import {
+  useConnectionStatus,
+  OfflineBanner,
+} from "@/components/ui/connection-status";
 
 // --- HELPER KOMPRESI GAMBAR ---
 const compressImage = async (file: File): Promise<File> => {
@@ -117,6 +130,7 @@ export function ReportFormClient({
 }: ReportFormClientProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const isOnline = useConnectionStatus();
 
   const [currentStep, setCurrentStep] = useState<Step>(preselectedUnitId ? 2 : 1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -126,6 +140,7 @@ export function ReportFormClient({
   } | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
+  const [draftSaved, setDraftSaved] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     unitId: preselectedUnitId || "",
@@ -136,6 +151,52 @@ export function ReportFormClient({
     batteryVoltage: "",
     notes: "",
   });
+
+  // Cache units for offline access
+  useEffect(() => {
+    if (units.length > 0) {
+      const unitsToCache: CachedUnit[] = units.map((u) => ({
+        id: u.id,
+        serialNumber: u.serialNumber,
+        province: u.province,
+        regency: u.regency,
+        latitude: u.latitude,
+        longitude: u.longitude,
+      }));
+      cacheUnits(unitsToCache);
+    }
+  }, [units]);
+
+  // Load saved draft on mount
+  useEffect(() => {
+    const draft = getReportDraft();
+    if (draft && !preselectedUnitId) {
+      setFormData((prev) => ({
+        ...prev,
+        unitId: draft.unitId || prev.unitId,
+        batteryVoltage: draft.batteryVoltage || prev.batteryVoltage,
+        notes: draft.notes || prev.notes,
+      }));
+    }
+  }, [preselectedUnitId]);
+
+  // Auto-save draft when form changes (debounced)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (formData.unitId || formData.batteryVoltage || formData.notes) {
+        saveReportDraft({
+          unitId: formData.unitId,
+          batteryVoltage: formData.batteryVoltage,
+          notes: formData.notes,
+        });
+        setDraftSaved(true);
+        // Hide the "saved" indicator after 2 seconds
+        setTimeout(() => setDraftSaved(false), 2000);
+      }
+    }, 1000); // Save after 1 second of no changes
+
+    return () => clearTimeout(timer);
+  }, [formData.unitId, formData.batteryVoltage, formData.notes]);
 
   const selectedUnit = units.find((u) => u.id === formData.unitId);
 
@@ -281,6 +342,9 @@ export function ReportFormClient({
       const result = await submitReport(fd);
 
       if (result.success) {
+        // Clear the draft on successful submission
+        clearReportDraft();
+        
         setSubmitResult({
           success: true,
           message: "Laporan berhasil dikirim!",
@@ -309,6 +373,9 @@ export function ReportFormClient({
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
+      {/* Offline Banner */}
+      <OfflineBanner />
+      
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200 safe-area-pt">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
@@ -323,7 +390,13 @@ export function ReportFormClient({
               Langkah {currentStep} dari 4
             </p>
           </div>
-          <div className="w-9" /> {/* Spacer */}
+          <div className="w-9 flex items-center justify-end">
+            {draftSaved && (
+              <div className="flex items-center gap-1 text-emerald-600">
+                <Save className="h-4 w-4" />
+              </div>
+            )}
+          </div>
         </div>
         <Progress value={progressValue} className="h-1" />
       </header>
@@ -739,6 +812,15 @@ export function ReportFormClient({
       {/* Fixed Bottom Navigation - Improved UI/UX */}
       {!submitResult && (
         <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-slate-200 shadow-[0_-4px_20px_-10px_rgba(0,0,0,0.1)] safe-area-pb">
+          {/* Offline warning */}
+          {!isOnline && currentStep === 4 && (
+            <div className="max-w-lg mx-auto px-4 pt-2">
+              <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>Anda sedang offline. Form tersimpan otomatis, kirim saat online.</span>
+              </div>
+            </div>
+          )}
           <div className="max-w-lg mx-auto px-4 py-3 flex gap-3">
             {currentStep > 1 && (
               <Button
@@ -762,12 +844,12 @@ export function ReportFormClient({
               </Button>
             ) : (
               <Button
-                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all disabled:bg-slate-400"
                 onClick={handleSubmit}
                 loading={isSubmitting}
-                disabled={isSubmitting}
+                disabled={isSubmitting || !isOnline}
               >
-                Kirim Laporan
+                {isOnline ? "Kirim Laporan" : "Menunggu Koneksi..."}
               </Button>
             )}
           </div>
