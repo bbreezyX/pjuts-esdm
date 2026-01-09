@@ -32,7 +32,7 @@ It's not just a database; it is the nervous system of Indonesia's solar lighting
 
 We chose a stack that prioritizes **performance**, **reliability**, and **scale**:
 
-- **Next.js 15 (App Router)**: For a fast, SEO-friendly, and modern frontend experience.
+- **Next.js 16 (App Router)**: For a fast, SEO-friendly, and modern frontend experience.
 - **TypeScript & Zod**: Ensuring end-to-end type safety and robust data validation.
 - **Prisma & PostgreSQL**: A powerful relational database to handle complex asset management.
 - **Cloudflare R2**: Cost-effective, robust object storage for thousands of field reports.
