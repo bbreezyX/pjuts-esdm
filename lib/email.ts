@@ -57,7 +57,7 @@ const styles = {
   body: "font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; background-color: #ffffff; color: #2d3748; margin: 0; padding: 0; line-height: 1.6;",
   container: "max-width: 600px; margin: 0 auto; padding: 20px;",
   logoContainer: "text-align: center; margin-bottom: 32px; padding-top: 20px;",
-  logo: "height: 40px; width: auto;", // Adjust based on actual logo aspect ratio
+  logo: "height: 60px; width: auto;", // Adjust based on actual logo aspect ratio
   headerTitle: "color: #1a202c; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 24px; letter-spacing: -0.025em;",
   content: "font-size: 16px; color: #4a5568; margin-bottom: 32px;",
   text: "margin-bottom: 16px; line-height: 1.6;",
