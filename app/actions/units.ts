@@ -115,13 +115,16 @@ export async function createPjutsUnit(
     try {
       const fieldStaff = await prisma.user.findMany({
         where: { role: Role.FIELD_STAFF },
-        select: { email: true },
+        select: { email: true, name: true },
       });
       
-      const fieldStaffEmails = fieldStaff.map((f) => f.email);
+      const recipients = fieldStaff.map((f) => ({
+        email: f.email,
+        name: f.name || "Petugas Lapangan"
+      }));
       
       // Send notification in background (don't await to avoid slowing down response)
-      sendUnitNotificationToFieldStaff(fieldStaffEmails, {
+      sendUnitNotificationToFieldStaff(recipients, {
         unitSerial: unit.serialNumber,
         unitProvince: unit.province,
         unitRegency: unit.regency,

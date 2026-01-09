@@ -28,6 +28,11 @@ interface SendEmailResult {
   error?: string;
 }
 
+export interface EmailRecipient {
+  email: string;
+  name: string;
+}
+
 interface ReportNotificationData {
   unitSerial: string;
   unitProvince: string;
@@ -49,26 +54,34 @@ interface UnitNotificationData {
 // ============================================
 
 const styles = {
-  body: "font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #334155; -webkit-font-smoothing: antialiased;",
-  container: "max-width: 600px; margin: 0 auto; padding: 0;",
-  header: "background-color: #0f172a; padding: 32px 24px; text-align: center;",
-  headerTitle: "color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em;",
-  headerSubtitle: "color: #94a3b8; margin: 8px 0 0; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;",
-  content: "padding: 32px 24px;",
-  sectionTitle: "color: #0f172a; margin: 0 0 24px; font-size: 18px; font-weight: 600;",
-  text: "color: #475569; margin-bottom: 24px; line-height: 1.6; font-size: 15px;",
-  tableContainer: "background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; margin-bottom: 32px;",
+  body: "font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'; background-color: #ffffff; color: #2d3748; margin: 0; padding: 0; line-height: 1.6;",
+  container: "max-width: 600px; margin: 0 auto; padding: 20px;",
+  logoContainer: "text-align: center; margin-bottom: 32px; padding-top: 20px;",
+  logo: "height: 40px; width: auto;", // Adjust based on actual logo aspect ratio
+  headerTitle: "color: #1a202c; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 24px; letter-spacing: -0.025em;",
+  content: "font-size: 16px; color: #4a5568; margin-bottom: 32px;",
+  text: "margin-bottom: 16px; line-height: 1.6;",
+  greeting: "font-weight: 600; color: #1a202c; margin-bottom: 16px;",
+  buttonContainer: "text-align: center; margin: 32px 0;",
+  button: "background-color: #003366; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 4px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2); transition: background-color 0.2s;",
+  divider: "border-top: 1px solid #e2e8f0; margin: 40px 0 30px;",
+  tableContainer: "background-color: #f7fafc; border-radius: 8px; padding: 20px; margin: 24px 0;",
   table: "width: 100%; border-collapse: separate; border-spacing: 0;",
-  tdLabel: "padding: 8px 0; color: #64748b; font-size: 14px; font-weight: 500; vertical-align: top; width: 40%;",
-  tdValue: "padding: 8px 0; color: #0f172a; font-size: 14px; font-weight: 600; vertical-align: top; text-align: right;",
-  buttonContainer: "text-align: center; margin-top: 8px; margin-bottom: 8px;",
-  button: "display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 15px; transition: all 0.2s;",
-  divider: "border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;",
-  footer: "padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;",
-  footerText: "color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.5;"
+  tdLabel: "padding: 8px 0; color: #718096; font-size: 14px; font-weight: 500; vertical-align: top; width: 35%;",
+  tdValue: "padding: 8px 0; color: #2d3748; font-size: 14px; font-weight: 600; vertical-align: top; text-align: right;",
+  footer: "text-align: center;",
+  footerLogo: "height: 30px; width: auto; opacity: 0.8; margin-bottom: 20px;",
+  footerText: "color: #718096; font-size: 12px; margin-bottom: 12px; line-height: 1.5;",
+  footerLinks: "color: #718096; font-size: 12px; margin-bottom: 20px;",
+  footerLink: "color: #718096; text-decoration: underline; margin: 0 8px;",
+  copyright: "color: #a0aec0; font-size: 12px;"
 };
 
-function BaseLayout(props: { title: string; subtitle?: string; children: string; previewText: string }) {
+function BaseLayout(props: { title: string; children: string; previewText: string }) {
+  // Use a reliable placeholder if local dev, assuming public folder is served
+  // In production, APP_URL should point to the actual domain where images are hosted
+  const logoUrl = `${APP_URL}/logo-esdm.png`; 
+
   return `
 <!DOCTYPE html>
 <html lang="id">
@@ -76,40 +89,41 @@ function BaseLayout(props: { title: string; subtitle?: string; children: string;
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${props.title}</title>
-  <!--[if mso]>
-  <noscript>
-    <xml>
-      <o:OfficeDocumentSettings>
-        <o:PixelsPerInch>96</o:PixelsPerInch>
-      </o:OfficeDocumentSettings>
-    </xml>
-  </noscript>
-  <![endif]-->
 </head>
 <body style="${styles.body}">
   <div style="display: none; max-height: 0px; overflow: hidden;">
     ${props.previewText}
     &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
+  
   <div style="${styles.container}">
-    <div style="${styles.header}">
-      <h1 style="${styles.headerTitle}">${props.title}</h1>
-      ${props.subtitle ? `<p style="${styles.headerSubtitle}">${props.subtitle}</p>` : ''}
+    <div style="${styles.logoContainer}">
+      <img src="${logoUrl}" alt="PJUTS ESDM Logo" style="${styles.logo}">
     </div>
+
+    <h1 style="${styles.headerTitle}">${props.title}</h1>
     
     <div style="${styles.content}">
       ${props.children}
-      
-      <div style="${styles.divider}"></div>
-      
-      <p style="${styles.footerText}">
-        Email ini dikirim otomatis oleh sistem PJUTS ESDM.<br>
-        Mohon tidak membalas email ini secara langsung.
-      </p>
     </div>
     
+    <div style="${styles.divider}"></div>
+    
     <div style="${styles.footer}">
+      <img src="${logoUrl}" alt="PJUTS ESDM" style="${styles.footerLogo}">
+      
       <p style="${styles.footerText}">
+        Anda menerima email ini karena terdaftar di sistem Monitoring PJUTS ESDM.<br>
+        Ini adalah notifikasi otomatis untuk memastikan keamanan dan kelancaran operasional unit.
+      </p>
+      
+      <div style="${styles.footerLinks}">
+        <a href="${APP_URL}" style="${styles.footerLink}">Dashboard</a> | 
+        <a href="${APP_URL}/map" style="${styles.footerLink}">Peta Sebaran</a> | 
+        <a href="mailto:support@esdm.go.id" style="${styles.footerLink}">Bantuan</a>
+      </div>
+      
+      <p style="${styles.copyright}">
         &copy; ${new Date().getFullYear()} PJUTS ESDM. Hak cipta dilindungi undang-undang.
       </p>
     </div>
@@ -140,31 +154,33 @@ function StatusBadge(text: string, color: string, bgColor: string) {
 // EMAIL TEMPLATES
 // ============================================
 
-function getReportNotificationHtml(data: ReportNotificationData): string {
+function getReportNotificationHtml(data: ReportNotificationData, recipientName: string = "Admin"): string {
   let statusText = "Offline";
-  let statusColor = "#ef4444"; // red-500
-  let statusBg = "#fef2f2"; // red-50
+  let statusColor = "#e53e3e"; // red
+  let statusBg = "#fff5f5";
   
   if (data.batteryVoltage >= 20) {
     statusText = "Operasional";
-    statusColor = "#10b981"; // emerald-500
-    statusBg = "#ecfdf5"; // emerald-50
+    statusColor = "#38a169"; // green
+    statusBg = "#f0fff4";
   } else if (data.batteryVoltage >= 10) {
     statusText = "Perlu Perawatan";
-    statusColor = "#f59e0b"; // amber-500
-    statusBg = "#fffbeb"; // amber-50
+    statusColor = "#d69e2e"; // yellow
+    statusBg = "#fffff0";
   }
 
   const content = `
+    <p style="${styles.greeting}">Halo, ${recipientName}</p>
+    
     <p style="${styles.text}">
-      Laporan baru telah diterima dari petugas lapangan. Berikut adalah detail kondisi unit PJUTS yang dilaporkan:
+      Laporan baru telah diterima dari petugas lapangan, <strong>${data.reporterName}</strong>. 
+      Mohon tinjau detail kondisi unit PJUTS berikut:
     </p>
     
     <div style="${styles.tableContainer}">
       <table style="${styles.table}">
-        ${DataRow("Unit ID", data.unitSerial)}
+        ${DataRow("ID Unit", data.unitSerial)}
         ${DataRow("Lokasi", `${data.unitRegency}, ${data.unitProvince}`)}
-        ${DataRow("Pelapor", data.reporterName)}
         <tr>
           <td style="${styles.tdLabel}">Status Baterai</td>
           <td style="${styles.tdValue}">
@@ -174,6 +190,10 @@ function getReportNotificationHtml(data: ReportNotificationData): string {
       </table>
     </div>
     
+    <p style="${styles.text}">
+      Data ini membantu kami menjaga keandalan sistem PJUTS. Klik tombol di bawah untuk melihat laporan lengkap.
+    </p>
+    
     <div style="${styles.buttonContainer}">
       <a href="${APP_URL}/reports" style="${styles.button}">
         Lihat Detail Laporan
@@ -182,52 +202,50 @@ function getReportNotificationHtml(data: ReportNotificationData): string {
   `;
 
   return BaseLayout({
-    title: "Laporan PJUTS Baru",
-    subtitle: `Unit ${data.unitSerial}`,
-    previewText: `Laporan baru dari ${data.reporterName} untuk unit ${data.unitSerial} - Status: ${statusText}`,
+    title: "Laporan PJUTS Baru Masuk",
+    previewText: `Laporan baru dari ${data.reporterName} untuk unit ${data.unitSerial}. Status: ${statusText}.`,
     children: content
   });
 }
 
-function getUnitNotificationHtml(data: UnitNotificationData): string {
+function getUnitNotificationHtml(data: UnitNotificationData, recipientName: string = "Petugas Lapangan"): string {
   const content = `
+    <p style="${styles.greeting}">Halo, ${recipientName}</p>
+    
     <p style="${styles.text}">
-      Unit PJUTS baru telah ditambahkan ke dalam sistem database. Unit ini memerlukan verifikasi lapangan untuk memastikan data yang dimasukkan sesuai.
+      Unit PJUTS baru dengan Serial Number <strong>${data.unitSerial}</strong> telah ditambahkan ke sistem. 
+      Sebelum unit ini dapat beroperasi penuh, verifikasi lapangan diperlukan.
     </p>
     
     <div style="${styles.tableContainer}">
       <table style="${styles.table}">
         ${DataRow("Serial Number", data.unitSerial)}
         ${DataRow("Provinsi", data.unitProvince)}
-        ${DataRow("Kabupaten/Kota", data.unitRegency)}
+        ${DataRow("Kab/Kota", data.unitRegency)}
         ${DataRow("Ditambahkan Oleh", data.createdByName)}
         <tr>
           <td style="${styles.tdLabel}">Status</td>
           <td style="${styles.tdValue}">
-            ${StatusBadge("Menunggu Verifikasi", "#d97706", "#fffbeb")}
+            ${StatusBadge("Menunggu Verifikasi", "#dd6b20", "#fffaf0")}
           </td>
         </tr>
       </table>
     </div>
     
-    <div style="background-color: #fff7ed; border-left: 4px solid #f97316; padding: 16px; margin-bottom: 32px; border-radius: 4px;">
-      <p style="margin: 0; color: #9a3412; font-size: 14px; line-height: 1.5;">
-        <strong>Tindakan Diperlukan:</strong><br>
-        Silakan kunjungi lokasi unit untuk melakukan inspeksi fisik dan verifikasi data melalui aplikasi.
-      </p>
-    </div>
+    <p style="${styles.text}">
+      Silakan kunjungi lokasi unit untuk melakukan inspeksi fisik dan verifikasi data melalui aplikasi.
+    </p>
     
     <div style="${styles.buttonContainer}">
       <a href="${APP_URL}/map" style="${styles.button}">
-        Lihat Lokasi di Peta
+        Verifikasi Unit Sekarang
       </a>
     </div>
   `;
 
   return BaseLayout({
-    title: "Unit Baru Ditambahkan",
-    subtitle: "Menunggu Verifikasi",
-    previewText: `Unit baru ${data.unitSerial} ditambahkan di ${data.unitRegency}, ${data.unitProvince}.`,
+    title: "Unit Baru Perlu Verifikasi",
+    previewText: `Unit baru ${data.unitSerial} ditambahkan di ${data.unitRegency}. Segera lakukan verifikasi.`,
     children: content
   });
 }
@@ -240,7 +258,7 @@ function getUnitNotificationHtml(data: UnitNotificationData): string {
  * Send notification to admins when a new report is submitted
  */
 export async function sendReportNotificationToAdmins(
-  adminEmails: string[],
+  recipients: EmailRecipient[],
   data: ReportNotificationData
 ): Promise<SendEmailResult> {
   const client = getResendClient();
@@ -249,22 +267,23 @@ export async function sendReportNotificationToAdmins(
     return { success: true }; // Don't fail if email not configured
   }
 
-  if (adminEmails.length === 0) {
+  if (recipients.length === 0) {
     return { success: true };
   }
 
   try {
-    const { error } = await client.emails.send({
-      from: FROM_EMAIL,
-      to: adminEmails,
-      subject: `[Laporan] ${data.unitSerial} - ${data.reporterName}`,
-      html: getReportNotificationHtml(data),
+    // Send individual emails to personalize greeting
+    const emailPromises = recipients.map(async (recipient) => {
+      const { error } = await client.emails.send({
+        from: FROM_EMAIL,
+        to: recipient.email,
+        subject: `[Laporan] ${data.unitSerial} - ${data.reporterName}`,
+        html: getReportNotificationHtml(data, recipient.name),
+      });
+      return { success: !error, error: error?.message };
     });
 
-    if (error) {
-      console.error("Failed to send report notification email:", error);
-      return { success: false, error: error.message };
-    }
+    await Promise.all(emailPromises);
 
     return { success: true };
   } catch (error) {
@@ -280,7 +299,7 @@ export async function sendReportNotificationToAdmins(
  * Send notification to field staff when a new unit is added
  */
 export async function sendUnitNotificationToFieldStaff(
-  fieldStaffEmails: string[],
+  recipients: EmailRecipient[],
   data: UnitNotificationData
 ): Promise<SendEmailResult> {
   const client = getResendClient();
@@ -289,22 +308,23 @@ export async function sendUnitNotificationToFieldStaff(
     return { success: true }; // Don't fail if email not configured
   }
 
-  if (fieldStaffEmails.length === 0) {
+  if (recipients.length === 0) {
     return { success: true };
   }
 
   try {
-    const { error } = await client.emails.send({
-      from: FROM_EMAIL,
-      to: fieldStaffEmails,
-      subject: `[Unit Baru] ${data.unitSerial} - ${data.unitProvince}`,
-      html: getUnitNotificationHtml(data),
+    // Send individual emails to personalize greeting
+    const emailPromises = recipients.map(async (recipient) => {
+      const { error } = await client.emails.send({
+        from: FROM_EMAIL,
+        to: recipient.email,
+        subject: `[Unit Baru] ${data.unitSerial} - ${data.unitProvince}`,
+        html: getUnitNotificationHtml(data, recipient.name),
+      });
+      return { success: !error, error: error?.message };
     });
 
-    if (error) {
-      console.error("Failed to send unit notification email:", error);
-      return { success: false, error: error.message };
-    }
+    await Promise.all(emailPromises);
 
     return { success: true };
   } catch (error) {

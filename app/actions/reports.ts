@@ -261,13 +261,16 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     try {
       const admins = await prisma.user.findMany({
         where: { role: Role.ADMIN },
-        select: { email: true },
+        select: { email: true, name: true },
       });
       
-      const adminEmails = admins.map((a) => a.email);
+      const recipients = admins.map((a) => ({
+        email: a.email,
+        name: a.name || "Admin"
+      }));
       
       // Send notification in background (don't await to avoid slowing down response)
-      sendReportNotificationToAdmins(adminEmails, {
+      sendReportNotificationToAdmins(recipients, {
         unitSerial: report.unit.serialNumber,
         unitProvince: report.unit.province,
         unitRegency: report.unit.regency,
