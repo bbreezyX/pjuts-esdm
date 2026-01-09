@@ -24,15 +24,20 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/50 to-primary-950/90" />
 
         {/* Animated Gradient Orbs */}
-        <motion.div 
+        <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.2, 0.3, 0.2] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-24 -right-24 w-96 h-96 bg-primary-400/20 rounded-full blur-3xl" 
+          className="absolute -top-24 -right-24 w-96 h-96 bg-primary-400/20 rounded-full blur-3xl"
         />
-        <motion.div 
+        <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-          className="absolute top-1/2 -left-24 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl" 
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: 1,
+          }}
+          className="absolute top-1/2 -left-24 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl"
         />
       </div>
 
@@ -73,8 +78,10 @@ export default function HeroSection() {
 
         {/* Hero Content */}
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center flex-grow py-8 lg:py-0">
-          <StaggerContainer className="flex flex-col items-start text-left" delayChildren={0.2}>
-            
+          <StaggerContainer
+            className="flex flex-col items-start text-left"
+            delayChildren={0.2}
+          >
             <FadeInItem>
               <div className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-white/5 border border-white/10 rounded-full text-amber-300 text-xs sm:text-sm font-medium mb-6 sm:mb-8 backdrop-blur-sm shadow-xl">
                 <span className="relative flex h-2.5 w-2.5">
@@ -97,21 +104,32 @@ export default function HeroSection() {
 
             <FadeInItem>
               <p className="text-base sm:text-lg lg:text-xl text-primary-100 mb-8 sm:mb-10 max-w-xl leading-relaxed opacity-90">
-                Platform terintegrasi Kementerian ESDM untuk pemantauan, pelaporan, dan analisis kinerja
-                Penerangan Jalan Umum Tenaga Surya di seluruh Indonesia.
+                Platform terintegrasi Kementerian ESDM untuk pemantauan,
+                pelaporan, dan analisis kinerja{" "}
+                <span className="text-amber-300 font-semibold">
+                  Penerangan Jalan Umum Tenaga Surya
+                </span>{" "}
+                di seluruh Indonesia.
               </p>
             </FadeInItem>
 
             <FadeInItem className="w-full sm:w-auto">
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/login" className="w-full sm:w-auto">
-                  <Button size="xl" className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-primary-950 font-bold shadow-amber-900/20 shadow-lg border-b-4 border-amber-600 active:border-b-0 active:translate-y-1 transition-all">
+                  <Button
+                    size="xl"
+                    className="w-full sm:w-auto bg-amber-500 hover:bg-amber-400 text-primary-950 font-bold shadow-amber-900/20 shadow-lg border-b-4 border-amber-600 active:border-b-0 active:translate-y-1 transition-all"
+                  >
                     Mulai Sekarang
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Button>
                 </Link>
                 <Link href="#features" className="w-full sm:w-auto">
-                  <Button size="xl" variant="outline" className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 hover:border-white/40 shadow-lg">
+                  <Button
+                    size="xl"
+                    variant="outline"
+                    className="w-full sm:w-auto bg-white/5 backdrop-blur-md border-white/20 text-white hover:bg-white/10 hover:border-white/40 shadow-lg"
+                  >
                     Pelajari Sistem
                   </Button>
                 </Link>
@@ -126,8 +144,12 @@ export default function HeroSection() {
                     <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">Data Aman</span>
-                    <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">Enkripsi AES-256</span>
+                    <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">
+                      Data Aman
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">
+                      Enkripsi AES-256
+                    </span>
                   </div>
                 </div>
 
@@ -136,8 +158,12 @@ export default function HeroSection() {
                     <Activity className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">Reliabel</span>
-                    <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">99.9% Uptime SLA</span>
+                    <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">
+                      Reliabel
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">
+                      99.9% Uptime SLA
+                    </span>
                   </div>
                 </div>
 
@@ -146,8 +172,12 @@ export default function HeroSection() {
                     <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-amber-300 group-hover:text-amber-400" />
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">Real-time</span>
-                    <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">Sync &lt; 1 Detik</span>
+                    <span className="text-sm font-bold text-white leading-tight mb-0.5 tracking-wide">
+                      Real-time
+                    </span>
+                    <span className="text-[10px] sm:text-[11px] text-primary-200/80 font-medium uppercase tracking-wider">
+                      Sync &lt; 1 Detik
+                    </span>
                   </div>
                 </div>
               </div>
@@ -155,9 +185,9 @@ export default function HeroSection() {
           </StaggerContainer>
 
           {/* Stats Visualization */}
-          <StaggerContainer 
-            className="grid grid-cols-2 gap-3 sm:gap-4 mt-8 lg:mt-0" 
-            delayChildren={0.4} 
+          <StaggerContainer
+            className="grid grid-cols-2 gap-3 sm:gap-4 mt-8 lg:mt-0"
+            delayChildren={0.4}
             staggerChildren={0.15}
           >
             <FadeInItem>
@@ -168,18 +198,10 @@ export default function HeroSection() {
               />
             </FadeInItem>
             <FadeInItem className="lg:translate-y-8">
-              <StatsCard
-                value="34"
-                label="Provinsi"
-                icon={MapPin}
-              />
+              <StatsCard value="34" label="Provinsi" icon={MapPin} />
             </FadeInItem>
             <FadeInItem>
-              <StatsCard
-                value="50k+"
-                label="Laporan Masuk"
-                icon={BarChart3}
-              />
+              <StatsCard value="50k+" label="Laporan Masuk" icon={BarChart3} />
             </FadeInItem>
             <FadeInItem className="lg:translate-y-8">
               <StatsCard
@@ -196,8 +218,17 @@ export default function HeroSection() {
 
       {/* Decorative Wave */}
       <div className="absolute bottom-0 left-0 right-0 h-24 lg:h-32 w-full overflow-hidden leading-none pointer-events-none">
-        <svg className="relative block w-[calc(100%+1.3px)] h-full" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z" className="fill-slate-50"></path>
+        <svg
+          className="relative block w-[calc(100%+1.3px)] h-full"
+          data-name="Layer 1"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 1200 120"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z"
+            className="fill-slate-50"
+          ></path>
         </svg>
       </div>
     </section>
@@ -209,13 +240,13 @@ function StatsCard({
   label,
   icon: Icon,
   className,
-  valueColor = "text-white"
+  valueColor = "text-white",
 }: {
-  value: string,
-  label: string,
+  value: string;
+  label: string;
   icon: React.ElementType;
-  className?: string,
-  valueColor?: string
+  className?: string;
+  valueColor?: string;
 }) {
   return (
     <div
@@ -226,8 +257,12 @@ function StatsCard({
           <Icon className="w-6 h-6 text-amber-400" />
         </div>
       </div>
-      <p className={`text-4xl font-bold ${valueColor} mb-1 tracking-tight`}>{value}</p>
-      <p className="text-primary-200 text-sm font-medium uppercase tracking-wide">{label}</p>
+      <p className={`text-4xl font-bold ${valueColor} mb-1 tracking-tight`}>
+        {value}
+      </p>
+      <p className="text-primary-200 text-sm font-medium uppercase tracking-wide">
+        {label}
+      </p>
     </div>
   );
 }
