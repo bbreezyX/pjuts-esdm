@@ -49,7 +49,7 @@ interface UnitNotificationData {
 // ============================================
 
 const styles = {
-  body: "font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #f1f5f9; color: #334155; -webkit-font-smoothing: antialiased;",
+  body: "font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; color: #334155; -webkit-font-smoothing: antialiased;",
   container: "max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);",
   header: "background-color: #0f172a; padding: 32px 24px; text-align: center; background-image: linear-gradient(to bottom right, #0f172a, #1e293b);",
   headerTitle: "color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em;",
