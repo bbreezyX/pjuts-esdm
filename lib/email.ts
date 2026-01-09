@@ -49,22 +49,22 @@ interface UnitNotificationData {
 // ============================================
 
 const styles = {
-  body: "font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; color: #334155; -webkit-font-smoothing: antialiased;",
-  container: "max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);",
-  header: "background-color: #0f172a; padding: 32px 24px; text-align: center; background-image: linear-gradient(to bottom right, #0f172a, #1e293b);",
+  body: "font-family: 'Segoe UI', 'Helvetica Neue', Helvetica, Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; color: #334155; -webkit-font-smoothing: antialiased;",
+  container: "max-width: 600px; margin: 0 auto; padding: 0;",
+  header: "background-color: #0f172a; padding: 32px 24px; text-align: center;",
   headerTitle: "color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.025em;",
   headerSubtitle: "color: #94a3b8; margin: 8px 0 0; font-size: 14px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;",
-  content: "padding: 40px 32px;",
+  content: "padding: 32px 24px;",
   sectionTitle: "color: #0f172a; margin: 0 0 24px; font-size: 18px; font-weight: 600;",
   text: "color: #475569; margin-bottom: 24px; line-height: 1.6; font-size: 15px;",
-  tableContainer: "background-color: #f8fafc; border-radius: 8px; padding: 24px; border: 1px solid #e2e8f0; margin-bottom: 32px;",
+  tableContainer: "background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 24px; margin-bottom: 32px;",
   table: "width: 100%; border-collapse: separate; border-spacing: 0;",
   tdLabel: "padding: 8px 0; color: #64748b; font-size: 14px; font-weight: 500; vertical-align: top; width: 40%;",
   tdValue: "padding: 8px 0; color: #0f172a; font-size: 14px; font-weight: 600; vertical-align: top; text-align: right;",
   buttonContainer: "text-align: center; margin-top: 8px; margin-bottom: 8px;",
-  button: "display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2); transition: all 0.2s;",
+  button: "display: inline-block; background-color: #2563eb; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 6px; font-weight: 600; font-size: 15px; transition: all 0.2s;",
   divider: "border: none; border-top: 1px solid #e2e8f0; margin: 32px 0;",
-  footer: "background-color: #f8fafc; padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;",
+  footer: "padding: 24px; text-align: center; border-top: 1px solid #e2e8f0;",
   footerText: "color: #94a3b8; font-size: 12px; margin: 0; line-height: 1.5;"
 };
 
@@ -91,29 +91,27 @@ function BaseLayout(props: { title: string; subtitle?: string; children: string;
     ${props.previewText}
     &nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;
   </div>
-  <div style="padding: 40px 20px;">
-    <div style="${styles.container}">
-      <div style="${styles.header}">
-        <h1 style="${styles.headerTitle}">${props.title}</h1>
-        ${props.subtitle ? `<p style="${styles.headerSubtitle}">${props.subtitle}</p>` : ''}
-      </div>
+  <div style="${styles.container}">
+    <div style="${styles.header}">
+      <h1 style="${styles.headerTitle}">${props.title}</h1>
+      ${props.subtitle ? `<p style="${styles.headerSubtitle}">${props.subtitle}</p>` : ''}
+    </div>
+    
+    <div style="${styles.content}">
+      ${props.children}
       
-      <div style="${styles.content}">
-        ${props.children}
-        
-        <div style="${styles.divider}"></div>
-        
-        <p style="${styles.footerText}">
-          Email ini dikirim otomatis oleh sistem PJUTS ESDM.<br>
-          Mohon tidak membalas email ini secara langsung.
-        </p>
-      </div>
+      <div style="${styles.divider}"></div>
       
-      <div style="${styles.footer}">
-        <p style="${styles.footerText}">
-          &copy; ${new Date().getFullYear()} PJUTS ESDM. Hak cipta dilindungi undang-undang.
-        </p>
-      </div>
+      <p style="${styles.footerText}">
+        Email ini dikirim otomatis oleh sistem PJUTS ESDM.<br>
+        Mohon tidak membalas email ini secara langsung.
+      </p>
+    </div>
+    
+    <div style="${styles.footer}">
+      <p style="${styles.footerText}">
+        &copy; ${new Date().getFullYear()} PJUTS ESDM. Hak cipta dilindungi undang-undang.
+      </p>
     </div>
   </div>
 </body>
