@@ -88,7 +88,7 @@ export function Notifications() {
                     )}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-[min(20rem,calc(100vw-4rem))] p-0 fixed left-1/2 -translate-x-1/2 mr-[120px]" align="center" sideOffset={16}>
+            <PopoverContent className="w-[320px] sm:w-[380px] p-0" align="end" sideOffset={8}>
                 <div className="flex items-center justify-between p-4 border-b border-slate-100">
                     <h4 className="font-semibold text-sm text-slate-900">Notifikasi</h4>
                     {unreadCount > 0 && (
