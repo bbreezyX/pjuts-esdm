@@ -11,9 +11,13 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+  metadataBase: new URL("https://esdm.cloud"),
+  title: {
+    default: "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+    template: "%s | PJUTS ESDM",
+  },
   description:
-    "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Kementerian ESDM Republik Indonesia",
+    "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Kementerian ESDM Republik Indonesia. Pantau kondisi lampu jalan tenaga surya secara real-time.",
   keywords: [
     "PJUTS",
     "ESDM",
@@ -22,13 +26,56 @@ export const metadata: Metadata = {
     "Indonesia",
     "Penerangan Jalan",
     "Energi Terbarukan",
+    "Lampu Jalan Tenaga Surya",
+    "Kementerian ESDM",
   ],
   authors: [{ name: "Kementerian ESDM RI" }],
+  creator: "Kementerian ESDM Republik Indonesia",
+  publisher: "Kementerian ESDM Republik Indonesia",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
     title: "PJUTS ESDM",
+  },
+  openGraph: {
+    type: "website",
+    locale: "id_ID",
+    url: "https://esdm.cloud",
+    siteName: "PJUTS ESDM",
+    title: "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+    description:
+      "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Kementerian ESDM Republik Indonesia",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "PJUTS ESDM - Monitoring Lampu Jalan Tenaga Surya",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+    description:
+      "Sistem monitoring dan pelaporan PJUTS Kementerian ESDM Republik Indonesia",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // Add your Google Search Console verification code here
+    // google: "your-google-verification-code",
   },
 };
 

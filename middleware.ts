@@ -11,8 +11,9 @@ export const config = {
      * - favicon.ico (favicon file)
      * - public folder
      * - api/auth (NextAuth routes)
+     * - sitemap.xml, robots.txt (SEO files)
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/auth|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|sitemap\\.xml|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
 
