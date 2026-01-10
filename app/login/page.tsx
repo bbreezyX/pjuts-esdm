@@ -57,14 +57,26 @@ function LoginFormContent() {
       {idleMessage && (
         <div className="bg-amber-50 border border-amber-200 text-amber-700 px-4 py-3 rounded-xl text-sm flex items-center gap-2 animate-fade-in">
           <Clock className="w-5 h-5 shrink-0" />
-          <span>Sesi Anda berakhir karena tidak ada aktivitas. Silakan masuk kembali.</span>
+          <span>
+            Sesi Anda berakhir karena tidak ada aktivitas. Silakan masuk
+            kembali.
+          </span>
         </div>
       )}
 
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2 animate-fade-in">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5 shrink-0">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clipRule="evenodd" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="w-5 h-5 shrink-0"
+          >
+            <path
+              fillRule="evenodd"
+              d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z"
+              clipRule="evenodd"
+            />
           </svg>
           {error}
         </div>
@@ -110,15 +122,25 @@ function LoginFormContent() {
 
       <div className="flex items-center justify-between text-sm">
         <label className="flex items-center gap-2 text-slate-600 cursor-pointer select-none">
-          <input type="checkbox" className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500" />
+          <input
+            type="checkbox"
+            className="w-4 h-4 rounded border-slate-300 text-primary-600 focus:ring-primary-500"
+          />
           Ingat saya
         </label>
-        <Link href="#" className="font-medium text-primary-600 hover:text-primary-700 hover:underline underline-offset-4">
+        <Link
+          href="/forgot-password"
+          className="font-medium text-primary-600 hover:text-primary-700 hover:underline underline-offset-4"
+        >
           Lupa password?
         </Link>
       </div>
 
-      <Button type="submit" className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary-900/10 hover:shadow-primary-900/20 transition-all" loading={loading}>
+      <Button
+        type="submit"
+        className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary-900/10 hover:shadow-primary-900/20 transition-all"
+        loading={loading}
+      >
         Masuk ke Dashboard
       </Button>
     </form>
@@ -141,10 +163,10 @@ export default function LoginPage() {
     <main className="min-h-screen flex bg-slate-50">
       {/* Left Panel - Illustration */}
       <div className="hidden lg:flex lg:w-[55%] bg-esdm-gradient relative overflow-hidden">
-        <div 
+        <div
           className="absolute inset-0 bg-fixed opacity-10"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23cbd5e1' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23cbd5e1' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/50 to-primary-950/90" />
@@ -154,7 +176,10 @@ export default function LoginPage() {
         <div className="absolute top-1/2 -left-24 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl animate-pulse delay-700" />
 
         <div className="relative z-10 flex flex-col justify-between p-16 w-full">
-          <Link href="/" className="flex items-center gap-4 group animate-fade-in">
+          <Link
+            href="/"
+            className="flex items-center gap-4 group animate-fade-in"
+          >
             <div className="relative">
               <div className="absolute inset-0 bg-white/20 blur-xl rounded-full" />
               <Image
@@ -190,21 +215,35 @@ export default function LoginPage() {
               </span>
             </h2>
             <p className="text-primary-100 text-lg leading-relaxed mb-12 opacity-90 max-w-lg">
-              Platform terintegrasi untuk pemantauan real-time, manajemen aset, dan pelaporan kinerja Penerangan Jalan Umum Tenaga Surya di seluruh Indonesia.
+              Platform terintegrasi untuk pemantauan real-time, manajemen aset,
+              dan pelaporan kinerja Penerangan Jalan Umum Tenaga Surya di
+              seluruh Indonesia.
             </p>
 
             <div className="grid grid-cols-3 gap-6">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 transition-colors group">
-                <p className="text-3xl font-bold text-white mb-1 group-hover:scale-105 transition-transform origin-left">12.5K+</p>
-                <p className="text-xs text-primary-200 uppercase tracking-wider font-medium">Unit Terpasang</p>
+                <p className="text-3xl font-bold text-white mb-1 group-hover:scale-105 transition-transform origin-left">
+                  12.5K+
+                </p>
+                <p className="text-xs text-primary-200 uppercase tracking-wider font-medium">
+                  Unit Terpasang
+                </p>
               </div>
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 transition-colors group">
-                <p className="text-3xl font-bold text-white mb-1 group-hover:scale-105 transition-transform origin-left">34</p>
-                <p className="text-xs text-primary-200 uppercase tracking-wider font-medium">Provinsi</p>
+                <p className="text-3xl font-bold text-white mb-1 group-hover:scale-105 transition-transform origin-left">
+                  34
+                </p>
+                <p className="text-xs text-primary-200 uppercase tracking-wider font-medium">
+                  Provinsi
+                </p>
               </div>
               <div className="bg-amber-500/10 backdrop-blur-md rounded-2xl p-5 border border-amber-500/20 hover:bg-amber-500/20 transition-colors group">
-                <p className="text-3xl font-bold text-amber-400 mb-1 group-hover:scale-105 transition-transform origin-left">99.9%</p>
-                <p className="text-xs text-amber-200 uppercase tracking-wider font-medium">Uptime Server</p>
+                <p className="text-3xl font-bold text-amber-400 mb-1 group-hover:scale-105 transition-transform origin-left">
+                  99.9%
+                </p>
+                <p className="text-xs text-amber-200 uppercase tracking-wider font-medium">
+                  Uptime Server
+                </p>
               </div>
             </div>
           </div>
@@ -230,13 +269,18 @@ export default function LoginPage() {
               />
             </div>
             <div>
-              <span className="font-bold text-slate-900 text-lg block leading-none">PJUTS <span className="text-amber-500">ESDM</span></span>
+              <span className="font-bold text-slate-900 text-lg block leading-none">
+                PJUTS <span className="text-amber-500">ESDM</span>
+              </span>
             </div>
           </Link>
         </div>
 
         <div className="absolute top-6 right-6">
-          <Link href="/" className="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-2">
+          <Link
+            href="/"
+            className="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-2"
+          >
             <ArrowLeft className="w-4 h-4" />
             Kembali ke Beranda
           </Link>
@@ -259,7 +303,10 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-slate-500">
             Belum punya akun akses? <br className="sm:hidden" />
-            <Link href="#" className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4">
+            <Link
+              href="#"
+              className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4"
+            >
               Hubungi Administrator
             </Link>
           </p>

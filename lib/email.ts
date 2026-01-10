@@ -14,10 +14,14 @@ function getResendClient(): Resend | null {
 }
 
 // Email sender - use your verified domain in production
-const FROM_EMAIL = process.env.EMAIL_FROM || "PJUTS ESDM <onboarding@resend.dev>";
+const FROM_EMAIL =
+  process.env.EMAIL_FROM || "PJUTS ESDM <onboarding@resend.dev>";
 
 // App URL for links in emails
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || process.env.AUTH_URL || "http://localhost:3000";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  process.env.AUTH_URL ||
+  "http://localhost:3000";
 
 // ============================================
 // TYPES
@@ -58,26 +62,36 @@ const styles = {
   container: "max-width: 600px; margin: 0 auto; padding: 20px;",
   logoContainer: "text-align: center; margin-bottom: 32px; padding-top: 20px;",
   logo: "height: 60px; width: auto;", // Adjust based on actual logo aspect ratio
-  headerTitle: "color: #1a202c; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 24px; letter-spacing: -0.025em;",
+  headerTitle:
+    "color: #1a202c; font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 24px; letter-spacing: -0.025em;",
   content: "font-size: 16px; color: #4a5568; margin-bottom: 32px;",
   text: "margin-bottom: 16px; line-height: 1.6;",
   greeting: "font-weight: 600; color: #1a202c; margin-bottom: 16px;",
   buttonContainer: "text-align: center; margin: 32px 0;",
-  button: "background-color: #003366; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 4px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2); transition: background-color 0.2s;",
+  button:
+    "background-color: #003366; color: #ffffff; text-decoration: none; padding: 12px 32px; border-radius: 4px; font-weight: 600; font-size: 16px; display: inline-block; box-shadow: 0 4px 6px rgba(0, 51, 102, 0.2); transition: background-color 0.2s;",
   divider: "border-top: 1px solid #e2e8f0; margin: 40px 0 30px;",
-  tableContainer: "background-color: #f7fafc; border-radius: 8px; padding: 20px; margin: 24px 0;",
+  tableContainer:
+    "background-color: #f7fafc; border-radius: 8px; padding: 20px; margin: 24px 0;",
   table: "width: 100%; border-collapse: separate; border-spacing: 0;",
-  tdLabel: "padding: 8px 0; color: #718096; font-size: 14px; font-weight: 500; vertical-align: top; width: 35%;",
-  tdValue: "padding: 8px 0; color: #2d3748; font-size: 14px; font-weight: 600; vertical-align: top; text-align: right;",
+  tdLabel:
+    "padding: 8px 0; color: #718096; font-size: 14px; font-weight: 500; vertical-align: top; width: 35%;",
+  tdValue:
+    "padding: 8px 0; color: #2d3748; font-size: 14px; font-weight: 600; vertical-align: top; text-align: right;",
   footer: "text-align: center;",
   footerLogo: "height: 30px; width: auto; opacity: 0.8; margin-bottom: 20px;",
-  footerText: "color: #718096; font-size: 12px; margin-bottom: 12px; line-height: 1.5;",
+  footerText:
+    "color: #718096; font-size: 12px; margin-bottom: 12px; line-height: 1.5;",
   footerLinks: "color: #718096; font-size: 12px; margin-bottom: 20px;",
   footerLink: "color: #718096; text-decoration: underline; margin: 0 8px;",
-  copyright: "color: #a0aec0; font-size: 12px;"
+  copyright: "color: #a0aec0; font-size: 12px;",
 };
 
-function BaseLayout(props: { title: string; children: string; previewText: string }) {
+function BaseLayout(props: {
+  title: string;
+  children: string;
+  previewText: string;
+}) {
   // Use a reliable placeholder if local dev, assuming public folder is served
   // In production, APP_URL should point to the actual domain where images are hosted
   const logoUrl = `${APP_URL}/logo-esdm.png`;
@@ -119,8 +133,12 @@ function BaseLayout(props: { title: string; children: string; previewText: strin
       
       <div style="${styles.footerLinks}">
         <a href="${APP_URL}" style="${styles.footerLink}">Dashboard</a> | 
-        <a href="${APP_URL}/map" style="${styles.footerLink}">Peta Sebaran</a> | 
-        <a href="mailto:support@esdm.go.id" style="${styles.footerLink}">Bantuan</a>
+        <a href="${APP_URL}/map" style="${
+    styles.footerLink
+  }">Peta Sebaran</a> | 
+        <a href="mailto:support@esdm.go.id" style="${
+          styles.footerLink
+        }">Bantuan</a>
       </div>
       
       <p style="${styles.copyright}">
@@ -154,7 +172,10 @@ function StatusBadge(text: string, color: string, bgColor: string) {
 // EMAIL TEMPLATES
 // ============================================
 
-function getReportNotificationHtml(data: ReportNotificationData, recipientName: string = "Admin"): string {
+function getReportNotificationHtml(
+  data: ReportNotificationData,
+  recipientName: string = "Admin"
+): string {
   let statusText = "Offline";
   let statusColor = "#e53e3e"; // red
   let statusBg = "#fff5f5";
@@ -173,7 +194,9 @@ function getReportNotificationHtml(data: ReportNotificationData, recipientName: 
     <p style="${styles.greeting}">Halo, ${recipientName}</p>
     
     <p style="${styles.text}">
-      Laporan baru telah diterima dari petugas lapangan, <strong>${data.reporterName}</strong>. 
+      Laporan baru telah diterima dari petugas lapangan, <strong>${
+        data.reporterName
+      }</strong>. 
       Mohon tinjau detail kondisi unit PJUTS berikut:
     </p>
     
@@ -184,7 +207,11 @@ function getReportNotificationHtml(data: ReportNotificationData, recipientName: 
         <tr>
           <td style="${styles.tdLabel}">Status Baterai</td>
           <td style="${styles.tdValue}">
-            ${StatusBadge(`${data.batteryVoltage}V • ${statusText}`, statusColor, statusBg)}
+            ${StatusBadge(
+              `${data.batteryVoltage}V • ${statusText}`,
+              statusColor,
+              statusBg
+            )}
           </td>
         </tr>
       </table>
@@ -204,16 +231,21 @@ function getReportNotificationHtml(data: ReportNotificationData, recipientName: 
   return BaseLayout({
     title: "Laporan PJUTS Baru Masuk",
     previewText: `Laporan baru dari ${data.reporterName} untuk unit ${data.unitSerial}. Status: ${statusText}.`,
-    children: content
+    children: content,
   });
 }
 
-function getUnitNotificationHtml(data: UnitNotificationData, recipientName: string = "Petugas Lapangan"): string {
+function getUnitNotificationHtml(
+  data: UnitNotificationData,
+  recipientName: string = "Petugas Lapangan"
+): string {
   const content = `
     <p style="${styles.greeting}">Halo, ${recipientName}</p>
     
     <p style="${styles.text}">
-      Unit PJUTS baru dengan Serial Number <strong>${data.unitSerial}</strong> telah ditambahkan ke sistem. 
+      Unit PJUTS baru dengan Serial Number <strong>${
+        data.unitSerial
+      }</strong> telah ditambahkan ke sistem. 
       Sebelum unit ini dapat beroperasi penuh, verifikasi lapangan diperlukan.
     </p>
     
@@ -246,7 +278,7 @@ function getUnitNotificationHtml(data: UnitNotificationData, recipientName: stri
   return BaseLayout({
     title: "Unit Baru Perlu Verifikasi",
     previewText: `Unit baru ${data.unitSerial} ditambahkan di ${data.unitRegency}. Segera lakukan verifikasi.`,
-    children: content
+    children: content,
   });
 }
 
@@ -290,7 +322,7 @@ export async function sendReportNotificationToAdmins(
     console.error("Error sending report notification email:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -331,7 +363,7 @@ export async function sendUnitNotificationToFieldStaff(
     console.error("Error sending unit notification email:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -350,7 +382,9 @@ function getAccountDisabledHtml(data: AccountStatusData): string {
     <p style="${styles.greeting}">Halo, ${data.userName}</p>
     
     <p style="${styles.text}">
-      Kami informasikan bahwa akun Anda dengan email <strong>${data.userEmail}</strong> 
+      Kami informasikan bahwa akun Anda dengan email <strong>${
+        data.userEmail
+      }</strong> 
       telah <strong>dinonaktifkan</strong> oleh administrator sistem PJUTS ESDM.
     </p>
     
@@ -358,7 +392,13 @@ function getAccountDisabledHtml(data: AccountStatusData): string {
       <table style="${styles.table}">
         ${DataRow("Status Akun", "Dinonaktifkan")}
         ${DataRow("Email", data.userEmail)}
-        ${DataRow("Waktu", new Date().toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" }))}
+        ${DataRow(
+          "Waktu",
+          new Date().toLocaleString("id-ID", {
+            dateStyle: "long",
+            timeStyle: "short",
+          })
+        )}
       </table>
     </div>
     
@@ -378,7 +418,7 @@ function getAccountDisabledHtml(data: AccountStatusData): string {
   return BaseLayout({
     title: "Akun Anda Dinonaktifkan",
     previewText: `Akun ${data.userEmail} telah dinonaktifkan oleh administrator.`,
-    children: content
+    children: content,
   });
 }
 
@@ -395,7 +435,13 @@ function getAccountEnabledHtml(data: AccountStatusData): string {
       <table style="${styles.table}">
         ${DataRow("Status Akun", "Aktif")}
         ${DataRow("Email", data.userEmail)}
-        ${DataRow("Waktu", new Date().toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" }))}
+        ${DataRow(
+          "Waktu",
+          new Date().toLocaleString("id-ID", {
+            dateStyle: "long",
+            timeStyle: "short",
+          })
+        )}
       </table>
     </div>
     
@@ -414,7 +460,7 @@ function getAccountEnabledHtml(data: AccountStatusData): string {
   return BaseLayout({
     title: "Akun Anda Diaktifkan Kembali",
     previewText: `Selamat datang kembali! Akun ${data.userEmail} telah diaktifkan.`,
-    children: content
+    children: content,
   });
 }
 
@@ -451,7 +497,7 @@ export async function sendAccountDisabledEmail(
     console.error("Error sending account disabled email:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
@@ -489,8 +535,102 @@ export async function sendAccountEnabledEmail(
     console.error("Error sending account enabled email:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "Unknown error"
+      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 }
 
+// ============================================
+// PASSWORD RESET EMAIL
+// ============================================
+
+interface PasswordResetData {
+  userName: string;
+  resetLink: string;
+  expiresInMinutes: number;
+}
+
+function getPasswordResetHtml(data: PasswordResetData): string {
+  const content = `
+    <p style="${styles.greeting}">Halo, ${data.userName}</p>
+    
+    <p style="${styles.text}">
+      Kami menerima permintaan untuk mereset password akun PJUTS ESDM Anda. 
+      Klik tombol di bawah untuk membuat password baru.
+    </p>
+    
+    <div style="${styles.buttonContainer}">
+      <a href="${data.resetLink}" style="${styles.button}">
+        Reset Password
+      </a>
+    </div>
+    
+    <div style="${styles.tableContainer}">
+      <table style="${styles.table}">
+        ${DataRow("Berlaku", `${data.expiresInMinutes} menit`)}
+        ${DataRow("Penggunaan", "Link ini hanya dapat digunakan sekali")}
+      </table>
+    </div>
+    
+    <p style="${styles.text}">
+      Jika Anda tidak meminta reset password, abaikan email ini. 
+      Akun Anda tetap aman dan password tidak akan berubah.
+    </p>
+    
+    <p style="${styles.text}; font-size: 12px; color: #718096;">
+      Jika tombol tidak berfungsi, salin dan tempel link berikut ke browser Anda:<br>
+      <span style="word-break: break-all; color: #4a5568;">${
+        data.resetLink
+      }</span>
+    </p>
+  `;
+
+  return BaseLayout({
+    title: "Reset Password",
+    previewText: `Reset password akun PJUTS ESDM Anda. Link berlaku selama ${data.expiresInMinutes} menit.`,
+    children: content,
+  });
+}
+
+/**
+ * Send password reset email
+ */
+export async function sendPasswordResetEmail(
+  email: string,
+  userName: string,
+  resetToken: string
+): Promise<SendEmailResult> {
+  const client = getResendClient();
+  if (!client) {
+    console.warn("RESEND_API_KEY not configured, skipping email notification");
+    return { success: false, error: "Email service not configured" };
+  }
+
+  const resetLink = `${APP_URL}/reset-password?token=${resetToken}`;
+
+  try {
+    const { error } = await client.emails.send({
+      from: FROM_EMAIL,
+      to: email,
+      subject: "[PJUTS ESDM] Reset Password",
+      html: getPasswordResetHtml({
+        userName,
+        resetLink,
+        expiresInMinutes: 60,
+      }),
+    });
+
+    if (error) {
+      console.error("Error sending password reset email:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error sending password reset email:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
+}
