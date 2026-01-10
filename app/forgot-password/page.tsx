@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Mail, Check } from "iconoir-react";
+import { ArrowLeft, Mail, Check, ShieldCheck, LightBulb, Flash } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { requestPasswordReset } from "@/app/actions/auth";
@@ -26,9 +26,10 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="min-h-screen flex bg-slate-50">
+    <main className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-primary-50/30">
       {/* Left Panel - Illustration */}
       <div className="hidden lg:flex lg:w-[55%] bg-esdm-gradient relative overflow-hidden">
+        {/* Background Pattern */}
         <div
           className="absolute inset-0 bg-fixed opacity-10"
           style={{
@@ -38,27 +39,29 @@ export default function ForgotPasswordPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-900/50 to-primary-950/90" />
 
         {/* Animated Orbs */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-primary-400/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute top-1/2 -left-24 w-72 h-72 bg-amber-400/10 rounded-full blur-3xl animate-pulse delay-700" />
+        <div className="absolute -top-32 -right-32 w-[500px] h-[500px] bg-primary-400/20 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute top-1/3 -left-32 w-96 h-96 bg-[#D4AF37]/15 rounded-full blur-[80px] animate-pulse delay-700" />
+        <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-primary-300/10 rounded-full blur-[60px] animate-pulse delay-1000" />
 
-        <div className="relative z-10 flex flex-col justify-between p-16 w-full">
+        <div className="relative z-10 flex flex-col justify-between p-12 xl:p-16 w-full">
+          {/* Logo */}
           <Link
             href="/"
             className="flex items-center gap-4 group animate-fade-in"
           >
             <div className="relative">
-              <div className="absolute inset-0 bg-white/20 blur-xl rounded-full" />
+              <div className="absolute inset-0 bg-white/20 blur-xl rounded-full scale-150" />
               <Image
                 src="/logo-esdm.png"
                 alt="Logo ESDM"
                 width={56}
                 height={56}
-                className="relative w-12 h-12 lg:w-14 lg:h-14 object-contain drop-shadow-2xl"
+                className="relative w-12 h-12 xl:w-14 xl:h-14 object-contain drop-shadow-2xl group-hover:scale-110 transition-transform"
               />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-white tracking-tight leading-none">
-                PJUTS <span className="text-amber-400">ESDM</span>
+                PJUTS <span className="text-[#E4C55B]">ESDM</span>
               </h1>
               <p className="text-xs text-primary-100 font-medium tracking-wide uppercase opacity-90">
                 Kementerian ESDM RI
@@ -66,135 +69,231 @@ export default function ForgotPasswordPage() {
             </div>
           </Link>
 
+          {/* Main Content */}
           <div className="max-w-xl">
-            <h2 className="text-4xl font-bold text-white leading-tight mb-6">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-[#E4C55B] text-sm font-medium mb-8 backdrop-blur-md shadow-xl">
+              <Mail className="w-4 h-4" />
+              Pemulihan Akun
+            </div>
+            <h2 className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6">
               Lupa Password? <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E4C55B] via-[#D4AF37] to-[#E4C55B]">
                 Kami Bantu Reset
               </span>
             </h2>
-            <p className="text-primary-100 text-lg leading-relaxed opacity-90 max-w-lg">
+            <p className="text-primary-100 text-lg leading-relaxed mb-12 opacity-90 max-w-lg">
               Masukkan email terdaftar Anda dan kami akan mengirimkan link untuk
               mengatur ulang password akun Anda.
             </p>
+
+            {/* Info Cards */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
+                <div className="flex items-center gap-2 mb-2">
+                  <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                </div>
+                <p className="text-lg font-bold text-white mb-1">
+                  Aman & Terenkripsi
+                </p>
+                <p className="text-xs text-primary-200 font-medium">
+                  Link reset valid 1 jam
+                </p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
+                <div className="flex items-center gap-2 mb-2">
+                  <Flash className="w-5 h-5 text-[#E4C55B]" />
+                </div>
+                <p className="text-lg font-bold text-white mb-1">
+                  Proses Cepat
+                </p>
+                <p className="text-xs text-primary-200 font-medium">
+                  Email dalam 2 menit
+                </p>
+              </div>
+            </div>
           </div>
 
-          <div className="text-xs text-primary-300/60 font-medium">
-            © 2026 Kementerian Energi dan Sumber Daya Mineral Republik Indonesia
+          {/* Footer */}
+          <div className="flex items-center gap-3 text-xs text-primary-300/60 font-medium">
+            <ShieldCheck className="w-4 h-4" />
+            <span>
+              © 2026 Kementerian Energi dan Sumber Daya Mineral Republik
+              Indonesia
+            </span>
           </div>
         </div>
       </div>
 
       {/* Right Panel - Form */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6 sm:p-12 lg:p-24 relative">
-        <div className="absolute top-6 left-6 lg:hidden">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-primary-600/10 blur-xl rounded-full" />
+      <div className="flex-1 flex flex-col min-h-screen lg:min-h-0 relative">
+        {/* Mobile Header with gradient */}
+        <div className="lg:hidden bg-esdm-gradient px-6 pt-safe-top pb-8 relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute inset-0 opacity-10">
+            <div
+              className="absolute inset-0"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23cbd5e1' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              }}
+            />
+          </div>
+          <div className="absolute -top-20 -right-20 w-40 h-40 bg-primary-400/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 -left-10 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-2xl" />
+
+          {/* Mobile Nav */}
+          <div className="relative flex items-center justify-between pt-4 mb-6">
+            <Link href="/" className="flex items-center gap-3">
               <Image
                 src="/logo-esdm.png"
                 alt="Logo ESDM"
                 width={40}
                 height={40}
-                className="relative w-10 h-10 object-contain drop-shadow-md group-hover:scale-105 transition-transform"
+                className="w-9 h-9 object-contain drop-shadow-lg"
               />
-            </div>
-            <div>
-              <span className="font-bold text-slate-900 text-lg block leading-none">
-                PJUTS <span className="text-amber-500">ESDM</span>
-              </span>
-            </div>
-          </Link>
-        </div>
-
-        <div className="absolute top-6 right-6">
-          <Link
-            href="/login"
-            className="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Kembali ke Login
-          </Link>
-        </div>
-
-        <div className="w-full max-w-[400px] space-y-8">
-          {!submitted ? (
-            <>
-              <div className="text-center lg:text-left">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-2xl mb-6">
-                  <Mail className="w-8 h-8 text-primary-600" />
-                </div>
-                <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
-                  Lupa Password
-                </h2>
-                <p className="text-slate-500 text-sm">
-                  Masukkan alamat email yang terdaftar pada akun Anda.
-                </p>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    label="Email Kedinasan"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="nama@esdm.go.id"
-                    required
-                    className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white transition-all"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  className="w-full h-12 rounded-xl text-base font-semibold shadow-lg shadow-primary-900/10 hover:shadow-primary-900/20 transition-all"
-                  loading={loading}
-                >
-                  Kirim Link Reset
-                </Button>
-              </form>
-            </>
-          ) : (
-            <div className="text-center space-y-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full">
-                <Check className="w-10 h-10 text-green-600" strokeWidth={2.5} />
-              </div>
               <div>
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
-                  Email Terkirim!
-                </h2>
-                <p className="text-slate-500 text-sm">
-                  Jika email{" "}
-                  <span className="font-medium text-slate-700">{email}</span>{" "}
-                  terdaftar di sistem kami, Anda akan menerima link untuk reset
-                  password dalam beberapa menit.
-                </p>
+                <span className="font-bold text-white text-base block leading-none">
+                  PJUTS <span className="text-[#E4C55B]">ESDM</span>
+                </span>
+                <span className="text-[10px] text-primary-200 uppercase tracking-wider">
+                  Kementerian ESDM
+                </span>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-sm text-amber-700">
-                <p className="font-medium mb-1">Tidak menerima email?</p>
-                <p>Cek folder spam atau coba lagi dengan email yang berbeda.</p>
-              </div>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Kembali ke halaman login
-              </Link>
-            </div>
-          )}
+            </Link>
+            <Link
+              href="/login"
+              className="text-xs font-medium text-primary-200 hover:text-white transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              Login
+            </Link>
+          </div>
 
-          {!submitted && (
-            <p className="text-center text-sm text-slate-500">
-              Ingat password Anda?{" "}
-              <Link
-                href="/login"
-                className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4"
-              >
-                Masuk di sini
-              </Link>
+          {/* Mobile Welcome */}
+          <div className="relative text-center">
+            <h2 className="text-2xl font-bold text-white tracking-tight mb-1">
+              Lupa Password 🔐
+            </h2>
+            <p className="text-primary-200 text-sm">
+              Reset password akun Anda dengan mudah
             </p>
-          )}
+          </div>
+        </div>
+
+        {/* Desktop background decoration */}
+        <div className="hidden lg:block absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-primary-100/40 to-transparent rounded-full blur-3xl -z-10" />
+        <div className="hidden lg:block absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-[#D4AF37]/10 to-transparent rounded-full blur-3xl -z-10" />
+
+        {/* Form Container */}
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-8 sm:p-10 lg:p-16 xl:p-24 bg-gradient-to-b from-white to-slate-50/80 lg:from-transparent lg:to-transparent -mt-4 lg:mt-0 rounded-t-3xl lg:rounded-none relative">
+          {/* Desktop Back Button */}
+          <div className="hidden lg:block absolute top-6 right-6">
+            <Link
+              href="/login"
+              className="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Kembali ke Login
+            </Link>
+          </div>
+
+          <div className="w-full max-w-[400px] space-y-6 lg:space-y-8">
+            {!submitted ? (
+              <>
+                {/* Desktop Welcome Header */}
+                <div className="hidden lg:block text-left space-y-3">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-50 rounded-2xl shadow-sm mb-2">
+                    <Mail className="w-8 h-8 text-primary-600" />
+                  </div>
+                  <h2 className="text-3xl xl:text-4xl font-bold text-slate-900 tracking-tight">
+                    Lupa Password
+                  </h2>
+                  <p className="text-slate-500 text-base">
+                    Masukkan alamat email yang terdaftar pada akun Anda.
+                  </p>
+                </div>
+
+                {/* Form Card */}
+                <div className="bg-white rounded-2xl lg:rounded-3xl p-5 sm:p-6 lg:p-8 shadow-lg shadow-slate-200/60 lg:shadow-xl lg:shadow-slate-200/50 border border-slate-100/80">
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="space-y-2">
+                      <Input
+                        type="email"
+                        label="Email Kedinasan"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="nama@esdm.go.id"
+                        required
+                        className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all shadow-sm"
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full h-13 rounded-xl text-base font-bold shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 bg-primary-600 hover:bg-primary-700"
+                      loading={loading}
+                    >
+                      Kirim Link Reset
+                    </Button>
+
+                    {/* Trust indicators */}
+                    <div className="flex items-center justify-center gap-6 pt-2">
+                      <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                        <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                        <span>Terenkripsi</span>
+                      </div>
+                      <div className="w-1 h-1 rounded-full bg-slate-300" />
+                      <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                        <Flash className="w-4 h-4 text-[#D4AF37]" />
+                        <span>2 Menit</span>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                {/* Help Text */}
+                <p className="text-center text-sm text-slate-500 pb-4 lg:pb-0">
+                  Ingat password Anda?{" "}
+                  <Link
+                    href="/login"
+                    className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4 transition-colors"
+                  >
+                    Masuk di sini
+                  </Link>
+                </p>
+              </>
+            ) : (
+              /* Success State */
+              <div className="bg-white rounded-2xl lg:rounded-3xl p-6 sm:p-8 shadow-lg shadow-slate-200/60 lg:shadow-xl lg:shadow-slate-200/50 border border-slate-100/80">
+                <div className="text-center space-y-6">
+                  <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full shadow-lg shadow-emerald-100">
+                    <Check className="w-10 h-10 text-emerald-600" strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
+                      Email Terkirim! ✉️
+                    </h2>
+                    <p className="text-slate-500 text-sm">
+                      Jika email{" "}
+                      <span className="font-medium text-slate-700">{email}</span>{" "}
+                      terdaftar di sistem kami, Anda akan menerima link untuk reset
+                      password dalam beberapa menit.
+                    </p>
+                  </div>
+                  <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#E4C55B]/10 border border-[#D4AF37]/30 rounded-2xl p-4 text-sm text-[#D4AF37]">
+                    <p className="font-semibold mb-1">Tidak menerima email?</p>
+                    <p className="text-[#D4AF37]/80">Cek folder spam atau coba lagi dengan email yang berbeda.</p>
+                  </div>
+                  <Link
+                    href="/login"
+                    className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    Kembali ke halaman login
+                  </Link>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </main>

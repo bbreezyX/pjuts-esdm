@@ -16,24 +16,24 @@ export default function CTASection() {
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         {/* Floating Glow - CSS animation */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full max-h-[400px] bg-amber-400/20 blur-[100px] rounded-full -z-10 animate-pulse-slow" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full max-h-[400px] bg-[#D4AF37]/20 blur-[100px] rounded-full -z-10 animate-pulse-slow" />
 
         <div className="animate-on-scroll">
           <div className="bg-slate-900 rounded-[2.5rem] p-8 sm:p-14 lg:p-20 relative overflow-hidden shadow-2xl shadow-slate-900/20 group border border-slate-800 hover:scale-[1.01] transition-transform duration-300">
             {/* Card Background Effects */}
             <div className="absolute inset-0 bg-[url('/grid-pattern.svg')] opacity-[0.03]" />
             <div className="absolute top-0 right-0 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-            <div className="absolute bottom-0 left-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
             <div className="relative z-10">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-amber-400 text-xs sm:text-sm font-bold tracking-wide uppercase mb-8 shadow-lg">
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 border border-slate-700 rounded-full text-[#E4C55B] text-xs sm:text-sm font-bold tracking-wide uppercase mb-8 shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
                 Bergabung Sekarang
               </div>
 
               <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-6 leading-tight">
                 Siap Berkontribusi untuk <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-amber-500">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E4C55B] to-[#D4AF37]">
                   Energi Negeri?
                 </span>
               </h3>
@@ -48,7 +48,7 @@ export default function CTASection() {
                 <Link href="/login" className="w-full sm:w-auto">
                   <Button
                     size="xl"
-                    className="w-full sm:w-auto h-14 px-8 bg-amber-500 hover:bg-amber-400 text-slate-900 font-bold text-lg rounded-xl transition-all shadow-[0_0_40px_-10px_rgba(245,158,11,0.5)] hover:scale-105 active:scale-95"
+                    className="w-full sm:w-auto h-14 px-8 bg-gradient-to-r from-[#D4AF37] to-[#E4C55B] hover:from-[#E4C55B] hover:to-[#D4AF37] text-primary-900 font-bold text-lg rounded-xl transition-all shadow-[0_0_40px_-10px_rgba(212,175,55,0.5)] hover:scale-105 active:scale-95"
                   >
                     Mulai Monitoring
                     <ArrowRight className="ml-2 w-5 h-5" />

@@ -9,6 +9,7 @@ import {
   MediaImage,
   Database,
   Globe,
+  ArrowRight,
 } from "iconoir-react";
 import { FadeIn, StaggerContainer, FadeInItem } from "@/components/ui/motion";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,7 @@ export default function WorkflowSection() {
             mask="url(#wave-mask)"
           />
         </svg>
-        {/* Grid Overlay masked to Inverted Wave Shape (The Top Chunk) */}
+        {/* Grid Overlay masked to Inverted Wave Shape */}
         <div
           className="absolute inset-0 bg-fixed"
           style={{
@@ -56,7 +57,7 @@ export default function WorkflowSection() {
         />
       </div>
 
-      {/* BG Decoration */}
+      {/* BG Decoration - Hexagon Pattern */}
       <div
         className="absolute inset-0 bg-fixed opacity-5"
         style={{
@@ -64,34 +65,69 @@ export default function WorkflowSection() {
         }}
       />
       <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary-900/40 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-amber-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-[#D4AF37]/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <FadeIn className="text-center max-w-3xl mx-auto mb-20">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-300 text-xs font-medium uppercase tracking-wider mb-4">
-            <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+        {/* Section Header */}
+        <FadeIn className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/20 text-[#E4C55B] text-xs font-semibold uppercase tracking-wider mb-5">
+            <span className="w-2 h-2 rounded-full bg-[#D4AF37] animate-pulse" />
             Alur Kerja
           </div>
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-6 tracking-tight">
-            Mekanisme Pelaporan <span className="text-blue-400">Terpadu</span>
+          <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6 tracking-tight">
+            Mekanisme Pelaporan{" "}
+            <span className="text-[#E4C55B]">
+              Terpadu
+            </span>
           </h2>
-          <p className="text-lg text-slate-400 leading-relaxed">
+          <p className="text-lg lg:text-xl text-slate-400 leading-relaxed">
             Alur kerja digital yang menyederhanakan proses monitoring lapangan
             menjadi langkah-langkah efisien dan terstruktur.
           </p>
         </FadeIn>
 
-        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 h-auto lg:h-[600px]">
+        {/* Workflow Steps Indicator */}
+        <FadeIn className="hidden lg:flex items-center justify-center gap-0 mb-12">
+          {["01", "02", "03"].map((num, idx) => {
+            const labels = ["Identifikasi", "Dokumentasi", "Sinkronisasi"];
+            return (
+            <div key={num} className="flex items-center">
+              <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
+                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-700 text-white text-sm font-bold flex items-center justify-center shadow-md shadow-primary-600/20 group-hover:scale-110 transition-transform">
+                  {num}
+                </span>
+                <span className="text-sm font-semibold text-slate-300 group-hover:text-white transition-colors">
+                  {labels[idx]}
+                </span>
+              </div>
+              {idx < 2 && (
+                <div className="flex items-center px-3">
+                  <div className="w-12 h-0.5 bg-gradient-to-r from-primary-500/30 to-[#D4AF37]/30 rounded-full" />
+                  <ArrowRight className="w-4 h-4 text-[#D4AF37]/60 -ml-1" />
+                </div>
+              )}
+            </div>
+            );
+          })}
+        </FadeIn>
+
+        <StaggerContainer className="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-6">
           {/* Left Column: Identifikasi */}
           <FadeInItem className="h-full">
-            <div className="group relative h-full bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="group relative h-full bg-white rounded-3xl border border-slate-200/80 p-7 lg:p-8 shadow-sm hover:shadow-xl hover:shadow-primary-100/50 hover:border-primary-200 transition-all duration-500 overflow-hidden flex flex-col min-h-[480px]">
+              {/* Decorative corner accent */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-50 to-[#D4AF37]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-60 group-hover:opacity-100 transition-opacity" />
+              
+              {/* Step number badge */}
+              <div className="absolute top-6 right-6 w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:from-primary-100 group-hover:to-primary-50 group-hover:border-primary-200 group-hover:text-primary-600 transition-all">
+                01
+              </div>
 
-              <div className="relative z-10 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-cyan-100 text-cyan-600 flex items-center justify-center mb-6">
-                  <ScanQrCode className="w-6 h-6" />
+              <div className="relative z-10 mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white flex items-center justify-center mb-5 shadow-lg shadow-primary-600/25 group-hover:scale-110 transition-transform">
+                  <ScanQrCode className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Identifikasi Aset
                 </h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
@@ -100,155 +136,167 @@ export default function WorkflowSection() {
                 </p>
               </div>
 
-              {/* Map Visualization - Simplified & Modern (Light) */}
-              <div className="relative flex-grow mt-6 w-full min-h-[300px] lg:min-h-0 bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden group-hover:border-cyan-500/30 transition-all duration-500 shadow-2xl">
-                {/* Abstract Digital Map Grid */}
-                <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
+              {/* Map Visualization - Modern Light Design */}
+              <div className="relative flex-grow mt-auto w-full min-h-[260px] bg-gradient-to-br from-slate-50 to-primary-50/30 rounded-2xl border border-slate-200/60 overflow-hidden group-hover:border-primary-300/50 transition-all duration-500 shadow-inner">
+                {/* Subtle Grid */}
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:32px_32px] opacity-50" />
 
                 {/* Minimalist Radar Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="w-[80%] h-[80%] border border-cyan-500/20 rounded-full animate-[spin_20s_linear_infinite]" />
-                  <div className="w-[60%] h-[60%] border border-cyan-500/30 rounded-full animate-[spin_15s_linear_infinite_reverse] border-dashed" />
-                  <div className="w-[40%] h-[40%] bg-cyan-500/10 rounded-full animate-pulse blur-xl" />
+                  <div className="w-[75%] h-[75%] border border-primary-300/30 rounded-full animate-[spin_25s_linear_infinite]" />
+                  <div className="w-[55%] h-[55%] border border-primary-400/40 rounded-full animate-[spin_18s_linear_infinite_reverse] border-dashed" />
+                  <div className="w-[35%] h-[35%] bg-primary-400/10 rounded-full animate-pulse" />
                 </div>
 
                 {/* Asset Marker 1 (Online) */}
-                <div className="absolute top-[35%] left-[30%] z-10 group/marker cursor-pointer">
-                  <div className="relative flex items-center gap-3">
+                <div className="absolute top-[32%] left-[28%] z-10 group/marker cursor-pointer">
+                  <div className="relative flex items-center gap-2">
                     <div className="relative flex items-center justify-center">
-                      <span className="absolute inline-flex h-8 w-8 animate-ping rounded-full bg-cyan-500 opacity-20"></span>
-                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-cyan-500 shadow-[0_0_12px_rgba(6,182,212,0.6)] ring-2 ring-white"></span>
+                      <span className="absolute inline-flex h-6 w-6 animate-ping rounded-full bg-primary-500 opacity-25"></span>
+                      <span className="relative inline-flex h-3 w-3 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 shadow-lg shadow-primary-500/40 ring-2 ring-white"></span>
                     </div>
-                    <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full border border-cyan-200 text-[10px] font-medium text-cyan-700 shadow-xl translate-x-[-10px] opacity-0 group-hover/marker:opacity-100 group-hover/marker:translate-x-0 transition-all duration-300">
-                      PJU-01 <span className="text-slate-400 mx-1">|</span> 98%
+                    <div className="bg-white/95 backdrop-blur px-2.5 py-1 rounded-lg border border-primary-200 text-[10px] font-semibold text-primary-700 shadow-lg translate-x-[-8px] opacity-0 group-hover/marker:opacity-100 group-hover/marker:translate-x-0 transition-all duration-300">
+                      PJU-01 • 98%
                     </div>
                   </div>
                 </div>
 
                 {/* Asset Marker 2 (Maintenance) */}
-                <div className="absolute bottom-[35%] right-[30%] z-10 group/marker cursor-pointer">
-                  <div className="relative flex items-center gap-3 flex-row-reverse">
+                <div className="absolute bottom-[32%] right-[28%] z-10 group/marker cursor-pointer">
+                  <div className="relative flex items-center gap-2 flex-row-reverse">
                     <div className="relative flex items-center justify-center">
-                      <span className="absolute inline-flex h-8 w-8 animate-ping rounded-full bg-amber-500 opacity-20 delay-150"></span>
-                      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.6)] ring-2 ring-white"></span>
+                      <span className="absolute inline-flex h-6 w-6 animate-ping rounded-full bg-[#D4AF37] opacity-25 delay-150"></span>
+                      <span className="relative inline-flex h-3 w-3 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] shadow-lg shadow-[#D4AF37]/40 ring-2 ring-white"></span>
                     </div>
-                    <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full border border-amber-200 text-[10px] font-medium text-amber-700 shadow-xl translate-x-[10px] opacity-0 group-hover/marker:opacity-100 group-hover/marker:translate-x-0 transition-all duration-300">
-                      PJU-45 <span className="text-slate-400 mx-1">|</span>{" "}
-                      Check
+                    <div className="bg-white/95 backdrop-blur px-2.5 py-1 rounded-lg border border-[#D4AF37]/30 text-[10px] font-semibold text-[#D4AF37] shadow-lg translate-x-[8px] opacity-0 group-hover/marker:opacity-100 group-hover/marker:translate-x-0 transition-all duration-300">
+                      PJU-45 • Check
                     </div>
                   </div>
                 </div>
 
-                {/* Simple Connecting Curve */}
-                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-60">
+                {/* Connecting Curve */}
+                <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-70">
                   <path
-                    d="M 130 120 Q 200 160 270 190"
-                    stroke="url(#simple-gradient)"
+                    d="M 80 85 Q 140 120 200 150"
+                    stroke="url(#simple-gradient-new)"
                     strokeWidth="2"
                     fill="none"
-                    strokeDasharray="6 6"
-                    className="animate-[dash_30s_linear_infinite]"
+                    strokeDasharray="4 6"
+                    className="animate-[dash_20s_linear_infinite]"
                   />
                   <defs>
-                    <linearGradient
-                      id="simple-gradient"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="0%"
-                    >
-                      <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.1" />
-                      <stop offset="50%" stopColor="#06b6d4" stopOpacity="1" />
-                      <stop
-                        offset="100%"
-                        stopColor="#f59e0b"
-                        stopOpacity="0.1"
-                      />
+                    <linearGradient id="simple-gradient-new" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#1e5a8a" stopOpacity="0.2" />
+                      <stop offset="50%" stopColor="#1e5a8a" stopOpacity="0.8" />
+                      <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.2" />
                     </linearGradient>
                   </defs>
                 </svg>
 
-                {/* Minimal Coordinates */}
-                <div className="absolute bottom-4 left-4 flex flex-col gap-0.5 pointer-events-none opacity-50">
-                  <div className="h-0.5 w-8 bg-slate-300 rounded-full"></div>
-                  <div className="h-0.5 w-5 bg-slate-300 rounded-full"></div>
+                {/* Bottom coordinate indicator */}
+                <div className="absolute bottom-3 left-3 flex items-center gap-2 opacity-60">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  <span className="text-[10px] font-mono text-slate-400">-6.2088, 106.8456</span>
                 </div>
               </div>
             </div>
           </FadeInItem>
 
           {/* Middle Column: Stacked */}
-          <div className="flex flex-col gap-6 lg:gap-8 h-full">
+          <div className="flex flex-col gap-5 lg:gap-6 h-full">
             {/* Top: Dokumentasi */}
-            <FadeInItem className="h-full">
-              <div className="group relative h-full bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
-                <div className="flex items-start justify-between relative z-10">
-                  <div>
-                    <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
-                      <MediaImage className="w-5 h-5" />
+            <FadeInItem className="flex-1">
+              <div className="group relative h-full bg-white rounded-3xl border border-slate-200/80 p-7 shadow-sm hover:shadow-xl hover:shadow-primary-100/50 hover:border-primary-200 transition-all duration-500 overflow-hidden min-h-[220px]">
+                {/* Step number badge */}
+                <div className="absolute top-5 right-5 w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:from-primary-100 group-hover:to-primary-50 group-hover:border-primary-200 group-hover:text-primary-600 transition-all">
+                  02
+                </div>
+                
+                <div className="flex items-start relative z-10">
+                  <div className="flex-1">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] text-primary-900 flex items-center justify-center mb-4 shadow-lg shadow-[#D4AF37]/25 group-hover:scale-110 transition-transform">
+                      <MediaImage className="w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
                       Dokumentasi Digital
                     </h3>
-                    <p className="text-slate-500 text-sm">
+                    <p className="text-slate-500 text-sm leading-relaxed">
                       Foto fisik dengan watermark timestamp & geotag otomatis.
                     </p>
                   </div>
                 </div>
-                {/* Decoration */}
-                <div className="absolute bottom-6 right-6 flex gap-2">
-                  <div className="w-16 h-20 bg-slate-50 rounded-lg border border-slate-200 rotate-6 transform group-hover:rotate-12 transition-transform p-2 flex flex-col gap-1.5 shadow-sm">
-                    <div className="w-8 h-1 bg-slate-200 rounded-full" />
-                    <div className="w-full h-1 bg-slate-100 rounded-full" />
-                    <div className="w-full h-1 bg-slate-100 rounded-full" />
-                    <div className="w-3/4 h-1 bg-slate-100 rounded-full" />
+                
+                {/* Photo cards decoration */}
+                <div className="absolute bottom-4 right-4 flex gap-2">
+                  <div className="w-14 h-18 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 rotate-6 transform group-hover:rotate-12 group-hover:translate-y-[-4px] transition-all p-2 flex flex-col gap-1 shadow-md">
+                    <div className="w-6 h-0.5 bg-slate-300 rounded-full" />
+                    <div className="flex-1 bg-slate-200/50 rounded-lg" />
                   </div>
-                  <div className="w-16 h-20 bg-blue-50 rounded-lg border border-blue-100 -rotate-3 transform group-hover:-rotate-6 transition-transform p-2 flex flex-col gap-1.5 shadow-sm z-10">
-                    <div className="w-8 h-1 bg-blue-200 rounded-full" />
-                    <div className="w-full h-1 bg-blue-100 rounded-full" />
-                    <div className="w-full h-1 bg-blue-100 rounded-full" />
-                    <div className="w-3/4 h-1 bg-blue-100 rounded-full" />
-                    <div className="mt-auto w-4 h-4 bg-blue-200 rounded-full self-end opacity-50" />
+                  <div className="w-14 h-18 bg-gradient-to-br from-[#D4AF37]/10 to-primary-50 rounded-xl border border-[#D4AF37]/30 -rotate-3 transform group-hover:-rotate-6 group-hover:translate-y-[-4px] transition-all p-2 flex flex-col gap-1 shadow-md z-10">
+                    <div className="w-6 h-0.5 bg-[#D4AF37]/50 rounded-full" />
+                    <div className="flex-1 bg-[#D4AF37]/20 rounded-lg flex items-end justify-end p-1">
+                      <div className="w-3 h-3 bg-[#D4AF37]/40 rounded-full" />
+                    </div>
                   </div>
                 </div>
               </div>
             </FadeInItem>
 
             {/* Bottom: Input Data */}
-            <FadeInItem className="h-full">
-              <div className="group relative h-full bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden">
-                <div className="flex items-start justify-between relative z-10">
-                  <div>
-                    <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center mb-4">
-                      <Activity className="w-5 h-5" />
+            <FadeInItem className="flex-1">
+              <div className="group relative h-full bg-white rounded-3xl border border-slate-200/80 p-7 shadow-sm hover:shadow-xl hover:shadow-primary-100/50 hover:border-primary-200 transition-all duration-500 overflow-hidden min-h-[220px]">
+                <div className="flex items-start relative z-10">
+                  <div className="flex-1">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary-700 to-primary-800 text-white flex items-center justify-center mb-4 shadow-lg shadow-primary-700/25 group-hover:scale-110 transition-transform">
+                      <Activity className="w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-slate-900 mb-2">
                       Input Parameter
                     </h3>
-                    <p className="text-slate-500 text-sm">
+                    <p className="text-slate-500 text-sm leading-relaxed">
                       Formulir teknis responsif untuk data komponen.
                     </p>
                   </div>
                 </div>
+                
+                {/* Form field indicators */}
+                <div className="absolute bottom-4 left-6 right-6 flex flex-col gap-2 opacity-60 group-hover:opacity-80 transition-opacity">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-primary-200 border border-primary-300" />
+                    <div className="flex-1 h-2 bg-slate-200 rounded-full" />
+                    <div className="w-8 h-2 bg-primary-300 rounded-full" />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded bg-primary-200 border border-primary-300" />
+                    <div className="flex-1 h-2 bg-slate-200 rounded-full" />
+                    <div className="w-12 h-2 bg-emerald-300 rounded-full" />
+                  </div>
+                </div>
+                
                 {/* Graph Line */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 opacity-50">
-                  <svg
-                    className="w-full h-full"
-                    viewBox="0 0 100 40"
-                    preserveAspectRatio="none"
-                  >
+                <div className="absolute bottom-0 left-0 right-0 h-12 opacity-40 group-hover:opacity-60 transition-opacity overflow-hidden rounded-b-3xl">
+                  <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
                     <path
-                      d="M0 35 Q 20 10, 40 25 T 100 5"
+                      d="M0 35 Q 15 15, 35 22 T 70 12 T 100 8"
                       fill="none"
-                      stroke="currentColor"
+                      stroke="url(#primary-gradient)"
                       strokeWidth="2"
-                      className="text-purple-300 group-hover:text-purple-500 transition-colors"
                     />
                     <path
-                      d="M0 35 Q 20 10, 40 25 T 100 5 V 40 H 0 Z"
-                      fill="currentColor"
-                      className="text-purple-50 group-hover:text-purple-100 transition-colors"
+                      d="M0 35 Q 15 15, 35 22 T 70 12 T 100 8 V 40 H 0 Z"
+                      fill="url(#primary-fill)"
                     />
+                    <defs>
+                      <linearGradient id="primary-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#1e5a8a" stopOpacity="0.3" />
+                        <stop offset="50%" stopColor="#1e5a8a" stopOpacity="0.8" />
+                        <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.3" />
+                      </linearGradient>
+                      <linearGradient id="primary-fill" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stopColor="#1e5a8a" stopOpacity="0.2" />
+                        <stop offset="100%" stopColor="#1e5a8a" stopOpacity="0.05" />
+                      </linearGradient>
+                    </defs>
                   </svg>
                 </div>
               </div>
@@ -257,14 +305,21 @@ export default function WorkflowSection() {
 
           {/* Right Column: Sync */}
           <FadeInItem className="h-full">
-            <div className="group relative h-full bg-white rounded-[2.5rem] border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 group-hover:opacity-100 transition-opacity" />
+            <div className="group relative h-full bg-white rounded-3xl border border-slate-200/80 p-7 lg:p-8 shadow-xl hover:shadow-2xl hover:shadow-primary-200/30 hover:border-primary-200 transition-all duration-500 overflow-hidden flex flex-col min-h-[480px]">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-primary-100/60 to-[#D4AF37]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#D4AF37]/20 to-primary-100/30 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
+              
+              {/* Step number badge */}
+              <div className="absolute top-6 right-6 w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:from-primary-100 group-hover:to-primary-50 group-hover:border-primary-200 group-hover:text-primary-600 transition-all">
+                03
+              </div>
 
-              <div className="relative z-10 mb-8">
-                <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center mb-6">
-                  <Globe className="w-6 h-6" />
+              <div className="relative z-10 mb-6">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary-600 to-primary-700 text-white flex items-center justify-center mb-5 shadow-lg shadow-primary-600/25 group-hover:scale-110 transition-transform">
+                  <Globe className="w-7 h-7" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-3">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">
                   Real-time Sync
                 </h3>
                 <p className="text-slate-500 text-sm leading-relaxed">
@@ -273,82 +328,56 @@ export default function WorkflowSection() {
               </div>
 
               {/* Network Visual */}
-              <div className="relative flex-grow mt-6 flex items-center justify-center min-h-[320px]">
+              <div className="relative flex-grow mt-auto flex items-center justify-center min-h-[280px]">
                 {/* Background Radar Effect */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="absolute w-[80%] h-[80%] border border-slate-100 rounded-full animate-[spin_20s_linear_infinite]" />
-                  <div className="absolute w-[60%] h-[60%] border border-slate-100 rounded-full border-dashed animate-[spin_15s_linear_infinite_reverse]" />
-                  <div className="absolute w-[40%] h-[40%] bg-blue-50/50 rounded-full animate-pulse" />
+                  <div className="absolute w-[80%] h-[80%] border border-slate-200 rounded-full animate-[spin_25s_linear_infinite]" />
+                  <div className="absolute w-[60%] h-[60%] border border-primary-200 rounded-full border-dashed animate-[spin_18s_linear_infinite_reverse]" />
+                  <div className="absolute w-[40%] h-[40%] bg-primary-100/50 rounded-full animate-pulse" />
                 </div>
 
                 {/* Center Hub */}
-                <div className="relative z-20 bg-white p-2 rounded-2xl shadow-xl shadow-blue-100/50 border border-blue-50 ring-4 ring-white">
-                  <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-3.5 rounded-xl shadow-inner">
+                <div className="relative z-20 bg-white p-2 rounded-2xl shadow-2xl border border-primary-100 ring-4 ring-primary-50">
+                  <div className="bg-gradient-to-br from-primary-600 to-primary-700 text-white p-4 rounded-xl shadow-inner">
                     <Database className="w-8 h-8" />
                   </div>
                   {/* Pulse Effect */}
-                  <div className="absolute inset-0 rounded-2xl bg-blue-500/20 animate-ping duration-1000" />
+                  <div className="absolute inset-0 rounded-2xl bg-primary-500/20 animate-ping" style={{ animationDuration: '2s' }} />
                 </div>
 
                 {/* Connecting Lines */}
                 <div className="absolute inset-0 z-0">
-                  <svg
-                    className="w-full h-full"
-                    viewBox="0 0 200 200"
-                    preserveAspectRatio="none"
-                  >
+                  <svg className="w-full h-full" viewBox="0 0 200 200" preserveAspectRatio="none">
                     <defs>
-                      <linearGradient
-                        id="lineGradient"
-                        x1="0%"
-                        y1="0%"
-                        x2="100%"
-                        y2="0%"
-                      >
-                        <stop
-                          offset="0%"
-                          stopColor="#CBD5E1"
-                          stopOpacity="0.2"
-                        />
-                        <stop
-                          offset="50%"
-                          stopColor="#3B82F6"
-                          stopOpacity="0.5"
-                        />
-                        <stop
-                          offset="100%"
-                          stopColor="#CBD5E1"
-                          stopOpacity="0.2"
-                        />
+                      <linearGradient id="lineGradientNew" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="rgba(226,232,240,0.5)" />
+                        <stop offset="50%" stopColor="rgba(30,90,138,0.6)" />
+                        <stop offset="100%" stopColor="rgba(226,232,240,0.5)" />
                       </linearGradient>
                       <style>
                         {`
-                          @keyframes dashFlow {
-                            to { stroke-dashoffset: -24; }
-                          }
-                          .data-flow {
-                            animation: dashFlow 1s linear infinite;
-                          }
+                          @keyframes dashFlowNew { to { stroke-dashoffset: -24; } }
+                          .data-flow-new { animation: dashFlowNew 1.5s linear infinite; }
                         `}
                       </style>
                     </defs>
 
-                    {/* Connection Paths */}
                     {[
-                      "M 40 40 L 100 100", // TL
-                      "M 160 40 L 100 100", // TR
-                      "M 160 160 L 100 100", // BR
-                      "M 40 160 L 100 100", // BL
+                      "M 40 40 L 100 100",
+                      "M 160 40 L 100 100",
+                      "M 160 160 L 100 100",
+                      "M 40 160 L 100 100",
                     ].map((d, i) => (
                       <g key={i}>
-                        <path d={d} stroke="#E2E8F0" strokeWidth="1" />
+                        <path d={d} stroke="rgba(226,232,240,0.8)" strokeWidth="1" />
                         <path
                           d={d}
-                          stroke="#3B82F6"
+                          stroke="#1e5a8a"
                           strokeWidth="2"
                           strokeDasharray="4 8"
-                          className="data-flow"
+                          className="data-flow-new"
                           strokeLinecap="round"
+                          style={{ animationDelay: `${i * 0.2}s` }}
                         />
                       </g>
                     ))}
@@ -357,52 +386,61 @@ export default function WorkflowSection() {
 
                 {/* Satellite Nodes */}
                 {/* Top Left - Mobile App */}
-                <div className="absolute top-[10%] left-[10%] z-10 animate-[bounce_4s_infinite]">
-                  <div className="bg-white p-2.5 rounded-2xl shadow-lg border border-slate-100 text-cyan-600 ring-1 ring-slate-50 group hover:scale-110 transition-transform cursor-default">
-                    <div className="bg-cyan-50 p-2 rounded-xl">
+                <div className="absolute top-[8%] left-[8%] z-10 animate-[bounce_4s_infinite]">
+                  <div className="bg-white p-2 rounded-2xl shadow-lg border border-slate-200 ring-1 ring-slate-100 group/node hover:scale-110 hover:shadow-xl hover:border-primary-200 transition-all cursor-default">
+                    <div className="bg-gradient-to-br from-primary-600 to-primary-700 p-2 rounded-xl text-white">
                       <SmartphoneDevice className="w-5 h-5" />
                     </div>
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-semibold py-1 px-2.5 rounded-lg opacity-0 group-hover/node:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
                       Mobile App
                     </div>
                   </div>
                 </div>
 
                 {/* Top Right - QR Scan */}
-                <div className="absolute top-[10%] right-[10%] z-10 animate-[bounce_5s_infinite_0.5s]">
-                  <div className="bg-white p-2.5 rounded-2xl shadow-lg border border-slate-100 text-purple-600 ring-1 ring-slate-50 group hover:scale-110 transition-transform cursor-default">
-                    <div className="bg-purple-50 p-2 rounded-xl">
+                <div className="absolute top-[8%] right-[8%] z-10 animate-[bounce_5s_infinite_0.5s]">
+                  <div className="bg-white p-2 rounded-2xl shadow-lg border border-slate-200 ring-1 ring-slate-100 group/node hover:scale-110 hover:shadow-xl hover:border-[#D4AF37]/30 transition-all cursor-default">
+                    <div className="bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] p-2 rounded-xl text-primary-900">
                       <ScanQrCode className="w-5 h-5" />
                     </div>
-                    <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    <div className="absolute -bottom-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-semibold py-1 px-2.5 rounded-lg opacity-0 group-hover/node:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
                       Asset ID
                     </div>
                   </div>
                 </div>
 
                 {/* Bottom Right - Web */}
-                <div className="absolute bottom-[10%] right-[10%] z-10 animate-[bounce_4.5s_infinite_1s]">
-                  <div className="bg-white p-2.5 rounded-2xl shadow-lg border border-slate-100 text-emerald-600 ring-1 ring-slate-50 group hover:scale-110 transition-transform cursor-default">
-                    <div className="bg-emerald-50 p-2 rounded-xl">
+                <div className="absolute bottom-[8%] right-[8%] z-10 animate-[bounce_4.5s_infinite_1s]">
+                  <div className="bg-white p-2 rounded-2xl shadow-lg border border-slate-200 ring-1 ring-slate-100 group/node hover:scale-110 hover:shadow-xl hover:border-emerald-200 transition-all cursor-default">
+                    <div className="bg-gradient-to-br from-emerald-500 to-emerald-600 p-2 rounded-xl text-white">
                       <Globe className="w-5 h-5" />
                     </div>
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-semibold py-1 px-2.5 rounded-lg opacity-0 group-hover/node:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
                       Web Portal
                     </div>
                   </div>
                 </div>
 
                 {/* Bottom Left - Status */}
-                <div className="absolute bottom-[10%] left-[10%] z-10 animate-[bounce_3.5s_infinite_1.5s]">
-                  <div className="bg-white p-2.5 rounded-2xl shadow-lg border border-slate-100 text-amber-600 ring-1 ring-slate-50 group hover:scale-110 transition-transform cursor-default">
-                    <div className="bg-amber-50 p-2 rounded-xl">
+                <div className="absolute bottom-[8%] left-[8%] z-10 animate-[bounce_3.5s_infinite_1.5s]">
+                  <div className="bg-white p-2 rounded-2xl shadow-lg border border-slate-200 ring-1 ring-slate-100 group/node hover:scale-110 hover:shadow-xl hover:border-[#D4AF37]/30 transition-all cursor-default">
+                    <div className="bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] p-2 rounded-xl text-primary-900">
                       <Activity className="w-5 h-5" />
                     </div>
-                    <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-[10px] font-semibold py-1 px-2.5 rounded-lg opacity-0 group-hover/node:opacity-100 transition-opacity whitespace-nowrap shadow-lg">
                       Live Status
                     </div>
                   </div>
                 </div>
+              </div>
+              
+              {/* Status indicator */}
+              <div className="relative z-10 mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                Sistem Terhubung • Realtime
               </div>
             </div>
           </FadeInItem>
