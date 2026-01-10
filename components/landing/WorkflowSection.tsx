@@ -104,7 +104,7 @@ export default function WorkflowSection() {
               <div className="relative flex-grow mt-6 w-full min-h-[300px] lg:min-h-0 bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden group-hover:border-cyan-500/30 transition-all duration-500 shadow-2xl">
                 {/* Abstract Digital Map Grid */}
                 <div className="absolute inset-0 bg-[linear-gradient(to_right,#cbd5e1_1px,transparent_1px),linear-gradient(to_bottom,#cbd5e1_1px,transparent_1px)] bg-[size:40px_40px] opacity-30" />
-                
+
                 {/* Minimalist Radar Overlay */}
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="w-[80%] h-[80%] border border-cyan-500/20 rounded-full animate-[spin_20s_linear_infinite]" />
@@ -133,7 +133,8 @@ export default function WorkflowSection() {
                       <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.6)] ring-2 ring-white"></span>
                     </div>
                     <div className="bg-white/90 backdrop-blur px-3 py-1.5 rounded-full border border-amber-200 text-[10px] font-medium text-amber-700 shadow-xl translate-x-[10px] opacity-0 group-hover/marker:opacity-100 group-hover/marker:translate-x-0 transition-all duration-300">
-                      PJU-45 <span className="text-slate-400 mx-1">|</span> Check
+                      PJU-45 <span className="text-slate-400 mx-1">|</span>{" "}
+                      Check
                     </div>
                   </div>
                 </div>
@@ -149,10 +150,20 @@ export default function WorkflowSection() {
                     className="animate-[dash_30s_linear_infinite]"
                   />
                   <defs>
-                    <linearGradient id="simple-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient
+                      id="simple-gradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
+                    >
                       <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.1" />
                       <stop offset="50%" stopColor="#06b6d4" stopOpacity="1" />
-                      <stop offset="100%" stopColor="#f59e0b" stopOpacity="0.1" />
+                      <stop
+                        offset="100%"
+                        stopColor="#f59e0b"
+                        stopOpacity="0.1"
+                      />
                     </linearGradient>
                   </defs>
                 </svg>
