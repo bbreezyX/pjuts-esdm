@@ -6,6 +6,7 @@ import HeroSection from "@/components/landing/HeroSection";
 import FeaturesSection from "@/components/landing/FeaturesSection";
 import WorkflowSection from "@/components/landing/WorkflowSection";
 import CTASection from "@/components/landing/CTASection";
+import { ScrollAnimationInit } from "@/components/ui/scroll-animation";
 
 export default async function HomePage() {
   const session = await auth();
@@ -17,6 +18,9 @@ export default async function HomePage() {
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-amber-400/30">
+      {/* Lightweight scroll animation initializer (~1KB) */}
+      <ScrollAnimationInit />
+
       {/* Hero Section */}
       <HeroSection />
 
@@ -39,6 +43,7 @@ export default async function HomePage() {
                 alt="Logo ESDM"
                 width={48}
                 height={48}
+                loading="lazy"
                 className="w-10 h-10 object-contain grayscale opacity-80 hover:grayscale-0 hover:opacity-100 transition-all"
               />
               <div className="text-left">
@@ -50,8 +55,18 @@ export default async function HomePage() {
             </div>
             <div className="flex gap-6 text-sm text-slate-500 font-medium">
               <span>© {new Date().getFullYear()} ESDM RI</span>
-              <Link href="#" className="hover:text-primary-600 transition-colors">Kebijakan Privasi</Link>
-              <Link href="#" className="hover:text-primary-600 transition-colors">Bantuan</Link>
+              <Link
+                href="#"
+                className="hover:text-primary-600 transition-colors"
+              >
+                Kebijakan Privasi
+              </Link>
+              <Link
+                href="#"
+                className="hover:text-primary-600 transition-colors"
+              >
+                Bantuan
+              </Link>
             </div>
           </div>
         </div>
