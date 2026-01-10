@@ -20,16 +20,17 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public routes that don't require authentication
-  const publicRoutes = ["/", "/login"];
+  const publicRoutes = ["/", "/login", "/forgot-password", "/reset-password"];
   const isPublicRoute = publicRoutes.includes(pathname);
 
   // API routes that require authentication
   const isApiRoute = pathname.startsWith("/api");
 
   // Check for session token (from NextAuth)
-  const sessionToken = request.cookies.get("authjs.session-token")?.value ||
-                       request.cookies.get("__Secure-authjs.session-token")?.value;
-  
+  const sessionToken =
+    request.cookies.get("authjs.session-token")?.value ||
+    request.cookies.get("__Secure-authjs.session-token")?.value;
+
   const isLoggedIn = !!sessionToken;
 
   // Protect API routes
