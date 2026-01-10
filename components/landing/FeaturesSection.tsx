@@ -16,7 +16,7 @@ export default function FeaturesSection() {
   return (
     <section
       id="features"
-      className="pt-8 pb-24 lg:pt-12 lg:pb-32 relative overflow-hidden bg-slate-50/50"
+      className="pt-8 pb-24 lg:pt-12 lg:pb-32 relative overflow-hidden bg-slate-50/50 font-sedan"
     >
       {/* Background Pattern */}
       <div

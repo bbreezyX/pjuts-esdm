@@ -45,7 +45,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={plusJakarta.variable}>
-
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
         <Toaster />

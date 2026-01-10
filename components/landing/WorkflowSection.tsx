@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 
 export default function WorkflowSection() {
   return (
-    <section className="pt-32 pb-40 lg:pt-48 lg:pb-64 bg-slate-900 text-white relative overflow-hidden">
+    <section className="pt-32 pb-40 lg:pt-48 lg:pb-64 bg-slate-900 text-white relative overflow-hidden font-sedan">
       {/* Wave Overlay (Inverted for Grid Continuity) */}
       <div className="absolute top-0 left-0 right-0 h-24 lg:h-32 w-full overflow-hidden leading-none z-20 pointer-events-none">
         <svg

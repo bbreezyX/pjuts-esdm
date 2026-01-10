@@ -32,9 +32,6 @@ export default {
           unverified: "#6b7280",
         },
       },
-      fontFamily: {
-        sans: ["var(--font-plus-jakarta)", "system-ui", "sans-serif"],
-      },
       animation: {
         "fade-in": "fadeIn 0.3s ease-out forwards",
         "slide-in-right": "slideInRight 0.3s ease-out forwards",
