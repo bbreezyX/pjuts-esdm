@@ -180,9 +180,9 @@ function FeatureCard({
         </div>
         
         <div className="mt-auto">
-          <h4 className={cn("font-bold text-slate-900 mb-3 tracking-tight group-hover:text-primary-600 transition-colors", highlight ? "text-2xl" : "text-xl")}>
+          <h3 className={cn("font-bold text-slate-900 mb-3 tracking-tight group-hover:text-primary-600 transition-colors", highlight ? "text-2xl" : "text-xl")}>
             {title}
-          </h4>
+          </h3>
           <p className="text-slate-500 leading-relaxed text-sm lg:text-base">
             {description}
           </p>

@@ -32,6 +32,8 @@ const nextConfig: NextConfig = {
     },
     // Enable optimistic client cache for faster navigation
     optimisticClientCache: true,
+    // Optimize bundle size by tree-shaking these packages
+    optimizePackageImports: ["iconoir-react", "framer-motion", "date-fns"],
   },
   // Enhanced Security headers
   async headers() {

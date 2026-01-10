@@ -107,16 +107,14 @@ export default function HeroSection() {
               </h2>
             </FadeInItem>
 
-            <FadeInItem>
-              <p className="text-base sm:text-lg lg:text-xl text-primary-100 mb-8 sm:mb-10 max-w-xl leading-relaxed opacity-90">
-                Platform terintegrasi Kementerian ESDM untuk pemantauan,
-                pelaporan, dan analisis kinerja{" "}
-                <span className="text-amber-300 font-semibold">
-                  Penerangan Jalan Umum Tenaga Surya
-                </span>{" "}
-                di seluruh Indonesia.
-              </p>
-            </FadeInItem>
+            <p className="text-base sm:text-lg lg:text-xl text-primary-100 mb-8 sm:mb-10 max-w-xl leading-relaxed">
+              Platform terintegrasi Kementerian ESDM untuk pemantauan,
+              pelaporan, dan analisis kinerja{" "}
+              <span className="text-amber-300 font-semibold">
+                Penerangan Jalan Umum Tenaga Surya
+              </span>{" "}
+              di seluruh Indonesia.
+            </p>
 
             <FadeInItem className="w-full sm:w-auto">
               <div className="flex flex-col sm:flex-row gap-4">
