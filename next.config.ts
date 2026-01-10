@@ -80,7 +80,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org",
-              "connect-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com",
+              "connect-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org",
               "frame-ancestors 'none'",
             ].join("; "),
           },
