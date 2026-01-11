@@ -9,7 +9,6 @@ import {
   Flash,
   Calendar,
   User,
-  Xmark,
   NavArrowLeft,
   NavArrowRight,
   Download,

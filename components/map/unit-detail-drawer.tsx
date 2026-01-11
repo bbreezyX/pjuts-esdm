@@ -21,7 +21,6 @@ import {
 } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getUnitDetail } from "@/app/actions/map";
@@ -93,19 +92,6 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
   }, [unitId]);
 
   if (!unitId) return null;
-
-  const getStatusBadgeVariant = (status: UnitStatus) => {
-    switch (status) {
-      case "OPERATIONAL":
-        return "operational";
-      case "MAINTENANCE_NEEDED":
-        return "maintenance";
-      case "OFFLINE":
-        return "offline";
-      default:
-        return "unverified";
-    }
-  };
 
   return (
     <>

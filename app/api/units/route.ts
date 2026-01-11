@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getPjutsUnits, getProvinces } from "@/app/actions/units";
+import { getPjutsUnits } from "@/app/actions/units";
 import { UnitStatus } from "@prisma/client";
 
 /**

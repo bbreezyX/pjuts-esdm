@@ -102,7 +102,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
       if (unit) {
         // Update mode
         // Filter out serialNumber as it's not updatable
-        const { serialNumber, ...updateData } = values;
+        const { serialNumber: _serialNumber, ...updateData } = values;
 
         // Ensure optional strings are undefined if empty strings, if backend expects that
         // But our schema says optional strings. updatePjutsUnit takes string | undefined.
@@ -146,7 +146,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
           });
         }
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Terjadi kesalahan sistem",

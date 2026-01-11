@@ -118,7 +118,7 @@ export function UsersClient({ users }: UsersClientProps) {
           });
         }
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",
@@ -147,7 +147,7 @@ export function UsersClient({ users }: UsersClientProps) {
           description: result.error || "Gagal menghapus pengguna",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",
@@ -187,7 +187,7 @@ export function UsersClient({ users }: UsersClientProps) {
           description: result.error || "Gagal mengubah status pengguna",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Error",

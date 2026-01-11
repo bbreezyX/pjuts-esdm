@@ -17,7 +17,6 @@ import {
   WarningCircle,
   CheckCircle,
   Xmark,
-  Trash,
   Plus,
   FloppyDisk,
 } from "iconoir-react";
@@ -39,7 +38,6 @@ import { submitReport } from "@/app/actions/reports";
 import { cn } from "@/lib/utils";
 import {
   cacheUnits,
-  getCachedUnits,
   saveReportDraft,
   getReportDraft,
   clearReportDraft,

@@ -2,7 +2,6 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getDashboardStats, getStatsByProvince, getMonthlyReportTrend } from "@/app/actions/dashboard";
 import { AppShell, PageHeader } from "@/components/layout";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Download } from "iconoir-react";
 import { AnalyticsCharts } from "./analytics-client";

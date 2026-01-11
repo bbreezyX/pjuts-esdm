@@ -8,28 +8,21 @@ import {
   WarningTriangle,
   XmarkCircle,
   StatsReport,
-  Calendar,
-  Clock,
-  GraphUp,
-  MapPin,
-  NavArrowRight,
+  ArrowRight,
+  Globe
 } from "iconoir-react";
-import { PageHeader } from "@/components/layout";
-import { StatCard } from "@/components/dashboard/stat-card";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { ProvinceChart, StatusDonutChart } from "@/components/dashboard/charts-lazy";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { DashboardStats, ProvinceStats, ActionResult } from "@/app/actions/dashboard";
 import { ExportDashboardButton } from "./export-button";
 import {
   StatsGridSkeleton,
-  ReportStatsSkeleton,
   ChartsGridSkeleton,
-  ActivityGridSkeleton,
   TableSkeleton
 } from "@/components/dashboard/skeletons";
+import { cn } from "@/lib/utils";
 
 // Define Promise Types
 type StatsPromise = Promise<ActionResult<DashboardStats>>;
@@ -47,6 +40,99 @@ interface DashboardClientProps {
   statsPromise: StatsPromise;
   provincesPromise: ProvincesPromise;
   activitiesPromise: ActivityPromise;
+  user?: {
+    name?: string | null;
+  };
+}
+
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 11) return "Selamat Pagi";
+  if (hour < 15) return "Selamat Siang";
+  if (hour < 19) return "Selamat Sore";
+  return "Selamat Malam";
+}
+
+// ==========================================
+// CUSTOM COMPONENTS FOR NEW DESIGN
+// ==========================================
+
+function ModernStatCard({ 
+  title, 
+  value, 
+  subtext, 
+  trend, 
+  variant = "white", 
+  icon: Icon 
+}: { 
+  title: string; 
+  value: string | number; 
+  subtext?: string;
+  trend?: { value: number; isPositive: boolean };
+  variant?: "primary" | "white" | "dark";
+  icon?: React.ElementType;
+}) {
+  const isPrimary = variant === "primary";
+  const isDark = variant === "dark";
+  const isColored = isPrimary || isDark;
+  
+  return (
+    <div className={cn(
+      "relative flex flex-col justify-between p-7 h-52 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+      "rounded-[2rem] shadow-sm group border",
+      isPrimary 
+        ? "bg-primary-600 text-white border-primary-500 shadow-primary-900/20" 
+        : isDark
+          ? "bg-slate-900 text-white border-slate-800 shadow-slate-900/20"
+          : "bg-white text-slate-900 border-slate-200/60 shadow-slate-100"
+    )}>
+      <div className="flex justify-between items-start">
+        <div className="flex flex-col">
+           <span className={cn("text-base font-medium tracking-wide", isColored ? "text-primary-100" : "text-slate-500")}>
+            {title}
+          </span>
+        </div>
+        <div className={cn(
+          "p-2.5 rounded-full transition-colors", 
+          isColored 
+            ? "bg-white/10 text-white group-hover:bg-white/20" 
+            : "bg-slate-50 text-slate-600 group-hover:bg-slate-100"
+        )}>
+          {Icon ? <Icon className="w-5 h-5"/> : <ArrowRight className="w-5 h-5 -rotate-45" />}
+        </div>
+      </div>
+      
+      <div className="space-y-3 z-10">
+        <div className="text-4xl lg:text-5xl font-bold tracking-tight">
+          {value}
+        </div>
+        
+        <div className="flex items-center gap-3">
+             {trend && (
+                 <Badge className={cn(
+                   "rounded-full px-2.5 py-0.5 text-xs font-semibold border-0",
+                   isColored 
+                    ? "bg-white/20 text-white hover:bg-white/30" 
+                    : trend.isPositive ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100" : "bg-red-50 text-red-600 hover:bg-red-100"
+                 )}>
+                     {trend.isPositive ? "+" : ""}{trend.value}%
+                 </Badge>
+             )}
+             {subtext && (
+               <span className={cn("text-sm font-medium", isColored ? "text-primary-100/80" : "text-slate-500")}>
+                {subtext}
+              </span>
+             )}
+        </div>
+      </div>
+
+      {Icon && isColored && (
+        <div className={cn("absolute bottom-6 right-6 opacity-0 group-hover:opacity-10 transition-opacity transform scale-150 pointer-events-none")}>
+           <Icon className="w-24 h-24" />
+        </div>
+      )}
+    </div>
+  );
 }
 
 // ==========================================
@@ -58,172 +144,173 @@ function StatsGrid({ dataPromise }: { dataPromise: StatsPromise }) {
 
   const totalUnits = stats?.totalUnits || 0;
   const operationalUnits = stats?.operationalUnits || 0;
+  const maintenanceUnits = stats?.maintenanceNeeded || 0;
+  const offlineUnits = stats?.offlineUnits || 0;
+
   const operationalPercentage = totalUnits > 0
     ? Math.round((operationalUnits / totalUnits) * 100)
     : 0;
+  
+  const maintenancePercentage = totalUnits > 0
+    ? Math.round((maintenanceUnits / totalUnits) * 100)
+    : 0;
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-8">
-      <StatCard
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <ModernStatCard
         title="Total Unit"
-        value={stats?.totalUnits || 0}
+        value={totalUnits.toLocaleString('id-ID')}
+        variant="primary"
+        subtext="Terpasang"
+        trend={{ value: 12, isPositive: true }} // Mock trend
         icon={LightBulb}
-        color="blue"
-        description="Unit PJUTS terpasang"
       />
-      <StatCard
+      <ModernStatCard
         title="Operasional"
-        value={stats?.operationalUnits || 0}
-        icon={CheckCircle}
-        color="green"
+        value={operationalUnits.toLocaleString('id-ID')}
+        variant="white"
         trend={{ value: operationalPercentage, isPositive: true }}
-        description="Unit berfungsi normal"
+        icon={CheckCircle}
       />
-      <StatCard
+      <ModernStatCard
         title="Perlu Perawatan"
-        value={stats?.maintenanceNeeded || 0}
+        value={maintenanceUnits.toLocaleString('id-ID')}
+        variant="white"
+        trend={{ value: maintenancePercentage, isPositive: false }}
         icon={WarningTriangle}
-        color="yellow"
-        description="Membutuhkan tindakan"
       />
-      <StatCard
+      <ModernStatCard
         title="Offline"
-        value={stats?.offlineUnits || 0}
+        value={offlineUnits.toLocaleString('id-ID')}
+        variant="white"
+        subtext="Tidak terhubung"
         icon={XmarkCircle}
-        color="red"
-        description="Tidak terhubung ke sistem"
       />
     </div>
   );
 }
 
-function ReportStats({ dataPromise }: { dataPromise: StatsPromise }) {
-  const { data: stats } = use(dataPromise);
-
-  const reportsThisMonth = stats?.reportsThisMonth || 0;
-  const reportsLastMonth = stats?.reportsLastMonth || 0;
-  const reportsGrowth = reportsLastMonth > 0
-    ? Math.round(((reportsThisMonth - reportsLastMonth) / reportsLastMonth) * 100)
-    : (reportsThisMonth > 0 ? 100 : 0);
-  const isGrowthPositive = reportsGrowth >= 0;
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md hover:shadow-md transition-all">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">
-                Total Laporan
-              </p>
-              <p className="text-3xl font-bold text-primary-600 mt-1">
-                {stats?.totalReports?.toLocaleString("id-ID") || 0}
-              </p>
-            </div>
-            <div className="p-2 bg-primary-100 rounded-lg shadow-sm">
-              <StatsReport className="h-6 w-6 text-primary-600" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-3 text-sm text-slate-500">
-            <GraphUp className="h-4 w-4" />
-            <span>Sejak sistem diluncurkan</span>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md hover:shadow-md transition-all">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">
-                Laporan Bulan Ini
-              </p>
-              <p className="text-3xl font-bold text-slate-900 mt-1">
-                {stats?.reportsThisMonth?.toLocaleString("id-ID") || 0}
-              </p>
-            </div>
-            <div className="p-2 bg-primary-100 rounded-lg shadow-sm">
-              <Calendar className="h-6 w-6 text-primary-600" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-3">
-            <Badge
-              variant="outline"
-              className={`text-xs border ${isGrowthPositive
-                ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                : "bg-red-50 text-red-700 border-red-200"
-                }`}
-            >
-              {isGrowthPositive ? '+' : ''}{reportsGrowth}% dari bulan lalu
-            </Badge>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md hover:shadow-md transition-all">
-        <CardContent className="p-5">
-          <div className="flex items-start justify-between">
-            <div>
-              <p className="text-slate-500 text-sm font-medium">
-                Laporan Hari Ini
-              </p>
-              <p className="text-3xl font-bold text-emerald-600 mt-1">
-                {stats?.reportsToday?.toLocaleString("id-ID") || 0}
-              </p>
-            </div>
-            <div className="p-2 bg-emerald-100 rounded-lg shadow-sm">
-              <Clock className="h-6 w-6 text-emerald-600" />
-            </div>
-          </div>
-          <div className="flex items-center gap-2 mt-3 text-sm text-slate-500">
-            <span>Update terakhir: baru saja</span>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function ChartsSection({ provincesPromise, statsPromise }: { provincesPromise: ProvincesPromise, statsPromise: StatsPromise }) {
-  const { data: provinces } = use(provincesPromise);
+function MainContentGrid({ 
+  statsPromise, 
+  provincesPromise, 
+  activitiesPromise 
+}: { 
+  statsPromise: StatsPromise, 
+  provincesPromise: ProvincesPromise, 
+  activitiesPromise: ActivityPromise 
+}) {
   const { data: stats } = use(statsPromise);
+  const { data: provinces } = use(provincesPromise);
+  const { data: activities } = use(activitiesPromise);
 
   const safeProvinces = provinces || [];
-
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-      {/* Province Chart - Takes 2 columns */}
-      <div className="lg:col-span-2">
-        <ProvinceChart data={safeProvinces} />
-      </div>
-
-      {/* Status Distribution */}
-      <StatusDonutChart
-        data={{
-          operational: stats?.operationalUnits || 0,
-          maintenanceNeeded: stats?.maintenanceNeeded || 0,
-          offline: stats?.offlineUnits || 0,
-          unverified: stats?.unverifiedUnits || 0,
-        }}
-      />
-    </div>
-  );
-}
-
-function ActivitySection({ activitiesPromise }: { activitiesPromise: ActivityPromise }) {
-  const { data: activities } = use(activitiesPromise);
   const safeActivities = activities || [];
 
-  // Note: Client components receiving promises from Server Components preserve Dates in RSC payload
   return (
-    <div className="lg:col-span-2">
-      <ActivityFeed
-        activities={safeActivities.map((a) => ({
-          ...a,
-          timestamp: new Date(a.timestamp),
-        }))}
-        maxHeight="400px"
-      />
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
+      {/* Province Chart - Takes 2 columns */}
+      <div className="xl:col-span-2 space-y-8">
+        {/* Charts Section */}
+        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60 relative overflow-hidden">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h3 className="text-xl font-bold text-slate-900">Sebaran Provinsi</h3>
+              <p className="text-slate-500 mt-1">Distribusi unit PJUTS per wilayah</p>
+            </div>
+            <div className="flex gap-2">
+               <span className="px-4 py-2 bg-slate-50 rounded-full text-xs font-semibold uppercase tracking-wider text-slate-500 border border-slate-200">
+                  Nasional
+               </span>
+            </div>
+          </div>
+          <div className="h-[400px] w-full">
+            <ProvinceChart data={safeProvinces} />
+          </div>
+        </div>
+
+        {/* Status & Reports Row */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+           {/* Status Donut */}
+           <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60 flex flex-col">
+              <div className="mb-6">
+                 <h3 className="text-lg font-bold text-slate-900">Status Unit</h3>
+                 <p className="text-slate-500 text-sm">Rasio performa keseluruhan</p>
+              </div>
+              <div className="flex-1 flex items-center justify-center min-h-[250px]">
+                 <StatusDonutChart
+                  data={{
+                    operational: stats?.operationalUnits || 0,
+                    maintenanceNeeded: stats?.maintenanceNeeded || 0,
+                    offline: stats?.offlineUnits || 0,
+                    unverified: stats?.unverifiedUnits || 0,
+                  }}
+                />
+              </div>
+           </div>
+
+           {/* Quick Reports Stats */}
+           <div className="bg-slate-900 rounded-[2rem] p-8 shadow-sm text-white flex flex-col justify-between group relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-8 opacity-10 transition-transform group-hover:scale-110 duration-700">
+                 <StatsReport className="w-32 h-32 rotate-12 text-slate-200" />
+              </div>
+              
+              <div className="relative z-10">
+                 <div className="flex items-center gap-3 mb-2">
+                    <div className="p-2 bg-white/10 rounded-xl">
+                      <StatsReport className="w-5 h-5 text-white" />
+                    </div>
+                    <h3 className="text-lg font-medium text-slate-300">Laporan Masuk</h3>
+                 </div>
+                 <p className="text-5xl font-bold mt-4 tracking-tight">{stats?.totalReports || 0}</p>
+                 <div className="mt-2 text-slate-400">Total laporan diterima</div>
+              </div>
+
+              <div className="space-y-4 mt-8 bg-white/5 rounded-2xl p-5 backdrop-blur-sm border border-white/5 relative z-10 transition-colors hover:bg-white/10">
+                 <div className="flex justify-between items-center">
+                    <span className="text-slate-400 text-sm">Bulan Ini</span>
+                    <span className="text-xl font-semibold">{stats?.reportsThisMonth || 0}</span>
+                 </div>
+                 <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-primary-500 rounded-full" 
+                      style={{ width: '75%' }} // Mock width
+                    ></div>
+                 </div>
+                 <div className="flex justify-between items-center pt-1">
+                    <span className="text-slate-400 text-sm">Hari Ini</span>
+                    <span className="text-white font-medium bg-emerald-500/20 px-2 py-0.5 rounded text-xs text-emerald-400">
+                      +{stats?.reportsToday || 0}
+                    </span>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </div>
+
+      {/* Right Column: Activity & Hot Lists */}
+      <div className="space-y-8">
+        {/* Activity Feed */}
+        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60 h-full max-h-[900px] overflow-hidden flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-xl font-bold text-slate-900">Aktivitas Terbaru</h3>
+            <Link href="/reports">
+               <div className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer border border-slate-100 group">
+                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-slate-900" />
+               </div>
+            </Link>
+          </div>
+          
+          <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
+             <ActivityFeed
+                activities={safeActivities.map((a) => ({
+                  ...a,
+                  timestamp: new Date(a.timestamp),
+                }))}
+                maxHeight="100%"
+              />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -233,76 +320,88 @@ function ProvinceTableSection({ provincesPromise }: { provincesPromise: Province
   const safeProvinces = provinces || [];
 
   return (
-    <Card className="mt-6 border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md">
-      <CardHeader className="flex flex-row items-center justify-between pb-4 bg-slate-50/50 border-b border-slate-100">
-        <CardTitle className="text-lg">Statistik per Provinsi</CardTitle>
-        <Link href="/analytics">
-          <Button variant="ghost" size="sm">
-            Lihat Semua
-          </Button>
-        </Link>
-      </CardHeader>
-      <CardContent className="p-0">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50/50 text-xs uppercase tracking-wider text-slate-500 border-b border-slate-100">
-              <tr>
-                <th className="px-6 py-4 font-semibold">Provinsi</th>
-                <th className="px-6 py-4 text-center font-semibold">Total Unit</th>
-                <th className="px-6 py-4 text-center font-semibold text-emerald-600">Operasional</th>
-                <th className="px-6 py-4 text-center font-semibold text-amber-600">Perawatan</th>
-                <th className="px-6 py-4 text-center font-semibold text-red-600">Offline</th>
-                <th className="px-6 py-4 text-center font-semibold">Laporan</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {safeProvinces.slice(0, 10).map((prov, index) => (
-                <tr
-                  key={prov.province}
-                  className="group hover:bg-slate-50/50 transition-colors animate-in fade-in duration-500"
-                  style={{ animationDelay: `${index * 0.05}s` }}
-                >
-                  <td className="px-6 py-4 font-medium text-slate-700 group-hover:text-slate-900 transition-colors">
-                    {prov.province}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-200">
-                      {prov.totalUnits}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
-                      {prov.operational}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    {prov.maintenanceNeeded > 0 ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/20">
-                        {prov.maintenanceNeeded}
-                      </span>
-                    ) : (
-                      <span className="text-slate-300">-</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    {prov.offline > 0 ? (
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/20">
-                        {prov.offline}
-                      </span>
-                    ) : (
-                      <span className="text-slate-300">-</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-center text-slate-600">
-                    {prov.totalReports > 0 ? prov.totalReports : <span className="text-slate-300">0</span>}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+        <div>
+           <h3 className="text-xl font-bold text-slate-900">Detail Wilayah</h3>
+           <p className="text-slate-500 mt-1">Status performa per provinsi</p>
         </div>
-      </CardContent>
-    </Card>
+        <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full text-sm font-medium text-slate-600 border border-slate-200">
+               <Globe className="w-4 h-4" />
+               <span>Indonesia</span>
+            </div>
+            <Link href="/analytics">
+              <Button variant="outline" className="rounded-full px-6 border-slate-200 hover:bg-slate-50 hover:text-slate-900">
+                Lihat Semua
+              </Button>
+            </Link>
+        </div>
+      </div>
+      
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-separate border-spacing-y-3">
+          <thead>
+            <tr className="text-slate-400 text-sm font-medium">
+              <th className="px-6 py-2 font-medium">Provinsi</th>
+              <th className="px-6 py-2 font-medium">Total Unit</th>
+              <th className="px-6 py-2 font-medium">Status</th>
+              <th className="px-6 py-2 text-right font-medium">Performa</th>
+            </tr>
+          </thead>
+          <tbody className="">
+            {safeProvinces.slice(0, 8).map((prov) => (
+              <tr
+                key={prov.province}
+                className="group transition-all hover:scale-[1.005]"
+              >
+                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 rounded-l-2xl border-y border-l border-transparent group-hover:border-slate-200 transition-colors">
+                  <div className="flex items-center gap-4">
+                     <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 font-bold text-xs shadow-sm border border-slate-200 group-hover:border-primary-200 group-hover:text-primary-600 transition-colors">
+                        {prov.province.substring(0, 2).toUpperCase()}
+                     </div>
+                     <span className="font-semibold text-slate-700 group-hover:text-slate-900">{prov.province}</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 border-y border-transparent group-hover:border-slate-200 transition-colors">
+                  <div className="flex flex-col">
+                     <span className="font-bold text-slate-900">{prov.totalUnits}</span>
+                     <span className="text-xs text-slate-400">Unit terpasang</span>
+                  </div>
+                </td>
+                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 border-y border-transparent group-hover:border-slate-200 transition-colors">
+                   <div className="flex gap-2">
+                       {prov.operational > 0 && (
+                           <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-0 shadow-none rounded-lg px-3">
+                              {prov.operational} OK
+                           </Badge>
+                       )}
+                       {(prov.maintenanceNeeded > 0 || prov.offline > 0) && (
+                           <Badge className="bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-none rounded-lg px-3">
+                              {prov.maintenanceNeeded + prov.offline} Issue
+                           </Badge>
+                       )}
+                   </div>
+                </td>
+                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 rounded-r-2xl border-y border-r border-transparent group-hover:border-slate-200 text-right transition-colors">
+                   <div className="flex flex-col items-end gap-1">
+                      <span className="font-bold text-slate-900">
+                        {prov.totalUnits > 0 ? Math.round((prov.operational / prov.totalUnits) * 100) : 0}%
+                      </span>
+                      <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                         <div 
+                           className="h-full bg-primary-500 rounded-full" 
+                           style={{ width: `${prov.totalUnits > 0 ? (prov.operational / prov.totalUnits) * 100 : 0}%` }}
+                         ></div>
+                      </div>
+                   </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 }
 
@@ -322,121 +421,60 @@ export function DashboardClient({
   statsPromise,
   provincesPromise,
   activitiesPromise,
+  user,
 }: DashboardClientProps) {
+  const greeting = getGreeting();
+  const displayName = user?.name?.split(' ')[0] || 'Admin';
+
   return (
-    <>
-      <PageHeader
-        title="Dashboard"
-        description="Pantau status PJUTS secara real-time di seluruh Indonesia"
-      >
-        <Suspense fallback={<Button size="sm" variant="outline" disabled>Loading...</Button>}>
-          <ExportButtonWrapper statsPromise={statsPromise} provincesPromise={provincesPromise} />
+    <div className="min-h-screen bg-slate-50/50 p-4 md:p-8 font-sans selection:bg-primary-100 selection:text-primary-900">
+      <div className="max-w-[1600px] mx-auto space-y-8">
+        
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+           <div>
+              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+                {greeting}, {displayName}
+              </h1>
+              <p className="text-slate-500 mt-2 text-lg">Pantau status & performa PJUTS Nasional</p>
+           </div>
+           
+           <div className="flex items-center gap-3">
+              <Suspense fallback={<Button disabled size="lg" className="rounded-full px-6">Loading...</Button>}>
+                <ExportButtonWrapper statsPromise={statsPromise} provincesPromise={provincesPromise} />
+              </Suspense>
+              
+              <Link href="/report/new">
+                <Button size="lg" className="bg-primary-600 text-white hover:bg-primary-700 rounded-full px-6 shadow-lg shadow-primary-900/20 h-11">
+                  <StatsReport className="h-5 w-5 mr-2" />
+                  Buat Laporan
+                </Button>
+              </Link>
+           </div>
+        </div>
+
+        {/* Stats Grid - "The Cards" */}
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest pl-1">Ringkasan Utama</p>
+        <Suspense fallback={<StatsGridSkeleton />}>
+          <StatsGrid dataPromise={statsPromise} />
         </Suspense>
 
-        <Link href="/report/new">
-          <Button size="sm">
-            <StatsReport className="h-4 w-4 mr-2" />
-            Buat Laporan
-          </Button>
-        </Link>
-      </PageHeader>
-
-      {/* KPI Stats Grid */}
-      <Suspense fallback={<StatsGridSkeleton />}>
-        <StatsGrid dataPromise={statsPromise} />
-      </Suspense>
-
-      {/* Modern Divider */}
-      <div className="relative my-8">
-        <div className="absolute inset-0 flex items-center" aria-hidden="true">
-          <div className="w-full border-t border-slate-200/60 shadow-sm"></div>
-        </div>
-        <div className="relative flex justify-center">
-          <div className="flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-200/60 shadow-sm text-slate-500">
-            <StatsReport className="h-3.5 w-3.5" />
-            <span className="text-xs font-medium uppercase tracking-wider">
-              Statistik Laporan
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Report Stats */}
-      <Suspense fallback={<ReportStatsSkeleton />}>
-        <ReportStats dataPromise={statsPromise} />
-      </Suspense>
-
-      {/* Charts & Activity Grid */}
-      <Suspense fallback={<ChartsGridSkeleton />}>
-        <ChartsSection provincesPromise={provincesPromise} statsPromise={statsPromise} />
-      </Suspense>
-
-      {/* Activity Feed & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activity Feed */}
-        <Suspense fallback={<ActivityGridSkeleton />}>
-          <ActivitySection activitiesPromise={activitiesPromise} />
+        {/* Main Content Grid: Charts + Side Content */}
+        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest pl-1">Analisis & Aktivitas</p>
+        <Suspense fallback={<ChartsGridSkeleton />}>
+           <MainContentGrid 
+             statsPromise={statsPromise} 
+             provincesPromise={provincesPromise} 
+             activitiesPromise={activitiesPromise} 
+           />
         </Suspense>
 
-        {/* Quick Actions (Static) */}
-        <Card className="border-slate-200/60 shadow-sm bg-white/90 backdrop-blur-md h-full">
-          <CardHeader className="pb-3 bg-slate-50/50 border-b border-slate-100">
-            <CardTitle className="text-base font-semibold text-slate-800">Aksi Cepat</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 pt-6">
-            <Link href="/report/new" className="block">
-              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-primary-100 hover:bg-primary-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-50 text-primary-600 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
-                    <StatsReport className="h-5 w-5" />
-                  </div>
-                  <span className="font-medium text-slate-700 group-hover:text-primary-700 transition-colors">Buat Laporan Baru</span>
-                </div>
-                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" />
-              </div>
-            </Link>
-            <Link href="/map" className="block">
-              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-emerald-100 hover:bg-emerald-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100 group-hover:scale-105 transition-all">
-                    <MapPin className="h-5 w-5" />
-                  </div>
-                  <span className="font-medium text-slate-700 group-hover:text-emerald-700 transition-colors">Lihat Peta PJUTS</span>
-                </div>
-                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
-              </div>
-            </Link>
-            <Link href="/units" className="block">
-              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-amber-100 hover:bg-amber-50/30 hover:shadow-sm transition-all duration-200 cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-50 text-amber-600 group-hover:bg-amber-100 group-hover:scale-105 transition-all">
-                    <LightBulb className="h-5 w-5" />
-                  </div>
-                  <span className="font-medium text-slate-700 group-hover:text-amber-700 transition-colors">Kelola Unit</span>
-                </div>
-                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
-              </div>
-            </Link>
-            <Link href="/reports" className="block">
-              <div className="group flex items-center justify-between p-3 rounded-xl border border-slate-100 bg-white hover:border-slate-200 hover:bg-slate-50 hover:shadow-sm transition-all duration-200 cursor-pointer">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-slate-600 group-hover:bg-slate-200 group-hover:scale-105 transition-all">
-                    <Calendar className="h-5 w-5" />
-                  </div>
-                  <span className="font-medium text-slate-700 group-hover:text-slate-900 transition-colors">Riwayat Laporan</span>
-                </div>
-                <NavArrowRight className="h-5 w-5 text-slate-300 group-hover:text-slate-500 group-hover:translate-x-1 transition-all" />
-              </div>
-            </Link>
-          </CardContent>
-        </Card>
+        {/* Bottom Section: Table */}
+        <Suspense fallback={<TableSkeleton />}>
+          <ProvinceTableSection provincesPromise={provincesPromise} />
+        </Suspense>
       </div>
-
-      {/* Province Table */}
-      <Suspense fallback={<TableSkeleton />}>
-        <ProvinceTableSection provincesPromise={provincesPromise} />
-      </Suspense>
-    </>
+    </div>
   );
 }
 

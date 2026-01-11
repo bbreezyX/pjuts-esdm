@@ -4,7 +4,6 @@ import {
   MapPin,
   SmartphoneDevice,
   Activity,
-  CheckCircle,
   ScanQrCode,
   MediaImage,
   Database,
@@ -12,7 +11,6 @@ import {
   ArrowRight,
 } from "iconoir-react";
 import { FadeIn, StaggerContainer, FadeInItem } from "@/components/ui/motion";
-import { cn } from "@/lib/utils";
 
 export default function WorkflowSection() {
   return (

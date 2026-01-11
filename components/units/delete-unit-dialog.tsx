@@ -45,7 +45,7 @@ export function DeleteUnitDialog({ open, onOpenChange, unit }: DeleteUnitDialogP
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Terjadi kesalahan sistem",

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
     CheckCircle,
@@ -12,7 +12,7 @@ import {
 } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { getNotifications, markAllRead, type NotificationItem } from "@/app/actions/notifications";
+import { markAllRead, type NotificationItem } from "@/app/actions/notifications";
 import { formatDistanceToNow } from "date-fns";
 import { id } from "date-fns/locale";
 import { toast } from "@/components/ui/use-toast";
@@ -24,7 +24,7 @@ interface NotificationsClientProps {
 
 export function NotificationsClient({ initialNotifications, initialLastRead }: NotificationsClientProps) {
     const router = useRouter();
-    const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications);
+    const [notifications] = useState<NotificationItem[]>(initialNotifications);
     const [lastReadTime, setLastReadTime] = useState<Date>(initialLastRead);
     const [isLoading, setIsLoading] = useState(false);
 

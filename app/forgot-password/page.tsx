@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Mail, Check, ShieldCheck, LightBulb, Flash } from "iconoir-react";
+import { ArrowLeft, Mail, Check, ShieldCheck, Flash } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { requestPasswordReset } from "@/app/actions/auth";

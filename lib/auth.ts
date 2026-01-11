@@ -101,7 +101,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/login",
   },
   callbacks: {
-    async jwt({ token, user, trigger }) {
+    async jwt({ token, user, trigger: _trigger }) {
       // Initial sign in - set user data in token
       if (user) {
         token.id = user.id ?? "";

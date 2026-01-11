@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useCallback, memo, ReactNode } from "react";
+import { useRef, memo, ReactNode } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 interface VirtualizedListProps<T> {

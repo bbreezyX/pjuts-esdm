@@ -4,8 +4,6 @@ import {
   LightBulb,
   MapPin,
   StatsReport,
-  ShieldCheck,
-  Activity,
   Flash,
   ArrowRight,
   SunLight,
@@ -192,8 +190,8 @@ export default function HeroSection() {
   );
 }
 
-// Simple Trust Badge Component
-function TrustBadge({
+// Simple Trust Badge Component - kept for future use
+function _TrustBadge({
   icon: Icon,
   label,
 }: {
@@ -210,7 +208,8 @@ function TrustBadge({
   );
 }
 
-function TrustIndicator({
+// Trust Indicator Component - kept for future use
+function _TrustIndicator({
   icon: Icon,
   title,
   subtitle,

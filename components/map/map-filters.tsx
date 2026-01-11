@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, WarningTriangle, XmarkCircle, HelpCircle, Map, NavArrowDown, NavArrowUp } from "iconoir-react";
+import { CheckCircle, WarningTriangle, XmarkCircle, HelpCircle, Map, NavArrowDown } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
