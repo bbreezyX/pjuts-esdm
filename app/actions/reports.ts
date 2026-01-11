@@ -255,7 +255,10 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     // Note: We await this to ensure email is sent before serverless function terminates
     try {
       const admins = await prisma.user.findMany({
-        where: { role: Role.ADMIN },
+        where: { 
+          role: Role.ADMIN,
+          isActive: true,  // Only send to active users
+        },
         select: { email: true, name: true },
       });
       

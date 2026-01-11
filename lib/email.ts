@@ -304,13 +304,19 @@ export async function sendReportNotificationToAdmins(
   }
 
   try {
+    // Generate unique timestamp for this batch to prevent Resend deduplication
+    const timestamp = Date.now();
+    
     // Send individual emails to personalize greeting
-    const emailPromises = recipients.map(async (recipient) => {
+    const emailPromises = recipients.map(async (recipient, index) => {
       const { error } = await client.emails.send({
         from: FROM_EMAIL,
         to: recipient.email,
         subject: `[Laporan] ${data.unitSerial} - ${data.reporterName}`,
         html: getReportNotificationHtml(data, recipient.name),
+        headers: {
+          "X-Entity-Ref-ID": `report-${data.reportId || data.unitSerial}-${timestamp}-${index}`,
+        },
       });
       return { success: !error, error: error?.message };
     });
@@ -345,13 +351,19 @@ export async function sendUnitNotificationToFieldStaff(
   }
 
   try {
+    // Generate unique timestamp for this batch to prevent Resend deduplication
+    const timestamp = Date.now();
+    
     // Send individual emails to personalize greeting
-    const emailPromises = recipients.map(async (recipient) => {
+    const emailPromises = recipients.map(async (recipient, index) => {
       const { error } = await client.emails.send({
         from: FROM_EMAIL,
         to: recipient.email,
         subject: `[Unit Baru] ${data.unitSerial} - ${data.unitProvince}`,
         html: getUnitNotificationHtml(data, recipient.name),
+        headers: {
+          "X-Entity-Ref-ID": `unit-${data.unitSerial}-${timestamp}-${index}`,
+        },
       });
       return { success: !error, error: error?.message };
     });

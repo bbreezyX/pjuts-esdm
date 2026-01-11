@@ -109,7 +109,10 @@ export async function createPjutsUnit(
     // Note: We await this to ensure email is sent before serverless function terminates
     try {
       const fieldStaff = await prisma.user.findMany({
-        where: { role: Role.FIELD_STAFF },
+        where: { 
+          role: Role.FIELD_STAFF,
+          isActive: true,  // Only send to active users
+        },
         select: { email: true, name: true },
       });
       
