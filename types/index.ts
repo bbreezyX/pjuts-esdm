@@ -4,6 +4,17 @@ import { UnitStatus, Role } from "@prisma/client";
 export { UnitStatus, Role };
 
 // ============================================
+// Action Result Type (Server Actions)
+// ============================================
+
+export interface ActionResult<T = void> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  errors?: Record<string, string[]>;
+}
+
+// ============================================
 // API Response Types
 // ============================================
 

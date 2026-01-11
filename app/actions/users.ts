@@ -3,21 +3,15 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { revalidatePath } from "next/cache";
-import { Role } from "@prisma/client";
+import { Prisma, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { sendAccountDisabledEmail, sendAccountEnabledEmail } from "@/lib/email";
+import { type ActionResult } from "@/types";
 
 // ============================================
 // TYPES & SCHEMAS
 // ============================================
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  errors?: Record<string, string[]>;
-}
 
 export interface UserData {
   id: string;
@@ -176,7 +170,7 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
 
     const { name, email, password, role } = validation.data;
 
-    const dataToUpdate: any = { name, email, role };
+    const dataToUpdate: Prisma.UserUpdateInput = { name, email, role };
     if (password && password.length >= 8) {
       dataToUpdate.password = await bcrypt.hash(password, 12);
     }

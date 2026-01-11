@@ -3,9 +3,10 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { mapBoundsSchema, type MapBounds } from "@/lib/validations";
-import { UnitStatus } from "@prisma/client";
+import { Prisma, UnitStatus } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 import { CacheTags, CacheDurations } from "@/lib/cache";
+import { type ActionResult } from "@/types";
 
 // ============================================
 // TYPES
@@ -26,12 +27,6 @@ export interface MapPoint {
     createdAt: Date;
     user: string;
   };
-}
-
-export interface ActionResult<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
 }
 
 // ============================================
@@ -175,7 +170,7 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
     }
 
     // Build where clause for bounds filtering
-    const where: Record<string, unknown> = {};
+    const where: Prisma.PjutsUnitWhereInput = {};
 
     // Validate bounds
     const validationResult = mapBoundsSchema.safeParse(bounds);

@@ -4,19 +4,13 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { createPjutsUnitSchema, type CreatePjutsUnitInput } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
-import { UnitStatus, Role } from "@prisma/client";
+import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { sendUnitNotificationToFieldStaff } from "@/lib/email";
+import { type ActionResult } from "@/types";
 
 // ============================================
 // TYPES
 // ============================================
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  errors?: Record<string, string[]>;
-}
 
 export interface PjutsUnitData {
   id: string;
@@ -181,7 +175,7 @@ export async function getPjutsUnits(options: GetUnitsOptions = {}): Promise<Acti
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: Record<string, unknown> = {};
+    const where: Prisma.PjutsUnitWhereInput = {};
 
     if (province) {
       where.province = province;

@@ -10,13 +10,6 @@ import {
   getLoginRateLimitKey,
 } from "./rate-limit";
 
-// Password requirements for enhanced security
-// - Minimum 8 characters
-// - At least one uppercase letter
-// - At least one lowercase letter  
-// - At least one number
-const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
-
 // Validation schema for sign in
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),

@@ -115,7 +115,6 @@ export async function getNotifications(limit: number = 10): Promise<{ success: b
         // Fetch user's lastNotificationCheck (this is user-specific, not cached)
         const user = await prisma.user.findUnique({
             where: { id: session.user.id },
-            // @ts-ignore - Prisma client might be locked/stale in dev, but schema has this field
             select: { lastNotificationCheck: true }
         });
 
@@ -131,7 +130,6 @@ export async function getNotifications(limit: number = 10): Promise<{ success: b
         return {
             success: true,
             data: notifications,
-            // @ts-ignore - Prisma client might be locked/stale in dev
             lastRead: user?.lastNotificationCheck ?? new Date(0),
         };
     } catch (error) {
@@ -147,7 +145,6 @@ export async function markAllRead() {
 
         await prisma.user.update({
             where: { id: session.user.id },
-            // @ts-ignore - Prisma client might be locked/stale in dev, but schema has this field
             data: { lastNotificationCheck: new Date() },
         });
 

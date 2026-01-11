@@ -5,19 +5,13 @@ import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
 import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
-import { UnitStatus, Role } from "@prisma/client";
+import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { sendReportNotificationToAdmins } from "@/lib/email";
+import { type ActionResult } from "@/types";
 
 // ============================================
 // TYPES
 // ============================================
-
-export interface ActionResult<T = void> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  errors?: Record<string, string[]>;
-}
 
 export interface ReportData {
   id: string;
@@ -336,7 +330,7 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
     const skip = (page - 1) * limit;
 
     // Build where clause
-    const where: Record<string, unknown> = {};
+    const where: Prisma.ReportWhereInput = {};
 
     if (unitId) {
       where.unitId = unitId;
@@ -347,13 +341,10 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
     }
 
     if (startDate || endDate) {
-      where.createdAt = {};
-      if (startDate) {
-        (where.createdAt as Record<string, Date>).gte = startDate;
-      }
-      if (endDate) {
-        (where.createdAt as Record<string, Date>).lte = endDate;
-      }
+      where.createdAt = {
+        ...(startDate && { gte: startDate }),
+        ...(endDate && { lte: endDate }),
+      };
     }
 
     // If field staff, only show their own reports
