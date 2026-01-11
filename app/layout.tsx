@@ -8,6 +8,7 @@ const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   variable: "--font-plus-jakarta",
   display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -92,6 +93,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className={plusJakarta.variable}>
+      <head>
+        {/* Preconnect to external resources for faster loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://tile.openstreetmap.org" />
+        <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+        
+        {/* Preconnect to R2 storage */}
+        <link rel="preconnect" href="https://pub-placeholder.r2.dev" />
+        
+        {/* Prefetch critical resources */}
+        <link rel="prefetch" href="/manifest.json" />
+      </head>
       <body className="font-sans antialiased">
         <Providers>{children}</Providers>
         <Toaster />

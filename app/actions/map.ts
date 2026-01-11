@@ -37,7 +37,6 @@ export interface MapPoint {
  * Internal function to fetch all map points (for caching)
  */
 async function fetchAllMapPoints(): Promise<MapPoint[]> {
-  console.log("[Map] Fetching all map points from database...");
   const units = await prisma.pjutsUnit.findMany({
     select: {
       id: true,
@@ -66,7 +65,7 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
     },
   });
 
-  const mapPoints = units.map((unit) => ({
+  return units.map((unit) => ({
     id: unit.id,
     serialNumber: unit.serialNumber,
     latitude: unit.latitude,
@@ -84,9 +83,6 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
       }
       : undefined,
   }));
-
-  console.log(`[Map] Fetched ${mapPoints.length} map points:`, mapPoints.map(p => `${p.serialNumber} (${p.latitude}, ${p.longitude})`));
-  return mapPoints;
 }
 
 // Cached version - refreshes every 5 minutes

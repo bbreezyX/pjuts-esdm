@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState, useEffect, Suspense } from "react";
+import { use, useState, useEffect, Suspense, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout";
 import { MapFilters, MapLegend, UnitDetailDrawer } from "@/components/map";
@@ -13,9 +13,9 @@ import { DashboardStats, ActionResult } from "@/app/actions/dashboard";
 type PointsPromise = Promise<ActionResult<MapPoint[]>>;
 type StatsPromise = Promise<ActionResult<DashboardStats>>;
 
-// Dynamic import for Leaflet (client-side only)
+// Dynamic import for optimized Leaflet with clustering (client-side only)
 const MapContainer = dynamic(
-  () => import("@/components/map/map-container").then((mod) => mod.MapContainer),
+  () => import("@/components/map/map-container-optimized").then((mod) => mod.MapContainer),
   {
     ssr: false,
     loading: () => (
@@ -23,6 +23,7 @@ const MapContainer = dynamic(
         <div className="text-center">
           <Skeleton className="w-12 h-12 rounded-full mx-auto mb-3" />
           <Skeleton className="w-32 h-4" />
+          <p className="text-xs text-slate-400 mt-2">Memuat peta...</p>
         </div>
       </div>
     ),
@@ -57,13 +58,14 @@ function MapContent({
   onPointClick: (point: MapPoint) => void;
 }) {
   const { data: points } = use(pointsPromise);
-  const safePoints = points || [];
+  const safePoints = useMemo(() => points || [], [points]);
 
   return (
     <MapContainer
       points={safePoints}
       selectedStatus={selectedStatus}
       onPointClick={onPointClick}
+      enableClustering={safePoints.length > 50} // Only enable clustering for large datasets
     />
   );
 }
@@ -80,16 +82,18 @@ function FiltersSection({
 }) {
   const { data: stats } = use(statsPromise);
 
+  const counts = useMemo(() => ({
+    operational: stats?.operationalUnits || 0,
+    maintenanceNeeded: stats?.maintenanceNeeded || 0,
+    offline: stats?.offlineUnits || 0,
+    unverified: stats?.unverifiedUnits || 0,
+  }), [stats]);
+
   return (
     <MapFilters
       selectedStatus={selectedStatus}
       onStatusChange={onStatusChange}
-      counts={{
-        operational: stats?.operationalUnits || 0,
-        maintenanceNeeded: stats?.maintenanceNeeded || 0,
-        offline: stats?.offlineUnits || 0,
-        unverified: stats?.unverifiedUnits || 0,
-      }}
+      counts={counts}
     />
   );
 }
@@ -144,7 +148,7 @@ export function MapPageClient({ pointsPromise, statsPromise }: MapPageClientProp
                 <div className="text-center space-y-3">
                   <Skeleton className="w-12 h-12 rounded-full mx-auto" />
                   <Skeleton className="w-32 h-4 mx-auto" />
-                  <p className="text-sm text-slate-400">Loading map data...</p>
+                  <p className="text-sm text-slate-400">Memuat data peta...</p>
                 </div>
               </div>
             }

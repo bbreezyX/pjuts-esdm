@@ -5,11 +5,24 @@ const withPWA = withPWAInit({
   dest: "public",
   disable: process.env.NODE_ENV === "development",
   register: true,
+  cacheOnFrontEndNav: true,
+  fallbacks: {
+    document: "/~offline",
+  },
 });
 
 const nextConfig: NextConfig = {
   // Silence Turbopack warning for PWA webpack config
   turbopack: {},
+  
+  // Compiler optimizations
+  compiler: {
+    // Remove console.log in production
+    removeConsole: process.env.NODE_ENV === "production" ? {
+      exclude: ["error", "warn"],
+    } : false,
+  },
+  
   images: {
     remotePatterns: [
       {
@@ -25,7 +38,9 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
     formats: ["image/webp", "image/avif"],
+    minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
+  
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb",
@@ -33,8 +48,22 @@ const nextConfig: NextConfig = {
     // Enable optimistic client cache for faster navigation
     optimisticClientCache: true,
     // Optimize bundle size by tree-shaking these packages
-    optimizePackageImports: ["iconoir-react", "framer-motion", "date-fns"],
+    optimizePackageImports: [
+      "iconoir-react",
+      "framer-motion",
+      "date-fns",
+      "recharts",
+      "@radix-ui/react-dialog",
+      "@radix-ui/react-dropdown-menu",
+      "@radix-ui/react-select",
+      "@radix-ui/react-tabs",
+      "@radix-ui/react-popover",
+      "leaflet",
+    ],
+    // Partial prerendering for faster page loads
+    ppr: false, // Enable when stable
   },
+  
   // Enhanced Security headers
   async headers() {
     return [
@@ -86,11 +115,78 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // Cache static assets aggressively
+      {
+        source: "/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      // Cache images
+      {
+        source: "/_next/image(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+      // Cache JS/CSS chunks
+      {
+        source: "/_next/static/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
     ];
   },
 
   // Reduce bundle size by marking external packages
-  serverExternalPackages: ["sharp"],
+  serverExternalPackages: ["sharp", "@prisma/client"],
+  
+  // Webpack optimizations
+  webpack: (config, { isServer }) => {
+    // Optimize chunks
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          ...config.optimization?.splitChunks,
+          cacheGroups: {
+            ...((config.optimization?.splitChunks as any)?.cacheGroups || {}),
+            // Separate large libraries into their own chunks
+            leaflet: {
+              test: /[\\/]node_modules[\\/](leaflet|leaflet\.markercluster)[\\/]/,
+              name: "leaflet",
+              chunks: "all",
+              priority: 30,
+            },
+            recharts: {
+              test: /[\\/]node_modules[\\/](recharts|d3-.*)[\\/]/,
+              name: "recharts",
+              chunks: "all",
+              priority: 30,
+            },
+            radix: {
+              test: /[\\/]node_modules[\\/]@radix-ui[\\/]/,
+              name: "radix",
+              chunks: "all",
+              priority: 20,
+            },
+          },
+        },
+      };
+    }
+    
+    return config;
+  },
 };
 
 export default withPWA(nextConfig);
