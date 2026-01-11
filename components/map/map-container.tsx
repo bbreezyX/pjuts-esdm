@@ -34,8 +34,9 @@ function MapContainerComponent({
   const mapRef = useRef<LeafletMap | null>(null);
   const markersRef = useRef<LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [L, setL] = useState<any>(null);
+  const [L, setL] = useState<typeof import("leaflet") | null>(null);
   const [isMapReady, setIsMapReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Memoize filtered points
   const filteredPoints = useMemo(() => {
@@ -44,7 +45,7 @@ function MapContainerComponent({
   }, [points, selectedStatus]);
 
   // Create icon function - memoized
-  const createIcon = useCallback((status: string, leaflet: any) => {
+  const createIcon = useCallback((status: string, leaflet: typeof import("leaflet")) => {
     // Check cache first
     const cacheKey = `icon-${status}`;
     if (iconCache.has(cacheKey)) {
@@ -148,20 +149,23 @@ function MapContainerComponent({
     `;
   }, []);
 
-  // Dynamically load Leaflet
+  // Dynamically load Leaflet (CSS is in globals.css for production compatibility)
   useEffect(() => {
     let mounted = true;
     
     async function loadLeaflet() {
       try {
+        // Dynamic import of leaflet
         const leafletModule = await import("leaflet");
-        await import("leaflet/dist/leaflet.css");
         
-        if (mounted) {
-          setL(leafletModule.default);
+        if (mounted && leafletModule.default) {
+          setL(leafletModule.default as any);
         }
-      } catch (error) {
-        console.error("Failed to load Leaflet:", error);
+      } catch (err) {
+        console.error("Failed to load Leaflet:", err);
+        if (mounted) {
+          setError("Gagal memuat library peta");
+        }
       }
     }
     
@@ -172,35 +176,61 @@ function MapContainerComponent({
     };
   }, []);
 
-  // Initialize map
+  // Initialize map - with proper cleanup and re-initialization
   useEffect(() => {
-    if (!containerRef.current || mapRef.current || !L) return;
+    if (!L || !containerRef.current) return;
+    
+    // Skip if map already exists
+    if (mapRef.current) return;
 
-    // Initialize map with performance options
-    const map = L.map(containerRef.current, {
-      center,
-      zoom,
-      zoomControl: false,
-      preferCanvas: true, // Better performance for many markers
-    });
+    // Small delay to ensure container is properly rendered with dimensions
+    const initTimer = setTimeout(() => {
+      if (!containerRef.current || mapRef.current) return;
+      
+      try {
+        // Initialize map with performance options
+        const map = L.map(containerRef.current, {
+          center,
+          zoom,
+          zoomControl: false,
+          preferCanvas: true,
+        });
 
-    // Add tile layer with caching options
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      maxZoom: 18,
-      updateWhenIdle: true,
-      updateWhenZooming: false,
-    }).addTo(map);
+        // Add tile layer
+        const tileLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+          maxZoom: 18,
+          subdomains: ['a', 'b', 'c'],
+        });
+        
+        tileLayer.addTo(map);
+        
+        // Handle tile errors
+        tileLayer.on('tileerror', (e: any) => {
+          console.warn('Tile load error:', e);
+        });
 
-    // Add zoom control on the right
-    L.control.zoom({ position: "topright" }).addTo(map);
+        // Add zoom control on the right
+        L.control.zoom({ position: "topright" }).addTo(map);
 
-    // Create markers layer group
-    markersRef.current = L.layerGroup().addTo(map);
-    mapRef.current = map;
-    setIsMapReady(true);
+        // Create markers layer group
+        markersRef.current = L.layerGroup().addTo(map);
+        mapRef.current = map;
+        
+        // Force a resize after initialization
+        setTimeout(() => {
+          map.invalidateSize();
+          setIsMapReady(true);
+        }, 100);
+        
+      } catch (err) {
+        console.error("Failed to initialize map:", err);
+        setError("Gagal menginisialisasi peta");
+      }
+    }, 50);
 
     return () => {
+      clearTimeout(initTimer);
       if (mapRef.current) {
         mapRef.current.remove();
         mapRef.current = null;
@@ -279,11 +309,57 @@ function MapContainerComponent({
     return () => clearTimeout(timeoutId);
   }, [filteredPoints, L, isMapReady]);
 
+  // Error state
+  if (error) {
+    return (
+      <div 
+        className="w-full h-full rounded-xl overflow-hidden bg-red-50 flex items-center justify-center"
+        style={{ minHeight: "500px", height: "100%" }}
+      >
+        <div className="text-center">
+          <div className="text-red-500 mb-2">
+            <svg className="w-12 h-12 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <p className="text-sm text-red-600 font-medium">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200 transition-colors"
+          >
+            Coba Lagi
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Loading state while Leaflet is loading
+  if (!L) {
+    return (
+      <div 
+        className="w-full h-full rounded-xl overflow-hidden bg-slate-100 flex items-center justify-center"
+        style={{ minHeight: "500px", height: "100%" }}
+      >
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-slate-300 border-t-primary rounded-full animate-spin mx-auto mb-2" />
+          <p className="text-sm text-slate-500">Memuat library peta...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       ref={containerRef}
-      className="w-full h-full rounded-xl overflow-hidden"
-      style={{ minHeight: "500px" }}
+      className="w-full h-full rounded-xl overflow-hidden leaflet-container"
+      style={{ 
+        minHeight: "500px", 
+        height: "100%", 
+        width: "100%",
+        position: "relative",
+        background: "#e5e7eb" 
+      }}
     />
   );
 }
