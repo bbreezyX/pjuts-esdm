@@ -105,11 +105,11 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'", // Required for Next.js
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com", // Required for Next.js and Leaflet CDN
+              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
               "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org",
-              "connect-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org",
+              "img-src 'self' data: blob: https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
+              "connect-src 'self' https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
               "frame-ancestors 'none'",
             ].join("; "),
           },

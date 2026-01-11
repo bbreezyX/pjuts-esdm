@@ -99,6 +99,15 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://tile.openstreetmap.org" />
         <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
+        <link rel="preconnect" href="https://unpkg.com" />
+        
+        {/* Leaflet CSS - loaded from CDN for production reliability */}
+        <link 
+          rel="stylesheet" 
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
         
         {/* Preconnect to R2 storage */}
         <link rel="preconnect" href="https://pub-placeholder.r2.dev" />
