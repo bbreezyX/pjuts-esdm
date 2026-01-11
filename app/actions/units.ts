@@ -105,7 +105,8 @@ export async function createPjutsUnit(
     revalidatePath("/units");
     revalidatePath("/map");
 
-    // Send email notification to field staff (non-blocking)
+    // Send email notification to field staff
+    // Note: We await this to ensure email is sent before serverless function terminates
     try {
       const fieldStaff = await prisma.user.findMany({
         where: { role: Role.FIELD_STAFF },
@@ -117,15 +118,18 @@ export async function createPjutsUnit(
         name: f.name || "Petugas Lapangan"
       }));
       
-      // Send notification in background (don't await to avoid slowing down response)
-      sendUnitNotificationToFieldStaff(recipients, {
-        unitSerial: unit.serialNumber,
-        unitProvince: unit.province,
-        unitRegency: unit.regency,
-        createdByName: session.user.name || "Admin",
-      }).catch((err) => {
-        console.error("Failed to send unit notification email:", err);
-      });
+      if (recipients.length > 0) {
+        const emailResult = await sendUnitNotificationToFieldStaff(recipients, {
+          unitSerial: unit.serialNumber,
+          unitProvince: unit.province,
+          unitRegency: unit.regency,
+          createdByName: session.user.name || "Admin",
+        });
+        
+        if (!emailResult.success) {
+          console.error("Failed to send unit notification email:", emailResult.error);
+        }
+      }
     } catch (emailError) {
       // Don't fail the unit creation if email fails
       console.error("Error preparing unit notification:", emailError);

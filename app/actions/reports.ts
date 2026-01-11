@@ -251,7 +251,8 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     revalidatePath("/units");
     revalidatePath("/map");
 
-    // 10. Send email notification to admins (non-blocking)
+    // 10. Send email notification to admins
+    // Note: We await this to ensure email is sent before serverless function terminates
     try {
       const admins = await prisma.user.findMany({
         where: { role: Role.ADMIN },
@@ -263,17 +264,20 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
         name: a.name || "Admin"
       }));
       
-      // Send notification in background (don't await to avoid slowing down response)
-      sendReportNotificationToAdmins(recipients, {
-        unitSerial: report.unit.serialNumber,
-        unitProvince: report.unit.province,
-        unitRegency: report.unit.regency,
-        reporterName: report.user.name,
-        batteryVoltage: validatedData.batteryVoltage,
-        reportId: report.id,
-      }).catch((err) => {
-        console.error("Failed to send report notification email:", err);
-      });
+      if (recipients.length > 0) {
+        const emailResult = await sendReportNotificationToAdmins(recipients, {
+          unitSerial: report.unit.serialNumber,
+          unitProvince: report.unit.province,
+          unitRegency: report.unit.regency,
+          reporterName: report.user.name,
+          batteryVoltage: validatedData.batteryVoltage,
+          reportId: report.id,
+        });
+        
+        if (!emailResult.success) {
+          console.error("Failed to send report notification email:", emailResult.error);
+        }
+      }
     } catch (emailError) {
       // Don't fail the report submission if email fails
       console.error("Error preparing report notification:", emailError);
