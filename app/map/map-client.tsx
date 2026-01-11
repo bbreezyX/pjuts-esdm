@@ -13,9 +13,9 @@ import { DashboardStats, ActionResult } from "@/app/actions/dashboard";
 type PointsPromise = Promise<ActionResult<MapPoint[]>>;
 type StatsPromise = Promise<ActionResult<DashboardStats>>;
 
-// Dynamic import for optimized Leaflet with clustering (client-side only)
+// Dynamic import for Leaflet (client-side only)
 const MapContainer = dynamic(
-  () => import("@/components/map/map-container-optimized").then((mod) => mod.MapContainer),
+  () => import("@/components/map/map-container").then((mod) => mod.MapContainer),
   {
     ssr: false,
     loading: () => (
@@ -65,7 +65,6 @@ function MapContent({
       points={safePoints}
       selectedStatus={selectedStatus}
       onPointClick={onPointClick}
-      enableClustering={safePoints.length > 50} // Only enable clustering for large datasets
     />
   );
 }
