@@ -54,10 +54,10 @@ const compressImage = async (file: File): Promise<File> => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = (event) => {
-      const img = document.createElement('img');
+      const img = document.createElement("img");
       img.src = event.target?.result as string;
       img.onload = () => {
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement("canvas");
 
         // REKOMENDASI: Balanced HD (Max 1600px)
         const MAX_WIDTH = 1600;
@@ -71,23 +71,27 @@ const compressImage = async (file: File): Promise<File> => {
           canvas.height = img.height * scaleSize;
         }
 
-        const ctx = canvas.getContext('2d');
+        const ctx = canvas.getContext("2d");
         ctx?.drawImage(img, 0, 0, canvas.width, canvas.height);
 
         // REKOMENDASI: JPEG Quality 80% (0.8)
-        canvas.toBlob((blob) => {
-          if (blob) {
-            // Ganti ekstensi ke .jpg
-            const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
-            const newFile = new File([blob], newFileName, {
-              type: 'image/jpeg',
-              lastModified: Date.now(),
-            });
-            resolve(newFile);
-          } else {
-            reject(new Error('Gagal kompresi gambar'));
-          }
-        }, 'image/jpeg', 0.8);
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              // Ganti ekstensi ke .jpg
+              const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
+              const newFile = new File([blob], newFileName, {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+              resolve(newFile);
+            } else {
+              reject(new Error("Gagal kompresi gambar"));
+            }
+          },
+          "image/jpeg",
+          0.8
+        );
       };
       img.onerror = (err) => reject(err);
     };
@@ -95,6 +99,122 @@ const compressImage = async (file: File): Promise<File> => {
   });
 };
 // ------------------------------
+
+// --- HELPER GEO-TAGGING OVERLAY ---
+const addGeotagOverlay = async (
+  file: File,
+  latitude: number,
+  longitude: number,
+  userName: string
+): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = document.createElement("img");
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+          reject(new Error("Gagal membuat canvas context"));
+          return;
+        }
+
+        // Draw original image
+        ctx.drawImage(img, 0, 0);
+
+        // Setup text styling - responsive font size based on image width
+        const fontSize = Math.max(20, Math.min(img.width * 0.028, 36));
+        const padding = fontSize * 0.8;
+        const lineHeight = fontSize * 1.4;
+
+        // Prepare text lines
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("id-ID", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+        const timeStr = now.toLocaleTimeString("id-ID", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        });
+
+        const lines = [
+          `GPS: ${latitude.toFixed(6)}, ${longitude.toFixed(6)}`,
+          `${dateStr}, ${timeStr} WIB`,
+          `Pelapor: ${userName}`,
+        ];
+
+        // Calculate background dimensions
+        const bgHeight = lines.length * lineHeight + padding * 2;
+
+        // Measure max text width
+        ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+        let maxTextWidth = 0;
+        lines.forEach((line) => {
+          const textWidth = ctx.measureText(line).width;
+          if (textWidth > maxTextWidth) maxTextWidth = textWidth;
+        });
+        const bgWidth = Math.min(maxTextWidth + padding * 2, img.width * 0.7);
+
+        // Draw semi-transparent background at bottom-left
+        ctx.fillStyle = "rgba(0, 0, 0, 0.65)";
+        ctx.fillRect(0, img.height - bgHeight, bgWidth, bgHeight);
+
+        // Draw text with shadow for better readability
+        ctx.font = `bold ${fontSize}px Arial, sans-serif`;
+        ctx.textBaseline = "top";
+
+        // Text shadow
+        ctx.shadowColor = "rgba(0, 0, 0, 0.5)";
+        ctx.shadowBlur = 3;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+
+        // Draw white text
+        ctx.fillStyle = "#FFFFFF";
+        lines.forEach((line, i) => {
+          const yPos = img.height - bgHeight + padding + i * lineHeight;
+          ctx.fillText(line, padding, yPos);
+        });
+
+        // Reset shadow
+        ctx.shadowColor = "transparent";
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Export to file with high quality
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const newFileName =
+                file.name.replace(/\.[^/.]+$/, "") + "_geotag.jpg";
+              const newFile = new File([blob], newFileName, {
+                type: "image/jpeg",
+                lastModified: Date.now(),
+              });
+              resolve(newFile);
+            } else {
+              reject(new Error("Gagal membuat file gambar dengan geotag"));
+            }
+          },
+          "image/jpeg",
+          0.92
+        );
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
+};
+// ----------------------------------
 
 interface ReportFormClientProps {
   units: PjutsUnitData[];
@@ -130,7 +250,9 @@ export function ReportFormClient({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isOnline = useConnectionStatus();
 
-  const [currentStep, setCurrentStep] = useState<Step>(preselectedUnitId ? 2 : 1);
+  const [currentStep, setCurrentStep] = useState<Step>(
+    preselectedUnitId ? 2 : 1
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitResult, setSubmitResult] = useState<{
     success: boolean;
@@ -139,6 +261,7 @@ export function ReportFormClient({
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState<string | null>(null);
   const [draftSaved, setDraftSaved] = useState(false);
+  const [imageProcessing, setImageProcessing] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     unitId: preselectedUnitId || "",
@@ -221,7 +344,8 @@ export function ReportFormClient({
         let message = "Gagal mendapatkan lokasi";
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message = "Izin lokasi ditolak. Aktifkan GPS dan izinkan akses lokasi.";
+            message =
+              "Izin lokasi ditolak. Aktifkan GPS dan izinkan akses lokasi.";
             break;
           case error.POSITION_UNAVAILABLE:
             message = "Informasi lokasi tidak tersedia";
@@ -248,22 +372,55 @@ export function ReportFormClient({
     }
   }, [currentStep, formData.latitude, getLocation]);
 
-  // Handle image capture
-  const handleImageCapture = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle image capture with geo-tagging overlay
+  const handleImageCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (formData.images.length >= 3) {
-        alert("Maksimal 3 foto per laporan.");
-        return;
-      }
+    if (!file) return;
 
+    if (formData.images.length >= 3) {
+      alert("Maksimal 3 foto per laporan.");
+      return;
+    }
+
+    // Validate GPS is available before processing
+    if (formData.latitude === null || formData.longitude === null) {
+      alert(
+        "Harap dapatkan lokasi GPS terlebih dahulu sebelum mengambil foto."
+      );
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      return;
+    }
+
+    setImageProcessing(true);
+
+    try {
+      // Add geo-tag overlay to the image
+      const geotaggedFile = await addGeotagOverlay(
+        file,
+        formData.latitude,
+        formData.longitude,
+        userName
+      );
+
+      const preview = URL.createObjectURL(geotaggedFile);
+      setFormData((prev) => ({
+        ...prev,
+        images: [...prev.images, geotaggedFile],
+        imagePreviews: [...prev.imagePreviews, preview],
+      }));
+    } catch (error) {
+      console.error("Gagal menambahkan geotag ke foto:", error);
+      // Fallback: use original file if geotag fails
       const preview = URL.createObjectURL(file);
       setFormData((prev) => ({
         ...prev,
         images: [...prev.images, file],
         imagePreviews: [...prev.imagePreviews, preview],
       }));
-
+    } finally {
+      setImageProcessing(false);
       // Reset input value so same file can be selected again if needed
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -296,9 +453,15 @@ export function ReportFormClient({
       case 1:
         return !!formData.unitId;
       case 2:
-        return formData.images.length > 0 && formData.latitude !== null && formData.longitude !== null;
+        return (
+          formData.images.length > 0 &&
+          formData.latitude !== null &&
+          formData.longitude !== null
+        );
       case 3:
-        return !!formData.batteryVoltage && parseFloat(formData.batteryVoltage) > 0;
+        return (
+          !!formData.batteryVoltage && parseFloat(formData.batteryVoltage) > 0
+        );
       default:
         return true;
     }
@@ -306,7 +469,12 @@ export function ReportFormClient({
 
   // Handle form submission
   const handleSubmit = async () => {
-    if (!selectedUnit || formData.images.length === 0 || formData.latitude === null || formData.longitude === null) {
+    if (
+      !selectedUnit ||
+      formData.images.length === 0 ||
+      formData.latitude === null ||
+      formData.longitude === null
+    ) {
       return;
     }
 
@@ -330,7 +498,10 @@ export function ReportFormClient({
           try {
             imageToUpload = await compressImage(imageToUpload);
           } catch (error) {
-            console.error("Gagal mengompresi gambar, menggunakan file asli", error);
+            console.error(
+              "Gagal mengompresi gambar, menggunakan file asli",
+              error
+            );
           }
         }
 
@@ -342,7 +513,7 @@ export function ReportFormClient({
       if (result.success) {
         // Clear the draft on successful submission
         clearReportDraft();
-        
+
         setSubmitResult({
           success: true,
           message: "Laporan berhasil dikirim!",
@@ -373,7 +544,7 @@ export function ReportFormClient({
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
       {/* Offline Banner */}
       <OfflineBanner />
-      
+
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-slate-200 safe-area-pt">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
@@ -415,8 +586,8 @@ export function ReportFormClient({
                     isCompleted
                       ? "bg-emerald-500 text-white"
                       : isCurrent
-                        ? "bg-primary-600 text-white"
-                        : "bg-slate-200 text-slate-500"
+                      ? "bg-primary-600 text-white"
+                      : "bg-slate-200 text-slate-500"
                   )}
                 >
                   {isCompleted ? (
@@ -507,9 +678,7 @@ export function ReportFormClient({
                 <h2 className="text-lg font-semibold text-slate-900">
                   Ambil Foto Unit
                 </h2>
-                <Badge variant="outline">
-                  {formData.images.length}/3 Foto
-                </Badge>
+                <Badge variant="outline">{formData.images.length}/3 Foto</Badge>
               </div>
 
               <input
@@ -524,7 +693,10 @@ export function ReportFormClient({
               {/* Image Grid */}
               <div className="grid grid-cols-2 gap-3 mb-4">
                 {formData.imagePreviews.map((preview, idx) => (
-                  <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 shadow-sm group">
+                  <div
+                    key={idx}
+                    className="relative aspect-video rounded-lg overflow-hidden border border-slate-200 shadow-sm group"
+                  >
                     <Image
                       src={preview}
                       alt={`Foto ${idx + 1}`}
@@ -547,14 +719,49 @@ export function ReportFormClient({
                 {formData.images.length < 3 && (
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="aspect-video rounded-lg border-2 border-dashed border-slate-300 bg-slate-50 flex flex-col items-center justify-center gap-2 hover:bg-slate-100 hover:border-primary-300 transition-colors"
+                    disabled={
+                      imageProcessing ||
+                      formData.latitude === null ||
+                      formData.longitude === null
+                    }
+                    className={cn(
+                      "aspect-video rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-2 transition-colors",
+                      imageProcessing ||
+                        formData.latitude === null ||
+                        formData.longitude === null
+                        ? "border-slate-200 bg-slate-100 cursor-not-allowed opacity-60"
+                        : "border-slate-300 bg-slate-50 hover:bg-slate-100 hover:border-primary-300"
+                    )}
                   >
-                    <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
-                      <Plus className="h-5 w-5 text-primary-600" />
-                    </div>
-                    <span className="text-xs font-medium text-slate-600">
-                      Tambah ({3 - formData.images.length})
-                    </span>
+                    {imageProcessing ? (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
+                          <SystemRestart className="h-5 w-5 text-slate-500 animate-spin" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-500">
+                          Memproses...
+                        </span>
+                      </>
+                    ) : formData.latitude === null ||
+                      formData.longitude === null ? (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                          <MapPin className="h-5 w-5 text-amber-600" />
+                        </div>
+                        <span className="text-xs font-medium text-amber-600 text-center px-2">
+                          Dapatkan lokasi GPS dulu
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center">
+                          <Plus className="h-5 w-5 text-primary-600" />
+                        </div>
+                        <span className="text-xs font-medium text-slate-600">
+                          Tambah ({3 - formData.images.length})
+                        </span>
+                      </>
+                    )}
                   </button>
                 )}
               </div>
@@ -562,7 +769,16 @@ export function ReportFormClient({
               {formData.images.length === 0 && (
                 <div className="text-center p-4 bg-slate-50 rounded-lg border border-slate-100 mb-4">
                   <Camera className="h-8 w-8 text-slate-400 mx-auto mb-2" />
-                  <p className="text-sm text-slate-500">Belum ada foto diambil.</p>
+                  <p className="text-sm text-slate-500">
+                    Belum ada foto diambil.
+                  </p>
+                  {(formData.latitude === null ||
+                    formData.longitude === null) && (
+                    <p className="text-xs text-amber-600 mt-1">
+                      Dapatkan lokasi GPS terlebih dahulu untuk mengambil foto
+                      dengan geo-tag.
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -599,7 +815,8 @@ export function ReportFormClient({
                 ) : formData.latitude && formData.longitude ? (
                   <div className="flex items-center justify-between">
                     <code className="text-sm text-slate-600">
-                      {formData.latitude.toFixed(6)}, {formData.longitude.toFixed(6)}
+                      {formData.latitude.toFixed(6)},{" "}
+                      {formData.longitude.toFixed(6)}
                     </code>
                     <Button variant="ghost" size="sm" onClick={getLocation}>
                       <Refresh className="h-4 w-4 mr-1" />
@@ -742,7 +959,10 @@ export function ReportFormClient({
                 {/* Preview Images Grid */}
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   {formData.imagePreviews.map((preview, idx) => (
-                    <div key={idx} className="relative aspect-video rounded-lg overflow-hidden border border-slate-200">
+                    <div
+                      key={idx}
+                      className="relative aspect-video rounded-lg overflow-hidden border border-slate-200"
+                    >
                       <Image
                         src={preview}
                         alt={`Preview ${idx}`}
@@ -781,8 +1001,8 @@ export function ReportFormClient({
                         parseFloat(formData.batteryVoltage) >= 20
                           ? "success"
                           : parseFloat(formData.batteryVoltage) >= 10
-                            ? "warning"
-                            : "destructive"
+                          ? "warning"
+                          : "destructive"
                       }
                     >
                       {formData.batteryVoltage}V
@@ -790,7 +1010,9 @@ export function ReportFormClient({
                   </div>
                   <div className="flex justify-between py-2 border-b">
                     <span className="text-slate-600">Pelapor</span>
-                    <span className="font-medium text-slate-900">{userName}</span>
+                    <span className="font-medium text-slate-900">
+                      {userName}
+                    </span>
                   </div>
                   {formData.notes && (
                     <div className="py-2">
@@ -815,7 +1037,10 @@ export function ReportFormClient({
             <div className="max-w-lg mx-auto px-4 pt-2">
               <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg">
                 <WarningCircle className="h-4 w-4 shrink-0" />
-                <span>Anda sedang offline. Form tersimpan otomatis, kirim saat online.</span>
+                <span>
+                  Anda sedang offline. Form tersimpan otomatis, kirim saat
+                  online.
+                </span>
               </div>
             </div>
           )}
