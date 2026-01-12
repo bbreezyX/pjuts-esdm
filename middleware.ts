@@ -9,11 +9,13 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public folder
+     * - public folder assets
      * - api/auth (NextAuth routes)
      * - sitemap.xml, robots.txt (SEO files)
+     * - manifest.json (PWA manifest)
+     * - All static assets (.js, .svg, .png, .jpg, etc.)
      */
-    "/((?!_next/static|_next/image|favicon.ico|api/auth|sitemap\\.xml|robots\\.txt|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|api/auth|sitemap\\.xml|robots\\.txt|manifest\\.json|.*\\.(?:js|svg|png|jpg|jpeg|gif|webp|ico|json)$).*)",
   ],
 };
 
