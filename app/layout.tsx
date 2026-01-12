@@ -14,7 +14,8 @@ const plusJakarta = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   metadataBase: new URL("https://esdm.cloud"),
   title: {
-    default: "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+    default:
+      "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
     template: "%s | PJUTS ESDM",
   },
   description:
@@ -34,6 +35,17 @@ export const metadata: Metadata = {
   creator: "Kementerian ESDM Republik Indonesia",
   publisher: "Kementerian ESDM Republik Indonesia",
   manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icons/icon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
@@ -96,22 +108,26 @@ export default function RootLayout({
       <head>
         {/* Preconnect to external resources for faster loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
         <link rel="preconnect" href="https://tile.openstreetmap.org" />
         <link rel="dns-prefetch" href="https://tile.openstreetmap.org" />
         <link rel="preconnect" href="https://unpkg.com" />
-        
+
         {/* Leaflet CSS - loaded from CDN for production reliability */}
-        <link 
-          rel="stylesheet" 
+        <link
+          rel="stylesheet"
           href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossOrigin=""
         />
-        
+
         {/* Preconnect to R2 storage */}
         <link rel="preconnect" href="https://pub-placeholder.r2.dev" />
-        
+
         {/* Prefetch critical resources */}
         <link rel="prefetch" href="/manifest.json" />
       </head>
