@@ -16,7 +16,7 @@ export default function WorkflowSection() {
   return (
     <section className="pt-32 pb-40 lg:pt-48 lg:pb-64 bg-slate-900 text-white relative overflow-hidden font-sedan">
       {/* Wave Overlay (Inverted for Grid Continuity) */}
-      <div className="absolute top-0 left-0 right-0 h-24 lg:h-32 w-full overflow-hidden leading-none z-20 pointer-events-none">
+      <div className="absolute -top-[1px] left-0 right-0 h-24 lg:h-32 w-full overflow-hidden leading-none z-20 pointer-events-none">
         <svg
           className="relative block w-[calc(100%+1.3px)] h-full"
           data-name="Layer 1"
@@ -73,10 +73,7 @@ export default function WorkflowSection() {
             Alur Kerja
           </div>
           <h2 className="text-3xl lg:text-5xl font-bold text-white mb-6 tracking-tight">
-            Mekanisme Pelaporan{" "}
-            <span className="text-[#E4C55B]">
-              Terpadu
-            </span>
+            Mekanisme Pelaporan <span className="text-[#E4C55B]">Terpadu</span>
           </h2>
           <p className="text-lg lg:text-xl text-slate-400 leading-relaxed">
             Alur kerja digital yang menyederhanakan proses monitoring lapangan
@@ -89,22 +86,22 @@ export default function WorkflowSection() {
           {["01", "02", "03"].map((num, idx) => {
             const labels = ["Identifikasi", "Dokumentasi", "Sinkronisasi"];
             return (
-            <div key={num} className="flex items-center">
-              <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
-                <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-700 text-white text-sm font-bold flex items-center justify-center shadow-md shadow-primary-600/20 group-hover:scale-110 transition-transform">
-                  {num}
-                </span>
-                <span className="text-sm font-semibold text-slate-300 group-hover:text-white transition-colors">
-                  {labels[idx]}
-                </span>
-              </div>
-              {idx < 2 && (
-                <div className="flex items-center px-3">
-                  <div className="w-12 h-0.5 bg-gradient-to-r from-primary-500/30 to-[#D4AF37]/30 rounded-full" />
-                  <ArrowRight className="w-4 h-4 text-[#D4AF37]/60 -ml-1" />
+              <div key={num} className="flex items-center">
+                <div className="flex items-center gap-3 px-5 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-sm hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
+                  <span className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-600 to-primary-700 text-white text-sm font-bold flex items-center justify-center shadow-md shadow-primary-600/20 group-hover:scale-110 transition-transform">
+                    {num}
+                  </span>
+                  <span className="text-sm font-semibold text-slate-300 group-hover:text-white transition-colors">
+                    {labels[idx]}
+                  </span>
                 </div>
-              )}
-            </div>
+                {idx < 2 && (
+                  <div className="flex items-center px-3">
+                    <div className="w-12 h-0.5 bg-gradient-to-r from-primary-500/30 to-[#D4AF37]/30 rounded-full" />
+                    <ArrowRight className="w-4 h-4 text-[#D4AF37]/60 -ml-1" />
+                  </div>
+                )}
+              </div>
             );
           })}
         </FadeIn>
@@ -115,7 +112,7 @@ export default function WorkflowSection() {
             <div className="group relative h-full bg-white rounded-3xl border border-slate-200/80 p-7 lg:p-8 shadow-sm hover:shadow-xl hover:shadow-primary-100/50 hover:border-primary-200 transition-all duration-500 overflow-hidden flex flex-col min-h-[480px]">
               {/* Decorative corner accent */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-primary-50 to-[#D4AF37]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 opacity-60 group-hover:opacity-100 transition-opacity" />
-              
+
               {/* Step number badge */}
               <div className="absolute top-6 right-6 w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:from-primary-100 group-hover:to-primary-50 group-hover:border-primary-200 group-hover:text-primary-600 transition-all">
                 01
@@ -183,10 +180,24 @@ export default function WorkflowSection() {
                     className="animate-[dash_20s_linear_infinite]"
                   />
                   <defs>
-                    <linearGradient id="simple-gradient-new" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <linearGradient
+                      id="simple-gradient-new"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="0%"
+                    >
                       <stop offset="0%" stopColor="#1e5a8a" stopOpacity="0.2" />
-                      <stop offset="50%" stopColor="#1e5a8a" stopOpacity="0.8" />
-                      <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.2" />
+                      <stop
+                        offset="50%"
+                        stopColor="#1e5a8a"
+                        stopOpacity="0.8"
+                      />
+                      <stop
+                        offset="100%"
+                        stopColor="#D4AF37"
+                        stopOpacity="0.2"
+                      />
                     </linearGradient>
                   </defs>
                 </svg>
@@ -194,7 +205,9 @@ export default function WorkflowSection() {
                 {/* Bottom coordinate indicator */}
                 <div className="absolute bottom-3 left-3 flex items-center gap-2 opacity-60">
                   <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                  <span className="text-[10px] font-mono text-slate-400">-6.2088, 106.8456</span>
+                  <span className="text-[10px] font-mono text-slate-400">
+                    -6.2088, 106.8456
+                  </span>
                 </div>
               </div>
             </div>
@@ -209,7 +222,7 @@ export default function WorkflowSection() {
                 <div className="absolute top-5 right-5 w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:from-primary-100 group-hover:to-primary-50 group-hover:border-primary-200 group-hover:text-primary-600 transition-all">
                   02
                 </div>
-                
+
                 <div className="flex items-start relative z-10">
                   <div className="flex-1">
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] text-primary-900 flex items-center justify-center mb-4 shadow-lg shadow-[#D4AF37]/25 group-hover:scale-110 transition-transform">
@@ -223,7 +236,7 @@ export default function WorkflowSection() {
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Photo cards decoration */}
                 <div className="absolute bottom-4 right-4 flex gap-2">
                   <div className="w-14 h-18 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200 rotate-6 transform group-hover:rotate-12 group-hover:translate-y-[-4px] transition-all p-2 flex flex-col gap-1 shadow-md">
@@ -256,7 +269,7 @@ export default function WorkflowSection() {
                     </p>
                   </div>
                 </div>
-                
+
                 {/* Form field indicators */}
                 <div className="absolute bottom-4 left-6 right-6 flex flex-col gap-2 opacity-60 group-hover:opacity-80 transition-opacity">
                   <div className="flex items-center gap-2">
@@ -270,10 +283,14 @@ export default function WorkflowSection() {
                     <div className="w-12 h-2 bg-emerald-300 rounded-full" />
                   </div>
                 </div>
-                
+
                 {/* Graph Line */}
                 <div className="absolute bottom-0 left-0 right-0 h-12 opacity-40 group-hover:opacity-60 transition-opacity overflow-hidden rounded-b-3xl">
-                  <svg className="w-full h-full" viewBox="0 0 100 40" preserveAspectRatio="none">
+                  <svg
+                    className="w-full h-full"
+                    viewBox="0 0 100 40"
+                    preserveAspectRatio="none"
+                  >
                     <path
                       d="M0 35 Q 15 15, 35 22 T 70 12 T 100 8"
                       fill="none"
@@ -285,14 +302,46 @@ export default function WorkflowSection() {
                       fill="url(#primary-fill)"
                     />
                     <defs>
-                      <linearGradient id="primary-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stopColor="#1e5a8a" stopOpacity="0.3" />
-                        <stop offset="50%" stopColor="#1e5a8a" stopOpacity="0.8" />
-                        <stop offset="100%" stopColor="#D4AF37" stopOpacity="0.3" />
+                      <linearGradient
+                        id="primary-gradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#1e5a8a"
+                          stopOpacity="0.3"
+                        />
+                        <stop
+                          offset="50%"
+                          stopColor="#1e5a8a"
+                          stopOpacity="0.8"
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="#D4AF37"
+                          stopOpacity="0.3"
+                        />
                       </linearGradient>
-                      <linearGradient id="primary-fill" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor="#1e5a8a" stopOpacity="0.2" />
-                        <stop offset="100%" stopColor="#1e5a8a" stopOpacity="0.05" />
+                      <linearGradient
+                        id="primary-fill"
+                        x1="0%"
+                        y1="0%"
+                        x2="0%"
+                        y2="100%"
+                      >
+                        <stop
+                          offset="0%"
+                          stopColor="#1e5a8a"
+                          stopOpacity="0.2"
+                        />
+                        <stop
+                          offset="100%"
+                          stopColor="#1e5a8a"
+                          stopOpacity="0.05"
+                        />
                       </linearGradient>
                     </defs>
                   </svg>
@@ -307,7 +356,7 @@ export default function WorkflowSection() {
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-48 h-48 bg-gradient-to-br from-primary-100/60 to-[#D4AF37]/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
               <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-[#D4AF37]/20 to-primary-100/30 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-              
+
               {/* Step number badge */}
               <div className="absolute top-6 right-6 w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-50 border border-slate-200 flex items-center justify-center text-sm font-bold text-slate-400 group-hover:from-primary-100 group-hover:to-primary-50 group-hover:border-primary-200 group-hover:text-primary-600 transition-all">
                 03
@@ -340,14 +389,27 @@ export default function WorkflowSection() {
                     <Database className="w-8 h-8" />
                   </div>
                   {/* Pulse Effect */}
-                  <div className="absolute inset-0 rounded-2xl bg-primary-500/20 animate-ping" style={{ animationDuration: '2s' }} />
+                  <div
+                    className="absolute inset-0 rounded-2xl bg-primary-500/20 animate-ping"
+                    style={{ animationDuration: "2s" }}
+                  />
                 </div>
 
                 {/* Connecting Lines */}
                 <div className="absolute inset-0 z-0">
-                  <svg className="w-full h-full" viewBox="0 0 200 200" preserveAspectRatio="none">
+                  <svg
+                    className="w-full h-full"
+                    viewBox="0 0 200 200"
+                    preserveAspectRatio="none"
+                  >
                     <defs>
-                      <linearGradient id="lineGradientNew" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <linearGradient
+                        id="lineGradientNew"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
                         <stop offset="0%" stopColor="rgba(226,232,240,0.5)" />
                         <stop offset="50%" stopColor="rgba(30,90,138,0.6)" />
                         <stop offset="100%" stopColor="rgba(226,232,240,0.5)" />
@@ -367,7 +429,11 @@ export default function WorkflowSection() {
                       "M 40 160 L 100 100",
                     ].map((d, i) => (
                       <g key={i}>
-                        <path d={d} stroke="rgba(226,232,240,0.8)" strokeWidth="1" />
+                        <path
+                          d={d}
+                          stroke="rgba(226,232,240,0.8)"
+                          strokeWidth="1"
+                        />
                         <path
                           d={d}
                           stroke="#1e5a8a"
@@ -431,7 +497,7 @@ export default function WorkflowSection() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Status indicator */}
               <div className="relative z-10 mt-4 flex items-center justify-center gap-2 text-xs text-slate-500">
                 <span className="relative flex h-2 w-2">
@@ -446,7 +512,7 @@ export default function WorkflowSection() {
       </div>
 
       {/* Bottom Wave Transition */}
-      <div className="absolute bottom-0 left-0 right-0 h-24 lg:h-32 w-full overflow-hidden leading-none z-20 pointer-events-none">
+      <div className="absolute -bottom-[1px] left-0 right-0 h-24 lg:h-32 w-full overflow-hidden leading-none z-20 pointer-events-none">
         <svg
           className="relative block w-[calc(100%+1.3px)] h-full"
           data-name="Layer 1"

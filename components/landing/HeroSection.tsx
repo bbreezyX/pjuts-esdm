@@ -16,14 +16,13 @@ export default function HeroSection() {
     <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 min-h-[90vh] flex flex-col">
       {/* Background Pattern - Hexagon SVG */}
       <div className="absolute inset-0">
-        {/* Hexagon Pattern */}
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-10 bg-fixed"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23ffffff' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
         />
-        
+
         {/* Radial Gradient Overlay */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(212,175,55,0.15),transparent)]" />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary-800/30 to-primary-950/80" />
@@ -123,14 +122,13 @@ export default function HeroSection() {
                 </Button>
               </Link>
             </div>
-
           </div>
 
           {/* Stats Grid - Premium Bento Style */}
           <div className="relative mt-8 lg:mt-0">
             {/* Glow Effect Behind Grid */}
             <div className="absolute inset-0 bg-gradient-to-br from-[#D4AF37]/15 via-transparent to-primary-400/15 blur-3xl -z-10 scale-125" />
-            
+
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               {/* Main Featured Stat */}
               <StatsCard
@@ -141,7 +139,7 @@ export default function HeroSection() {
                 variant="featured"
                 className="col-span-2 animate-fade-in"
               />
-              
+
               {/* Secondary Stats Row */}
               <StatsCard
                 value="34"
@@ -157,7 +155,7 @@ export default function HeroSection() {
                 variant="default"
                 className="animate-fade-in"
               />
-              
+
               {/* Highlight Stat - Full Width */}
               <StatsCard
                 value="24/7"
@@ -185,6 +183,25 @@ export default function HeroSection() {
             className="fill-slate-50"
           />
         </svg>
+        {/* Grid Overlay masked to Wave Shape with Fade Out */}
+        <div
+          className="absolute inset-0"
+          style={{
+            maskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z' fill='black'/%3E%3C/svg%3E")`,
+            maskSize: "100% 100%",
+            WebkitMaskImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120' preserveAspectRatio='none'%3E%3Cpath d='M985.66,92.83C906.67,72,823.78,31,743.84,14.19c-82.26-17.34-168.06-16.33-250.45.39-57.84,11.73-114,31.07-172,41.86A600.21,600.21,0,0,1,0,27.35V120H1200V95.8C1132.19,118.92,1055.71,111.31,985.66,92.83Z' fill='black'/%3E%3C/svg%3E")`,
+            WebkitMaskSize: "100% 100%",
+          }}
+        >
+          <div
+            className="absolute inset-0 bg-fixed"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23cbd5e1' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+              maskImage: "linear-gradient(to bottom, black, transparent)",
+              WebkitMaskImage: "linear-gradient(to bottom, black, transparent)",
+            }}
+          />
+        </div>
       </div>
     </section>
   );
@@ -254,19 +271,22 @@ function StatsCard({
 }) {
   const variants = {
     default: {
-      container: "bg-white/[0.08] backdrop-blur-xl border-white/10 hover:bg-white/[0.12] hover:border-[#D4AF37]/30",
+      container:
+        "bg-white/[0.08] backdrop-blur-xl border-white/10 hover:bg-white/[0.12] hover:border-[#D4AF37]/30",
       icon: "bg-white/10 text-[#E4C55B]",
       value: "text-white text-3xl sm:text-4xl",
       label: "text-primary-200/90",
     },
     featured: {
-      container: "bg-gradient-to-br from-white/[0.12] to-white/[0.04] backdrop-blur-xl border-white/15 hover:border-[#D4AF37]/40",
+      container:
+        "bg-gradient-to-br from-white/[0.12] to-white/[0.04] backdrop-blur-xl border-white/15 hover:border-[#D4AF37]/40",
       icon: "bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] text-primary-900 shadow-lg shadow-[#D4AF37]/30",
       value: "text-white text-4xl sm:text-5xl lg:text-6xl",
       label: "text-white font-semibold",
     },
     highlight: {
-      container: "bg-gradient-to-r from-[#D4AF37]/15 via-[#D4AF37]/10 to-[#D4AF37]/15 backdrop-blur-xl border-[#D4AF37]/30 hover:border-[#D4AF37]/50",
+      container:
+        "bg-gradient-to-r from-[#D4AF37]/15 via-[#D4AF37]/10 to-[#D4AF37]/15 backdrop-blur-xl border-[#D4AF37]/30 hover:border-[#D4AF37]/50",
       icon: "bg-[#D4AF37]/20 text-[#E4C55B] ring-2 ring-[#D4AF37]/30",
       value: "text-[#E4C55B] text-3xl sm:text-4xl",
       label: "text-[#E4C55B]/80",
@@ -282,27 +302,33 @@ function StatsCard({
       >
         {/* Animated Gradient Background */}
         <div className="absolute inset-0 bg-gradient-to-r from-[#D4AF37]/0 via-[#D4AF37]/10 to-[#D4AF37]/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-        
+
         {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37]/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-primary-400/10 rounded-full blur-2xl translate-y-1/2 -translate-x-1/2" />
-        
+
         <div className="relative flex items-center gap-6">
-          <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl ${styles.icon} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+          <div
+            className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl ${styles.icon} transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}
+          >
             <Icon className="w-8 h-8 sm:w-10 sm:h-10" />
           </div>
           <div className="flex-1">
             <p className={`font-bold ${styles.value} mb-1 tracking-tight`}>
               {value}
             </p>
-            <p className={`${styles.label} text-sm sm:text-base uppercase tracking-wider`}>
+            <p
+              className={`${styles.label} text-sm sm:text-base uppercase tracking-wider`}
+            >
               {label}
             </p>
             {description && (
-              <p className="text-primary-300/70 text-xs sm:text-sm mt-1">{description}</p>
+              <p className="text-primary-300/70 text-xs sm:text-sm mt-1">
+                {description}
+              </p>
             )}
           </div>
-          
+
           {/* Progress/Activity Indicator */}
           <div className="hidden sm:flex flex-col items-end gap-1">
             <div className="flex gap-1">
@@ -317,7 +343,9 @@ function StatsCard({
                 />
               ))}
             </div>
-            <span className="text-[10px] text-primary-300/50 uppercase tracking-wider">Live</span>
+            <span className="text-[10px] text-primary-300/50 uppercase tracking-wider">
+              Live
+            </span>
           </div>
         </div>
       </div>
@@ -331,9 +359,11 @@ function StatsCard({
       >
         {/* Shimmer Effect */}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#D4AF37]/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-        
+
         <div className="relative flex items-center gap-4">
-          <div className={`p-2.5 sm:p-3 rounded-xl ${styles.icon} transition-all duration-300 group-hover:scale-110`}>
+          <div
+            className={`p-2.5 sm:p-3 rounded-xl ${styles.icon} transition-all duration-300 group-hover:scale-110`}
+          >
             <Icon className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
           <div className="flex-1">
@@ -346,12 +376,16 @@ function StatsCard({
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E4C55B]"></span>
               </span>
             </div>
-            <p className={`${styles.label} text-sm font-medium uppercase tracking-wide`}>
+            <p
+              className={`${styles.label} text-sm font-medium uppercase tracking-wide`}
+            >
               {label}
             </p>
           </div>
           {description && (
-            <p className="hidden sm:block text-[#E4C55B]/60 text-xs max-w-[140px] text-right">{description}</p>
+            <p className="hidden sm:block text-[#E4C55B]/60 text-xs max-w-[140px] text-right">
+              {description}
+            </p>
           )}
         </div>
       </div>
@@ -365,10 +399,12 @@ function StatsCard({
     >
       {/* Subtle Hover Glow */}
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      
+
       <div className="relative">
         <div className="flex items-start justify-between mb-3">
-          <div className={`p-2 sm:p-2.5 rounded-xl ${styles.icon} transition-all duration-300 group-hover:scale-110 group-hover:bg-[#D4AF37]/20`}>
+          <div
+            className={`p-2 sm:p-2.5 rounded-xl ${styles.icon} transition-all duration-300 group-hover:scale-110 group-hover:bg-[#D4AF37]/20`}
+          >
             <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
           </div>
           {/* Mini Chart/Trend Indicator */}
@@ -382,10 +418,14 @@ function StatsCard({
             ))}
           </div>
         </div>
-        <p className={`font-bold ${styles.value} mb-1 tracking-tight transition-colors duration-300 group-hover:text-[#E4C55B]`}>
+        <p
+          className={`font-bold ${styles.value} mb-1 tracking-tight transition-colors duration-300 group-hover:text-[#E4C55B]`}
+        >
           {value}
         </p>
-        <p className={`${styles.label} text-xs sm:text-sm font-medium uppercase tracking-wide`}>
+        <p
+          className={`${styles.label} text-xs sm:text-sm font-medium uppercase tracking-wide`}
+        >
           {label}
         </p>
       </div>

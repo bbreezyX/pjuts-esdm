@@ -17,8 +17,9 @@ export default function FeaturesSection() {
       className="pt-8 pb-24 lg:pt-12 lg:pb-32 relative overflow-hidden bg-slate-50/50 font-sedan"
     >
       {/* Background Pattern - Static, GPU accelerated */}
+      {/* Background Pattern - Static, GPU accelerated */}
       <div
-        className="absolute inset-0 will-change-transform"
+        className="absolute inset-0 bg-fixed"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='49' viewBox='0 0 28 49'%3E%3Cg fill-rule='evenodd'%3E%3Cg id='hexagons' fill='%23cbd5e1' fill-opacity='0.4' fill-rule='nonzero'%3E%3Cpath d='M13.99 9.25l13 7.5v15l-13 7.5L1 31.75v-15l12.99-7.5zM3 17.9v12.7l10.99 6.34 11-6.35V17.9l-11-6.34L3 17.9zM0 15l12.98-7.5V0h-2v6.35L0 12.69v2.3zm0 18.5L12.98 41v8h-2v-6.85L0 35.81v-2.3zM15 0v7.5L27.99 15H28v-2.31h-.01L17 6.35V0h-2zm0 49v-8l12.99-7.5H28v2.31h-.01L17 42.15V49h-2z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           maskImage: "linear-gradient(to bottom, transparent 0%, black 400px)",
@@ -54,10 +55,14 @@ export default function FeaturesSection() {
               title="Peta Interaktif Nasional"
               description="Visualisasi sebaran unit PJUTS di seluruh Indonesia dengan clustering cerdas dan status operasional real-time. Lihat kondisi infrastruktur secara langsung dari dashboard."
               variant="hero"
-              features={["Clustering Cerdas", "Real-time Status", "Filter Provinsi"]}
+              features={[
+                "Clustering Cerdas",
+                "Real-time Status",
+                "Filter Provinsi",
+              ]}
             />
           </div>
-          
+
           {/* 4-Column Feature Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
             <div className="animate-on-scroll">
@@ -69,7 +74,7 @@ export default function FeaturesSection() {
                 stat={{ value: "PWA", label: "Ready" }}
               />
             </div>
-            
+
             <div className="animate-on-scroll">
               <FeatureCard
                 icon={StatsReport}
@@ -79,7 +84,7 @@ export default function FeaturesSection() {
                 stat={{ value: "50+", label: "Metrik" }}
               />
             </div>
-            
+
             <div className="animate-on-scroll">
               <FeatureCard
                 icon={Wifi}
@@ -89,7 +94,7 @@ export default function FeaturesSection() {
                 stat={{ value: "100%", label: "Uptime" }}
               />
             </div>
-            
+
             <div className="animate-on-scroll">
               <FeatureCard
                 icon={Shield}
@@ -100,7 +105,7 @@ export default function FeaturesSection() {
               />
             </div>
           </div>
-          
+
           {/* Bottom Hero Card */}
           <div className="animate-on-scroll">
             <FeatureCard
@@ -108,7 +113,11 @@ export default function FeaturesSection() {
               title="Manajemen Aset Terpadu"
               description="Siklus hidup lengkap unit PJUTS mulai dari instalasi, perawatan berkala, hingga penggantian komponen secara terintegrasi dalam satu platform."
               variant="hero-amber"
-              features={["Lifecycle Tracking", "Maintenance Alerts", "Component History"]}
+              features={[
+                "Lifecycle Tracking",
+                "Maintenance Alerts",
+                "Component History",
+              ]}
             />
           </div>
         </div>
@@ -133,12 +142,13 @@ function FeatureCard({
   stat?: { value: string; label: string };
 }) {
   const isHero = variant === "hero" || variant === "hero-amber";
-  
+
   const styles = {
     blue: {
       bg: "bg-gradient-to-br from-white to-primary-50/40",
       border: "border-primary-100 hover:border-primary-300",
-      iconBg: "bg-gradient-to-br from-primary-600 to-primary-700 shadow-lg shadow-primary-600/25",
+      iconBg:
+        "bg-gradient-to-br from-primary-600 to-primary-700 shadow-lg shadow-primary-600/25",
       iconColor: "text-white",
       accent: "bg-primary-600",
       glow: "from-primary-400/20 to-transparent",
@@ -148,7 +158,8 @@ function FeatureCard({
     amber: {
       bg: "bg-gradient-to-br from-white to-[#D4AF37]/5",
       border: "border-[#D4AF37]/20 hover:border-[#D4AF37]/40",
-      iconBg: "bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] shadow-lg shadow-[#D4AF37]/25",
+      iconBg:
+        "bg-gradient-to-br from-[#D4AF37] to-[#E4C55B] shadow-lg shadow-[#D4AF37]/25",
       iconColor: "text-primary-900",
       accent: "bg-[#D4AF37]",
       glow: "from-[#D4AF37]/20 to-transparent",
@@ -158,7 +169,8 @@ function FeatureCard({
     slate: {
       bg: "bg-gradient-to-br from-white to-slate-50/50",
       border: "border-slate-200/80 hover:border-primary-200",
-      iconBg: "bg-gradient-to-br from-primary-800 to-primary-900 shadow-lg shadow-primary-900/25",
+      iconBg:
+        "bg-gradient-to-br from-primary-800 to-primary-900 shadow-lg shadow-primary-900/25",
       iconColor: "text-white",
       accent: "bg-primary-800",
       glow: "from-primary-400/15 to-transparent",
@@ -203,10 +215,15 @@ function FeatureCard({
         {/* Decorative Background Elements */}
         <div className="absolute top-0 right-0 w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         <div className="absolute bottom-0 left-0 w-56 h-56 bg-primary-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
-        
+
         {/* Corner Accent - Amber to match Hero */}
-        <div className={cn("absolute top-0 left-0 w-32 h-1.5 rounded-r-full", s.accent)} />
-        
+        <div
+          className={cn(
+            "absolute top-0 left-0 w-32 h-1.5 rounded-r-full",
+            s.accent
+          )}
+        />
+
         {/* Decorative Corner Shapes */}
         <div className="absolute top-6 right-6 flex items-center gap-2 opacity-60">
           <span className="w-2 h-2 rounded-full bg-[#D4AF37]/60 animate-pulse" />
@@ -230,12 +247,12 @@ function FeatureCard({
             <h3 className="text-2xl lg:text-3xl font-bold text-white mb-4 tracking-tight">
               {title}
             </h3>
-            
+
             {/* Description */}
             <p className="text-primary-100/90 text-base lg:text-lg leading-relaxed mb-6">
               {description}
             </p>
-            
+
             {/* Features Pills - Amber accent like Hero CTA */}
             {features && (
               <div className="flex flex-wrap gap-2">
@@ -244,7 +261,7 @@ function FeatureCard({
                     key={i}
                     className={cn(
                       "px-4 py-2 text-xs font-semibold rounded-full backdrop-blur-sm border transition-all duration-300",
-                      variant === "hero-amber" 
+                      variant === "hero-amber"
                         ? "bg-white/20 text-white border-white/25 hover:bg-white/30"
                         : "bg-[#D4AF37]/20 text-[#E4C55B] border-[#D4AF37]/30 hover:bg-[#D4AF37]/30 hover:border-[#D4AF37]/50"
                     )}
@@ -255,25 +272,35 @@ function FeatureCard({
               </div>
             )}
           </div>
-          
+
           {/* Decorative Side Element */}
           <div className="hidden lg:flex items-center justify-center">
             <div className="relative">
               {/* Rotating border */}
-              <div className={cn(
-                "w-36 h-36 rounded-3xl border-2 border-dashed rotate-12 transition-transform duration-700 group-hover:rotate-45",
-                variant === "hero-amber" ? "border-white/20" : "border-[#D4AF37]/30"
-              )} />
+              <div
+                className={cn(
+                  "w-36 h-36 rounded-3xl border-2 border-dashed rotate-12 transition-transform duration-700 group-hover:rotate-45",
+                  variant === "hero-amber"
+                    ? "border-white/20"
+                    : "border-[#D4AF37]/30"
+                )}
+              />
               {/* Inner shape */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className={cn(
-                  "w-20 h-20 rounded-2xl backdrop-blur-sm flex items-center justify-center",
-                  variant === "hero-amber" ? "bg-white/10" : "bg-[#D4AF37]/10"
-                )}>
-                  <Icon className={cn(
-                    "w-10 h-10",
-                    variant === "hero-amber" ? "text-white/50" : "text-[#E4C55B]/60"
-                  )} />
+                <div
+                  className={cn(
+                    "w-20 h-20 rounded-2xl backdrop-blur-sm flex items-center justify-center",
+                    variant === "hero-amber" ? "bg-white/10" : "bg-[#D4AF37]/10"
+                  )}
+                >
+                  <Icon
+                    className={cn(
+                      "w-10 h-10",
+                      variant === "hero-amber"
+                        ? "text-white/50"
+                        : "text-[#E4C55B]/60"
+                    )}
+                  />
                 </div>
               </div>
             </div>
@@ -295,11 +322,13 @@ function FeatureCard({
       )}
     >
       {/* Gradient Glow on Hover */}
-      <div className={cn(
-        "absolute -top-16 -right-16 w-32 h-32 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-radial",
-        s.glow
-      )} />
-      
+      <div
+        className={cn(
+          "absolute -top-16 -right-16 w-32 h-32 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-radial",
+          s.glow
+        )}
+      />
+
       {/* Subtle top accent line */}
       <div className="absolute top-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-primary-200/50 to-transparent opacity-60" />
 
@@ -318,25 +347,31 @@ function FeatureCard({
         <h3 className="text-lg font-bold text-primary-900 mb-2 tracking-tight group-hover:text-primary-800">
           {title}
         </h3>
-        
+
         {/* Description */}
         <p className="text-primary-600/70 text-sm leading-relaxed flex-grow">
           {description}
         </p>
-        
+
         {/* Stat Badge */}
         {stat && (
           <div className="mt-5 pt-5 border-t border-primary-100/60 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={cn("px-3 py-1.5 rounded-lg", s.statBg)}>
-                <span className={cn("text-sm font-bold", s.statColor)}>{stat.value}</span>
+                <span className={cn("text-sm font-bold", s.statColor)}>
+                  {stat.value}
+                </span>
               </div>
-              <span className="text-xs text-primary-400 uppercase tracking-wider font-medium">{stat.label}</span>
+              <span className="text-xs text-primary-400 uppercase tracking-wider font-medium">
+                {stat.label}
+              </span>
             </div>
-            <div className={cn(
-              "w-8 h-8 rounded-full flex items-center justify-center bg-primary-50 border border-primary-100",
-              "opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0 -translate-x-2 group-hover:bg-primary-900 group-hover:border-primary-900"
-            )}>
+            <div
+              className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center bg-primary-50 border border-primary-100",
+                "opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-0 -translate-x-2 group-hover:bg-primary-900 group-hover:border-primary-900"
+              )}
+            >
               <ArrowUpRight className="w-4 h-4 text-primary-400 group-hover:text-white transition-colors" />
             </div>
           </div>
