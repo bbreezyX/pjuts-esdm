@@ -10,6 +10,7 @@ import { sendAccountDisabledEmail, sendAccountEnabledEmail } from "@/lib/email";
 import { logUserAudit } from "@/lib/audit";
 import { ERROR_MESSAGES } from "@/lib/errors";
 import { type ActionResult } from "@/types";
+import { isValidCuid } from "@/lib/validations";
 
 // ============================================
 // TYPES & SCHEMAS
@@ -161,6 +162,11 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
       return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
     }
 
+    // Validate userId format to prevent potential injection attacks
+    if (!isValidCuid(userId)) {
+      return { success: false, error: ERROR_MESSAGES.USER_NOT_FOUND };
+    }
+
     const rawData = {
       name: formData.get("name"),
       email: formData.get("email"),
@@ -180,7 +186,9 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
     const { name, email, password, role } = validation.data;
 
     const dataToUpdate: Prisma.UserUpdateInput = { name, email, role };
-    if (password && password.length >= 8) {
+    // Only update password if a non-empty password is provided
+    // The schema validates password requirements (min 8 chars, upper, lower, digit)
+    if (password && password.trim().length > 0) {
       dataToUpdate.password = await bcrypt.hash(password, 12);
     }
 
@@ -202,7 +210,7 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
       email: user.email,
       name: user.name,
       role: user.role,
-      passwordChanged: !!password && password.length >= 8,
+      passwordChanged: !!password && password.trim().length > 0,
     });
 
     revalidatePath("/users");
@@ -222,6 +230,11 @@ export async function deleteUser(userId: string): Promise<ActionResult> {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
       return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
+    }
+
+    // Validate userId format
+    if (!isValidCuid(userId)) {
+      return { success: false, error: ERROR_MESSAGES.USER_NOT_FOUND };
     }
 
     if (session.user.id === userId) {
@@ -260,6 +273,11 @@ export async function toggleUserStatus(userId: string): Promise<ActionResult<Use
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
       return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
+    }
+
+    // Validate userId format
+    if (!isValidCuid(userId)) {
+      return { success: false, error: ERROR_MESSAGES.USER_NOT_FOUND };
     }
 
     // Prevent admin from disabling themselves

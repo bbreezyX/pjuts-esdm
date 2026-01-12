@@ -16,6 +16,24 @@ const INDONESIA_BOUNDS = {
 // REUSABLE FIELD SCHEMAS
 // ============================================
 
+/**
+ * CUID validation schema
+ * CUIDs are 25 characters starting with 'c'
+ * Pattern: c[a-z0-9]{24}
+ */
+export const cuidSchema = z
+  .string()
+  .min(25, { message: "Invalid ID format" })
+  .max(25, { message: "Invalid ID format" })
+  .regex(/^c[a-z0-9]{24}$/, { message: "Invalid ID format" });
+
+/**
+ * Validate if a string is a valid CUID
+ */
+export function isValidCuid(id: string): boolean {
+  return cuidSchema.safeParse(id).success;
+}
+
 export const latitudeSchema = z
   .number({
     required_error: "Latitude is required",

@@ -3,7 +3,7 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
-import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
+import { submitReportSchema, type SubmitReportInput, isValidCuid } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { getStatusFromVoltage } from "@/lib/constants";
@@ -423,6 +423,14 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
       return {
         success: false,
         error: ERROR_MESSAGES.AUTH_REQUIRED,
+      };
+    }
+
+    // Validate reportId format
+    if (!isValidCuid(reportId)) {
+      return {
+        success: false,
+        error: ERROR_MESSAGES.REPORT_NOT_FOUND,
       };
     }
 

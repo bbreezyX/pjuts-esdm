@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
-import { createPjutsUnitSchema, type CreatePjutsUnitInput } from "@/lib/validations";
+import { createPjutsUnitSchema, type CreatePjutsUnitInput, isValidCuid } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { sendUnitNotificationToFieldStaff } from "@/lib/email";
@@ -273,6 +273,14 @@ export async function updatePjutsUnit(
       };
     }
 
+    // Validate unitId format
+    if (!isValidCuid(unitId)) {
+      return {
+        success: false,
+        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
+      };
+    }
+
     // Only admins can update units
     if (session.user.role !== "ADMIN") {
       return {
@@ -339,6 +347,14 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
       return {
         success: false,
         error: ERROR_MESSAGES.AUTH_REQUIRED,
+      };
+    }
+
+    // Validate unitId format
+    if (!isValidCuid(unitId)) {
+      return {
+        success: false,
+        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
       };
     }
 
