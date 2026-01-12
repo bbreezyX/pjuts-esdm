@@ -879,7 +879,8 @@ export function ReportFormClient({
                   <div
                     className={cn(
                       "p-2 rounded text-center",
-                      parseFloat(formData.batteryVoltage) >= BATTERY_THRESHOLDS.OPERATIONAL_MIN
+                      parseFloat(formData.batteryVoltage) >=
+                        BATTERY_THRESHOLDS.OPERATIONAL_MIN
                         ? "bg-emerald-100 text-emerald-700 font-medium"
                         : "bg-slate-100 text-slate-500"
                     )}
@@ -889,19 +890,23 @@ export function ReportFormClient({
                   <div
                     className={cn(
                       "p-2 rounded text-center",
-                      parseFloat(formData.batteryVoltage) >= BATTERY_THRESHOLDS.MAINTENANCE_MIN &&
-                        parseFloat(formData.batteryVoltage) < BATTERY_THRESHOLDS.OPERATIONAL_MIN
+                      parseFloat(formData.batteryVoltage) >=
+                        BATTERY_THRESHOLDS.MAINTENANCE_MIN &&
+                        parseFloat(formData.batteryVoltage) <
+                          BATTERY_THRESHOLDS.OPERATIONAL_MIN
                         ? "bg-amber-100 text-amber-700 font-medium"
                         : "bg-slate-100 text-slate-500"
                     )}
                   >
-                    {BATTERY_THRESHOLDS.MAINTENANCE_MIN}-{BATTERY_THRESHOLDS.OPERATIONAL_MIN}V: Perlu Cek
+                    {BATTERY_THRESHOLDS.MAINTENANCE_MIN}-
+                    {BATTERY_THRESHOLDS.OPERATIONAL_MIN}V: Perlu Cek
                   </div>
                   <div
                     className={cn(
                       "p-2 rounded text-center",
                       parseFloat(formData.batteryVoltage) > 0 &&
-                        parseFloat(formData.batteryVoltage) < BATTERY_THRESHOLDS.MAINTENANCE_MIN
+                        parseFloat(formData.batteryVoltage) <
+                          BATTERY_THRESHOLDS.MAINTENANCE_MIN
                         ? "bg-red-100 text-red-700 font-medium"
                         : "bg-slate-100 text-slate-500"
                     )}
@@ -997,7 +1002,11 @@ export function ReportFormClient({
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-slate-600">Tegangan</span>
-                    <Badge variant={getStatusVariant(parseFloat(formData.batteryVoltage) || 0)}>
+                    <Badge
+                      variant={getStatusVariant(
+                        parseFloat(formData.batteryVoltage) || 0
+                      )}
+                    >
                       {formData.batteryVoltage}V
                     </Badge>
                   </div>

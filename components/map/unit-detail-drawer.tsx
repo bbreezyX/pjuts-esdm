@@ -101,22 +101,32 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/50 sticky top-0 z-10">
           <div>
-            <h3 className="font-bold text-lg text-slate-900 tracking-tight">Detail Unit</h3>
+            <h3 className="font-bold text-lg text-slate-900 tracking-tight">
+              Detail Unit
+            </h3>
             {detail && (
               <div className="flex items-center gap-2 mt-0.5">
-                <p className="text-sm font-medium text-slate-500">{detail.unit.serialNumber}</p>
+                <p className="text-sm font-medium text-slate-500">
+                  {detail.unit.serialNumber}
+                </p>
                 {detail.unit.installDate && (
                   <>
                     <span className="text-slate-300">•</span>
                     <span className="text-xs text-slate-400">
-                      Dipasang {formatDateTime(detail.unit.installDate).split(',')[0]}
+                      Dipasang{" "}
+                      {formatDateTime(detail.unit.installDate).split(",")[0]}
                     </span>
                   </>
                 )}
               </div>
             )}
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="rounded-full hover:bg-slate-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-full hover:bg-slate-100"
+          >
             <Xmark className="h-5 w-5 text-slate-500" />
           </Button>
         </div>
@@ -129,7 +139,10 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
             </div>
           </ScrollArea>
         ) : detail ? (
-          <Tabs defaultValue="overview" className="flex-1 flex flex-col overflow-hidden">
+          <Tabs
+            defaultValue="overview"
+            className="flex-1 flex flex-col overflow-hidden"
+          >
             <div className="px-6 pt-4 pb-2 bg-slate-50/50">
               <TabsList className="w-full grid grid-cols-2">
                 <TabsTrigger value="overview">Ringkasan</TabsTrigger>
@@ -144,19 +157,30 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
 
             <ScrollArea className="flex-1">
               <div className="p-6">
-                <TabsContent value="overview" className="mt-0 space-y-6 animate-in fade-in-50 slide-in-from-bottom-2 duration-500">
+                <TabsContent
+                  value="overview"
+                  className="mt-0 space-y-6 animate-in fade-in-50 slide-in-from-bottom-2 duration-500"
+                >
                   {/* Status Card */}
                   <div className="bg-white rounded-3xl shadow-sm p-5 overflow-hidden relative">
-                    <div className={cn(
-                      "absolute top-0 right-0 w-24 h-24 -mr-6 -mt-6 rounded-full opacity-10 blur-xl",
-                      detail.unit.lastStatus === "OPERATIONAL" ? "bg-green-500" :
-                        detail.unit.lastStatus === "MAINTENANCE_NEEDED" ? "bg-amber-500" :
-                          detail.unit.lastStatus === "OFFLINE" ? "bg-red-500" : "bg-slate-500"
-                    )} />
+                    <div
+                      className={cn(
+                        "absolute top-0 right-0 w-24 h-24 -mr-6 -mt-6 rounded-full opacity-10 blur-xl",
+                        detail.unit.lastStatus === "OPERATIONAL"
+                          ? "bg-green-500"
+                          : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
+                          ? "bg-amber-500"
+                          : detail.unit.lastStatus === "OFFLINE"
+                          ? "bg-red-500"
+                          : "bg-slate-500"
+                      )}
+                    />
 
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-4">
-                        <span className="text-sm font-medium text-slate-500">Status Terkini</span>
+                        <span className="text-sm font-medium text-slate-500">
+                          Status Terkini
+                        </span>
                         {detail.recentReports[0] && (
                           <span className="text-xs text-slate-400 flex items-center gap-1">
                             <Clock className="h-3 w-3" />
@@ -166,15 +190,28 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <div className={cn(
-                          "p-2 rounded-full",
-                          detail.unit.lastStatus === "OPERATIONAL" ? "bg-green-100 text-green-600" :
-                            detail.unit.lastStatus === "MAINTENANCE_NEEDED" ? "bg-amber-100 text-amber-600" :
-                              detail.unit.lastStatus === "OFFLINE" ? "bg-red-100 text-red-600" : "bg-slate-100 text-slate-600"
-                        )}>
-                          {detail.unit.lastStatus === "OPERATIONAL" ? <CheckCircle className="h-6 w-6" /> :
-                            detail.unit.lastStatus === "MAINTENANCE_NEEDED" ? <WarningTriangle className="h-6 w-6" /> :
-                              detail.unit.lastStatus === "OFFLINE" ? <XmarkCircle className="h-6 w-6" /> : <HelpCircle className="h-6 w-6" />}
+                        <div
+                          className={cn(
+                            "p-2 rounded-full",
+                            detail.unit.lastStatus === "OPERATIONAL"
+                              ? "bg-green-100 text-green-600"
+                              : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
+                              ? "bg-amber-100 text-amber-600"
+                              : detail.unit.lastStatus === "OFFLINE"
+                              ? "bg-red-100 text-red-600"
+                              : "bg-slate-100 text-slate-600"
+                          )}
+                        >
+                          {detail.unit.lastStatus === "OPERATIONAL" ? (
+                            <CheckCircle className="h-6 w-6" />
+                          ) : detail.unit.lastStatus ===
+                            "MAINTENANCE_NEEDED" ? (
+                            <WarningTriangle className="h-6 w-6" />
+                          ) : detail.unit.lastStatus === "OFFLINE" ? (
+                            <XmarkCircle className="h-6 w-6" />
+                          ) : (
+                            <HelpCircle className="h-6 w-6" />
+                          )}
                         </div>
                         <div>
                           <h4 className="font-bold text-lg text-slate-900 leading-tight">
@@ -190,24 +227,39 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                       {detail.recentReports[0] && (
                         <div className="mt-4 pt-4 border-t flex items-center gap-4">
                           <div className="flex-1">
-                            <span className="text-xs text-slate-500 block mb-1">Tegangan Baterai</span>
+                            <span className="text-xs text-slate-500 block mb-1">
+                              Tegangan Baterai
+                            </span>
                             <div className="flex items-end gap-1.5">
-                              <BatteryFull className={cn("h-5 w-5 mb-0.5",
-                                detail.recentReports[0].batteryVoltage >= BATTERY_THRESHOLDS.OPERATIONAL_MIN ? "text-green-500" :
-                                  detail.recentReports[0].batteryVoltage >= BATTERY_THRESHOLDS.MAINTENANCE_MIN ? "text-amber-500" : "text-red-500"
-                              )} />
+                              <BatteryFull
+                                className={cn(
+                                  "h-5 w-5 mb-0.5",
+                                  detail.recentReports[0].batteryVoltage >=
+                                    BATTERY_THRESHOLDS.OPERATIONAL_MIN
+                                    ? "text-green-500"
+                                    : detail.recentReports[0].batteryVoltage >=
+                                      BATTERY_THRESHOLDS.MAINTENANCE_MIN
+                                    ? "text-amber-500"
+                                    : "text-red-500"
+                                )}
+                              />
                               <span className="text-2xl font-bold tracking-tight text-slate-900">
                                 {detail.recentReports[0].batteryVoltage}
                               </span>
-                              <span className="text-sm font-medium text-slate-500 mb-1">Volts</span>
+                              <span className="text-sm font-medium text-slate-500 mb-1">
+                                Volts
+                              </span>
                             </div>
                           </div>
                           <div className="w-px h-10 bg-slate-100" />
                           <div className="flex-1">
-                            <span className="text-xs text-slate-500 block mb-1">Kondisi Fisik</span>
+                            <span className="text-xs text-slate-500 block mb-1">
+                              Kondisi Fisik
+                            </span>
                             <div className="flex items-center gap-2">
                               <span className="text-sm font-medium text-slate-900 line-clamp-2">
-                                {detail.recentReports[0].notes || "Tidak ada catatan"}
+                                {detail.recentReports[0].notes ||
+                                  "Tidak ada catatan"}
                               </span>
                             </div>
                           </div>
@@ -218,9 +270,10 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
 
                   {/* Location Card */}
                   <div className="space-y-3">
-                    <h4 className="text-sm font-semibold text-slate-900 pl-2">Lokasi & Koordinat</h4>
+                    <h4 className="text-sm font-semibold text-slate-900 pl-2">
+                      Lokasi & Koordinat
+                    </h4>
                     <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100 space-y-4">
-
                       {/* Address */}
                       <div className="flex items-start gap-3">
                         <div className="bg-white p-2 rounded-lg shadow-sm shrink-0 border border-slate-100">
@@ -234,8 +287,10 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                             {[
                               detail.unit.village,
                               detail.unit.district,
-                              detail.unit.regency
-                            ].filter(Boolean).join(", ")}
+                              detail.unit.regency,
+                            ]
+                              .filter(Boolean)
+                              .join(", ")}
                           </p>
                           {detail.unit.address && (
                             <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
@@ -250,17 +305,22 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
 
                       {/* Coordinates Action */}
                       <div className="flex items-center gap-2">
-                        <div className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 flex items-center justify-between group cursor-pointer hover:border-primary-400 transition-colors"
+                        <div
+                          className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 flex items-center justify-between group cursor-pointer hover:border-primary-400 transition-colors"
                           onClick={() => {
-                            navigator.clipboard.writeText(`${detail.unit.latitude}, ${detail.unit.longitude}`);
+                            navigator.clipboard.writeText(
+                              `${detail.unit.latitude}, ${detail.unit.longitude}`
+                            );
                             toast({
                               description: "Koordinat berhasil disalin",
                             });
-                          }}>
+                          }}
+                        >
                           <div className="flex items-center gap-2">
                             <NavArrowRight className="h-3.5 w-3.5 text-slate-400" />
                             <code className="text-xs text-slate-700 font-medium">
-                              {detail.unit.latitude.toFixed(6)}, {detail.unit.longitude.toFixed(6)}
+                              {detail.unit.latitude.toFixed(6)},{" "}
+                              {detail.unit.longitude.toFixed(6)}
                             </code>
                           </div>
                           <Copy className="h-3.5 w-3.5 text-slate-400 group-hover:text-primary-600" />
@@ -283,7 +343,10 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                   </div>
                 </TabsContent>
 
-                <TabsContent value="history" className="mt-0 space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 delay-75">
+                <TabsContent
+                  value="history"
+                  className="mt-0 space-y-4 animate-in fade-in-50 slide-in-from-bottom-2 duration-500 delay-75"
+                >
                   {detail.recentReports.length > 0 ? (
                     <div className="space-y-4 relative before:absolute before:inset-y-0 before:left-[19px] before:w-[2px] before:bg-slate-100 pl-2">
                       {detail.recentReports.map((report) => (
@@ -297,7 +360,9 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                               {report.imageUrl ? (
                                 <div
                                   className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 cursor-pointer bg-slate-100 group/image"
-                                  onClick={() => setSelectedImage(report.imageUrl)}
+                                  onClick={() =>
+                                    setSelectedImage(report.imageUrl)
+                                  }
                                 >
                                   <Image
                                     src={report.imageUrl}
@@ -313,7 +378,9 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                                 <div className="relative w-24 h-24 rounded-lg overflow-hidden shrink-0 bg-slate-100 flex items-center justify-center">
                                   <div className="text-center text-slate-400">
                                     <Calendar className="w-6 h-6 mx-auto mb-1" />
-                                    <span className="text-[10px]">Tanpa Foto</span>
+                                    <span className="text-[10px]">
+                                      Tanpa Foto
+                                    </span>
                                   </div>
                                 </div>
                               )}
@@ -330,11 +397,15 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                                 <div className="grid grid-cols-2 gap-2 mb-3">
                                   <div className="flex items-center gap-2">
                                     <Flash className="h-3.5 w-3.5 text-amber-500" />
-                                    <span className="text-sm font-bold text-slate-900">{report.batteryVoltage}V</span>
+                                    <span className="text-sm font-bold text-slate-900">
+                                      {report.batteryVoltage}V
+                                    </span>
                                   </div>
                                   <div className="flex items-center gap-2">
                                     <User className="h-3.5 w-3.5 text-blue-500" />
-                                    <span className="text-sm font-medium text-slate-700 truncate">{report.user}</span>
+                                    <span className="text-sm font-medium text-slate-700 truncate">
+                                      {report.user}
+                                    </span>
                                   </div>
                                 </div>
 
@@ -356,7 +427,9 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                       <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center">
                         <Calendar className="h-8 w-8 text-slate-300" />
                       </div>
-                      <p className="text-sm">Belum ada laporan untuk unit ini</p>
+                      <p className="text-sm">
+                        Belum ada laporan untuk unit ini
+                      </p>
                     </div>
                   )}
                 </TabsContent>
@@ -412,4 +485,3 @@ function DrawerSkeleton() {
     </div>
   );
 }
-
