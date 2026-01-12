@@ -47,6 +47,7 @@ import {
   useConnectionStatus,
   OfflineBanner,
 } from "@/components/ui/connection-status";
+import { BATTERY_THRESHOLDS, getStatusVariant } from "@/lib/constants";
 
 // --- HELPER KOMPRESI GAMBAR ---
 const compressImage = async (file: File): Promise<File> => {
@@ -878,34 +879,34 @@ export function ReportFormClient({
                   <div
                     className={cn(
                       "p-2 rounded text-center",
-                      parseFloat(formData.batteryVoltage) >= 20
+                      parseFloat(formData.batteryVoltage) >= BATTERY_THRESHOLDS.OPERATIONAL_MIN
                         ? "bg-emerald-100 text-emerald-700 font-medium"
                         : "bg-slate-100 text-slate-500"
                     )}
                   >
-                    ≥20V: Baik
+                    ≥{BATTERY_THRESHOLDS.OPERATIONAL_MIN}V: Baik
                   </div>
                   <div
                     className={cn(
                       "p-2 rounded text-center",
-                      parseFloat(formData.batteryVoltage) >= 10 &&
-                        parseFloat(formData.batteryVoltage) < 20
+                      parseFloat(formData.batteryVoltage) >= BATTERY_THRESHOLDS.MAINTENANCE_MIN &&
+                        parseFloat(formData.batteryVoltage) < BATTERY_THRESHOLDS.OPERATIONAL_MIN
                         ? "bg-amber-100 text-amber-700 font-medium"
                         : "bg-slate-100 text-slate-500"
                     )}
                   >
-                    10-20V: Perlu Cek
+                    {BATTERY_THRESHOLDS.MAINTENANCE_MIN}-{BATTERY_THRESHOLDS.OPERATIONAL_MIN}V: Perlu Cek
                   </div>
                   <div
                     className={cn(
                       "p-2 rounded text-center",
                       parseFloat(formData.batteryVoltage) > 0 &&
-                        parseFloat(formData.batteryVoltage) < 10
+                        parseFloat(formData.batteryVoltage) < BATTERY_THRESHOLDS.MAINTENANCE_MIN
                         ? "bg-red-100 text-red-700 font-medium"
                         : "bg-slate-100 text-slate-500"
                     )}
                   >
-                    {"<10V: Offline"}
+                    {`<${BATTERY_THRESHOLDS.MAINTENANCE_MIN}V: Offline`}
                   </div>
                 </div>
               </div>
@@ -996,15 +997,7 @@ export function ReportFormClient({
                   </div>
                   <div className="flex justify-between py-2">
                     <span className="text-slate-600">Tegangan</span>
-                    <Badge
-                      variant={
-                        parseFloat(formData.batteryVoltage) >= 20
-                          ? "success"
-                          : parseFloat(formData.batteryVoltage) >= 10
-                          ? "warning"
-                          : "destructive"
-                      }
-                    >
+                    <Badge variant={getStatusVariant(parseFloat(formData.batteryVoltage) || 0)}>
                       {formData.batteryVoltage}V
                     </Badge>
                   </div>

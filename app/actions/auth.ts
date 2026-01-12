@@ -4,6 +4,7 @@ import { randomBytes } from "crypto";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/db";
 import { sendPasswordResetEmail } from "@/lib/email";
+import { ERROR_MESSAGES } from "@/lib/errors";
 
 // Token expiry time (1 hour)
 const TOKEN_EXPIRY_HOURS = 1;
@@ -92,21 +93,21 @@ export async function resetPassword(
   try {
     // Validate inputs
     if (!token || token.length !== 64) {
-      return { success: false, error: "Token tidak valid" };
+      return { success: false, error: ERROR_MESSAGES.TOKEN_INVALID };
     }
 
     // Validate password requirements
     if (!newPassword || newPassword.length < PASSWORD_MIN_LENGTH) {
       return {
         success: false,
-        error: `Password minimal ${PASSWORD_MIN_LENGTH} karakter`,
+        error: ERROR_MESSAGES.PASSWORD_MIN_LENGTH,
       };
     }
 
     if (!PASSWORD_REGEX.test(newPassword)) {
       return {
         success: false,
-        error: "Password harus mengandung huruf besar, huruf kecil, dan angka",
+        error: ERROR_MESSAGES.PASSWORD_REQUIREMENTS,
       };
     }
 
@@ -118,7 +119,7 @@ export async function resetPassword(
     if (!resetToken) {
       return {
         success: false,
-        error: "Token tidak valid atau sudah digunakan",
+        error: ERROR_MESSAGES.TOKEN_USED,
       };
     }
 
@@ -130,7 +131,7 @@ export async function resetPassword(
       });
       return {
         success: false,
-        error: "Token sudah kadaluarsa. Silakan minta reset password baru.",
+        error: ERROR_MESSAGES.TOKEN_EXPIRED,
       };
     }
 
@@ -140,7 +141,7 @@ export async function resetPassword(
     });
 
     if (!user) {
-      return { success: false, error: "User tidak ditemukan" };
+      return { success: false, error: ERROR_MESSAGES.USER_NOT_FOUND };
     }
 
     // Hash new password
@@ -162,7 +163,7 @@ export async function resetPassword(
     console.error("Error in resetPassword:", error);
     return {
       success: false,
-      error: "Terjadi kesalahan. Silakan coba lagi.",
+      error: ERROR_MESSAGES.GENERIC_ERROR,
     };
   }
 }
@@ -176,7 +177,7 @@ export async function validateResetToken(token: string): Promise<{
 }> {
   try {
     if (!token || token.length !== 64) {
-      return { valid: false, error: "Token tidak valid" };
+      return { valid: false, error: ERROR_MESSAGES.TOKEN_INVALID };
     }
 
     const resetToken = await prisma.passwordResetToken.findUnique({
@@ -184,16 +185,16 @@ export async function validateResetToken(token: string): Promise<{
     });
 
     if (!resetToken) {
-      return { valid: false, error: "Token tidak valid atau sudah digunakan" };
+      return { valid: false, error: ERROR_MESSAGES.TOKEN_USED };
     }
 
     if (new Date() > resetToken.expiresAt) {
-      return { valid: false, error: "Token sudah kadaluarsa" };
+      return { valid: false, error: ERROR_MESSAGES.TOKEN_EXPIRED };
     }
 
     return { valid: true };
   } catch (error) {
     console.error("Error in validateResetToken:", error);
-    return { valid: false, error: "Terjadi kesalahan" };
+    return { valid: false, error: ERROR_MESSAGES.GENERIC_ERROR };
   }
 }

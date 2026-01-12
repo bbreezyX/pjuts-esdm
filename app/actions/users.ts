@@ -7,6 +7,8 @@ import { Prisma, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { sendAccountDisabledEmail, sendAccountEnabledEmail } from "@/lib/email";
+import { logUserAudit } from "@/lib/audit";
+import { ERROR_MESSAGES } from "@/lib/errors";
 import { type ActionResult } from "@/types";
 
 // ============================================
@@ -57,7 +59,7 @@ export async function getUsers(): Promise<ActionResult<UserData[]>> {
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
     }
 
     const users = await prisma.user.findMany({
@@ -75,7 +77,7 @@ export async function getUsers(): Promise<ActionResult<UserData[]>> {
     return { success: true, data: users };
   } catch (error) {
     console.error("Get users error:", error);
-    return { success: false, error: "Gagal mengambil data pengguna" };
+    return { success: false, error: ERROR_MESSAGES.USER_FETCH_FAILED };
   }
 }
 
@@ -87,7 +89,7 @@ export async function createUser(formData: FormData): Promise<ActionResult<UserD
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
     }
 
     const rawData = {
@@ -101,7 +103,7 @@ export async function createUser(formData: FormData): Promise<ActionResult<UserD
     if (!validation.success) {
       return {
         success: false,
-        error: "Validasi gagal",
+        error: ERROR_MESSAGES.VALIDATION_FAILED,
         errors: validation.error.flatten().fieldErrors,
       };
     }
@@ -111,7 +113,7 @@ export async function createUser(formData: FormData): Promise<ActionResult<UserD
     // Check duplicate email
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
-      return { success: false, error: "Email sudah digunakan" };
+      return { success: false, error: ERROR_MESSAGES.USER_EMAIL_EXISTS };
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
@@ -133,11 +135,18 @@ export async function createUser(formData: FormData): Promise<ActionResult<UserD
       },
     });
 
+    // Log audit event
+    await logUserAudit("CREATE_USER", user.id, session.user.id, {
+      email: user.email,
+      name: user.name,
+      role: user.role,
+    });
+
     revalidatePath("/users");
     return { success: true, data: user };
   } catch (error) {
     console.error("Create user error:", error);
-    return { success: false, error: "Gagal membuat pengguna" };
+    return { success: false, error: ERROR_MESSAGES.USER_CREATE_FAILED };
   }
 }
 
@@ -149,7 +158,7 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
     }
 
     const rawData = {
@@ -163,7 +172,7 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
     if (!validation.success) {
       return {
         success: false,
-        error: "Validasi gagal",
+        error: ERROR_MESSAGES.VALIDATION_FAILED,
         errors: validation.error.flatten().fieldErrors,
       };
     }
@@ -188,11 +197,19 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
       },
     });
 
+    // Log audit event
+    await logUserAudit("UPDATE_USER", user.id, session.user.id, {
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      passwordChanged: !!password && password.length >= 8,
+    });
+
     revalidatePath("/users");
     return { success: true, data: user };
   } catch (error) {
     console.error("Update user error:", error);
-    return { success: false, error: "Gagal mengupdate pengguna" };
+    return { success: false, error: ERROR_MESSAGES.USER_UPDATE_FAILED };
   }
 }
 
@@ -204,20 +221,33 @@ export async function deleteUser(userId: string): Promise<ActionResult> {
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
     }
 
     if (session.user.id === userId) {
-      return { success: false, error: "Tidak dapat menghapus akun sendiri" };
+      return { success: false, error: ERROR_MESSAGES.USER_DELETE_SELF };
     }
 
+    // Get user details before deletion for audit log
+    const userToDelete = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true, name: true, role: true },
+    });
+
     await prisma.user.delete({ where: { id: userId } });
+
+    // Log audit event
+    await logUserAudit("DELETE_USER", userId, session.user.id, {
+      deletedUserEmail: userToDelete?.email,
+      deletedUserName: userToDelete?.name,
+      deletedUserRole: userToDelete?.role,
+    });
 
     revalidatePath("/users");
     return { success: true };
   } catch (error) {
     console.error("Delete user error:", error);
-    return { success: false, error: "Gagal menghapus pengguna" };
+    return { success: false, error: ERROR_MESSAGES.USER_DELETE_FAILED };
   }
 }
 
@@ -229,12 +259,12 @@ export async function toggleUserStatus(userId: string): Promise<ActionResult<Use
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
-      return { success: false, error: "Unauthorized" };
+      return { success: false, error: ERROR_MESSAGES.UNAUTHORIZED };
     }
 
     // Prevent admin from disabling themselves
     if (session.user.id === userId) {
-      return { success: false, error: "Tidak dapat menonaktifkan akun sendiri" };
+      return { success: false, error: ERROR_MESSAGES.USER_DISABLE_SELF };
     }
 
     // Get current user status
@@ -244,7 +274,7 @@ export async function toggleUserStatus(userId: string): Promise<ActionResult<Use
     });
 
     if (!currentUser) {
-      return { success: false, error: "Pengguna tidak ditemukan" };
+      return { success: false, error: ERROR_MESSAGES.USER_NOT_FOUND };
     }
 
     // Toggle the status
@@ -261,6 +291,15 @@ export async function toggleUserStatus(userId: string): Promise<ActionResult<Use
         isActive: true,
         createdAt: true,
       },
+    });
+
+    // Log audit event
+    await logUserAudit("TOGGLE_USER_STATUS", userId, session.user.id, {
+      email: user.email,
+      name: user.name,
+      previousStatus: !newStatus,
+      newStatus: newStatus,
+      action: newStatus ? "enabled" : "disabled",
     });
 
     // Send email notification
@@ -282,6 +321,6 @@ export async function toggleUserStatus(userId: string): Promise<ActionResult<Use
     return { success: true, data: user };
   } catch (error) {
     console.error("Toggle user status error:", error);
-    return { success: false, error: "Gagal mengubah status pengguna" };
+    return { success: false, error: ERROR_MESSAGES.USER_STATUS_FAILED };
   }
 }

@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { getStatusVariant } from "@/lib/constants";
 import {
   Dialog,
   DialogContent,
@@ -134,15 +135,7 @@ export function ReportsTable({
                       </div>
                     </td>
                     <td className="text-center">
-                      <Badge
-                        variant={
-                          report.batteryVoltage >= 20
-                            ? "success"
-                            : report.batteryVoltage >= 10
-                              ? "warning"
-                              : "destructive"
-                        }
-                      >
+                      <Badge variant={getStatusVariant(report.batteryVoltage)}>
                         {report.batteryVoltage}V
                       </Badge>
                     </td>
@@ -249,13 +242,7 @@ export function ReportsTable({
                     </div>
                     <Badge
                       className="shrink-0"
-                      variant={
-                        report.batteryVoltage >= 20
-                          ? "success"
-                          : report.batteryVoltage >= 10
-                            ? "warning"
-                            : "destructive"
-                      }
+                      variant={getStatusVariant(report.batteryVoltage)}
                     >
                       {report.batteryVoltage}V
                     </Badge>

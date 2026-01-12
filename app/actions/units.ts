@@ -6,6 +6,8 @@ import { createPjutsUnitSchema, type CreatePjutsUnitInput } from "@/lib/validati
 import { revalidatePath } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { sendUnitNotificationToFieldStaff } from "@/lib/email";
+import { logUnitAudit } from "@/lib/audit";
+import { ERROR_MESSAGES } from "@/lib/errors";
 import { type ActionResult } from "@/types";
 
 // ============================================
@@ -45,7 +47,7 @@ export async function createPjutsUnit(
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -53,7 +55,7 @@ export async function createPjutsUnit(
     if (session.user.role !== "ADMIN") {
       return {
         success: false,
-        error: "Only administrators can create PJUTS units",
+        error: ERROR_MESSAGES.UNIT_ADMIN_ONLY,
       };
     }
 
@@ -62,7 +64,7 @@ export async function createPjutsUnit(
     if (!validationResult.success) {
       return {
         success: false,
-        error: "Validation failed",
+        error: ERROR_MESSAGES.VALIDATION_FAILED,
         errors: validationResult.error.flatten().fieldErrors as Record<string, string[]>,
       };
     }
@@ -77,7 +79,7 @@ export async function createPjutsUnit(
     if (existing) {
       return {
         success: false,
-        error: `Unit with serial number ${validatedData.serialNumber} already exists`,
+        error: ERROR_MESSAGES.UNIT_EXISTS,
       };
     }
 
@@ -99,6 +101,15 @@ export async function createPjutsUnit(
           select: { reports: true },
         },
       },
+    });
+
+    // Log audit event
+    await logUnitAudit("CREATE_UNIT", unit.id, session.user.id, {
+      serialNumber: unit.serialNumber,
+      province: unit.province,
+      regency: unit.regency,
+      latitude: unit.latitude,
+      longitude: unit.longitude,
     });
 
     revalidatePath("/dashboard");
@@ -146,7 +157,7 @@ export async function createPjutsUnit(
     console.error("Create unit error:", error);
     return {
       success: false,
-      error: "Failed to create PJUTS unit",
+      error: ERROR_MESSAGES.UNIT_CREATE_FAILED,
     };
   }
 }
@@ -174,7 +185,7 @@ export async function getPjutsUnits(options: GetUnitsOptions = {}): Promise<Acti
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -229,7 +240,7 @@ export async function getPjutsUnits(options: GetUnitsOptions = {}): Promise<Acti
     console.error("Get units error:", error);
     return {
       success: false,
-      error: "Failed to fetch PJUTS units",
+      error: ERROR_MESSAGES.UNIT_FETCH_FAILED,
     };
   }
 }
@@ -258,7 +269,7 @@ export async function updatePjutsUnit(
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -266,7 +277,7 @@ export async function updatePjutsUnit(
     if (session.user.role !== "ADMIN") {
       return {
         success: false,
-        error: "Only administrators can update PJUTS units",
+        error: ERROR_MESSAGES.UNIT_ADMIN_ONLY,
       };
     }
 
@@ -278,7 +289,7 @@ export async function updatePjutsUnit(
     if (!existing) {
       return {
         success: false,
-        error: "Unit not found",
+        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
       };
     }
 
@@ -293,6 +304,13 @@ export async function updatePjutsUnit(
       },
     });
 
+    // Log audit event
+    await logUnitAudit("UPDATE_UNIT", unit.id, session.user.id, {
+      serialNumber: unit.serialNumber,
+      updatedFields: Object.keys(input),
+      newValues: JSON.parse(JSON.stringify(input)),
+    });
+
     revalidatePath("/dashboard");
     revalidatePath("/units");
     revalidatePath("/map");
@@ -305,7 +323,7 @@ export async function updatePjutsUnit(
     console.error("Update unit error:", error);
     return {
       success: false,
-      error: "Failed to update PJUTS unit",
+      error: ERROR_MESSAGES.UNIT_UPDATE_FAILED,
     };
   }
 }
@@ -320,7 +338,7 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -328,7 +346,7 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
     if (session.user.role !== "ADMIN") {
       return {
         success: false,
-        error: "Only administrators can delete PJUTS units",
+        error: ERROR_MESSAGES.UNIT_ADMIN_ONLY,
       };
     }
 
@@ -345,7 +363,7 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
     if (!existing) {
       return {
         success: false,
-        error: "Unit not found",
+        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
       };
     }
 
@@ -359,6 +377,14 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
       where: { id: unitId },
     });
 
+    // Log audit event
+    await logUnitAudit("DELETE_UNIT", unitId, session.user.id, {
+      serialNumber: existing.serialNumber,
+      province: existing.province,
+      regency: existing.regency,
+      reportsDeleted: existing._count.reports,
+    });
+
     revalidatePath("/dashboard");
     revalidatePath("/units");
     revalidatePath("/map");
@@ -368,7 +394,7 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
     console.error("Delete unit error:", error);
     return {
       success: false,
-      error: "Failed to delete PJUTS unit",
+      error: ERROR_MESSAGES.UNIT_DELETE_FAILED,
     };
   }
 }
@@ -383,7 +409,7 @@ export async function getProvinces(): Promise<ActionResult<string[]>> {
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -401,7 +427,7 @@ export async function getProvinces(): Promise<ActionResult<string[]>> {
     console.error("Get provinces error:", error);
     return {
       success: false,
-      error: "Failed to fetch provinces",
+      error: ERROR_MESSAGES.PROVINCES_FETCH_FAILED,
     };
   }
 }

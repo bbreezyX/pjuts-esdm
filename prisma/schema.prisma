@@ -41,6 +41,7 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   reports       Report[]
+  auditLogs     AuditLog[]
   lastNotificationCheck DateTime  @default(now())
 
   @@index([email])
@@ -127,6 +128,27 @@ model PasswordResetToken {
 
   @@index([email])
   @@index([token])
+}
+
+// ============================================
+// AUDIT LOG MODEL
+// ============================================
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // CREATE_USER, UPDATE_USER, DELETE_USER, TOGGLE_USER_STATUS, CREATE_UNIT, UPDATE_UNIT, DELETE_UNIT, DELETE_REPORT
+  entityType  String   // USER, UNIT, REPORT
+  entityId    String   // ID of the affected entity
+  performedBy String   // ID of the user who performed the action
+  performer   User     @relation(fields: [performedBy], references: [id], onDelete: Cascade)
+  metadata    Json?    // Additional context (old/new values, entity details, etc.)
+  createdAt   DateTime @default(now())
+
+  @@index([action])
+  @@index([entityType])
+  @@index([performedBy])
+  @@index([createdAt])
+  @@index([entityId])
 }
 
 

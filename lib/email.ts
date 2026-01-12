@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import { BATTERY_THRESHOLDS, getVoltageStatusLabel } from "./constants";
 
 // Lazy-initialized Resend client (prevents build-time errors when API key is not set)
 let resend: Resend | null = null;
@@ -176,16 +177,15 @@ function getReportNotificationHtml(
   data: ReportNotificationData,
   recipientName: string = "Admin"
 ): string {
-  let statusText = "Offline";
-  let statusColor = "#e53e3e"; // red
+  // Use centralized constants for voltage thresholds
+  const statusText = getVoltageStatusLabel(data.batteryVoltage);
+  let statusColor = "#e53e3e"; // red (offline)
   let statusBg = "#fff5f5";
 
-  if (data.batteryVoltage >= 20) {
-    statusText = "Operasional";
+  if (data.batteryVoltage >= BATTERY_THRESHOLDS.OPERATIONAL_MIN) {
     statusColor = "#38a169"; // green
     statusBg = "#f0fff4";
-  } else if (data.batteryVoltage >= 10) {
-    statusText = "Perlu Perawatan";
+  } else if (data.batteryVoltage >= BATTERY_THRESHOLDS.MAINTENANCE_MIN) {
     statusColor = "#d69e2e"; // yellow
     statusBg = "#fffff0";
   }

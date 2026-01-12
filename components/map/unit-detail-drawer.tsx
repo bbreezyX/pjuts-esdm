@@ -25,6 +25,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { getUnitDetail } from "@/app/actions/map";
 import { getStatusLabel, formatDateTime } from "@/lib/utils";
+import { BATTERY_THRESHOLDS } from "@/lib/constants";
 import { UnitStatus } from "@prisma/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
@@ -192,8 +193,8 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                             <span className="text-xs text-slate-500 block mb-1">Tegangan Baterai</span>
                             <div className="flex items-end gap-1.5">
                               <BatteryFull className={cn("h-5 w-5 mb-0.5",
-                                detail.recentReports[0].batteryVoltage > 12 ? "text-green-500" :
-                                  detail.recentReports[0].batteryVoltage > 11 ? "text-amber-500" : "text-red-500"
+                                detail.recentReports[0].batteryVoltage >= BATTERY_THRESHOLDS.OPERATIONAL_MIN ? "text-green-500" :
+                                  detail.recentReports[0].batteryVoltage >= BATTERY_THRESHOLDS.MAINTENANCE_MIN ? "text-amber-500" : "text-red-500"
                               )} />
                               <span className="text-2xl font-bold tracking-tight text-slate-900">
                                 {detail.recentReports[0].batteryVoltage}

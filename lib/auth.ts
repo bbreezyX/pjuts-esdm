@@ -33,9 +33,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Validate credentials with Zod
           const { email, password } = await signInSchema.parseAsync(credentials);
 
-          // Check rate limit before processing
+          // Check rate limit before processing (async for Redis support)
           const rateLimitKey = getLoginRateLimitKey(email);
-          const rateLimitCheck = checkRateLimit(rateLimitKey);
+          const rateLimitCheck = await checkRateLimit(rateLimitKey);
 
           if (!rateLimitCheck.success) {
             console.warn(`Rate limit exceeded for: ${email}`);
@@ -64,8 +64,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const isValidPassword = await bcrypt.compare(password, passwordToCompare);
 
           if (!user || !isValidPassword) {
-            // Increment rate limit counter on failed attempt
-            incrementRateLimit(rateLimitKey);
+            // Increment rate limit counter on failed attempt (async for Redis support)
+            await incrementRateLimit(rateLimitKey);
             return null;
           }
 
@@ -75,8 +75,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return null;
           }
 
-          // Reset rate limit on successful login
-          resetRateLimit(rateLimitKey);
+          // Reset rate limit on successful login (async for Redis support)
+          await resetRateLimit(rateLimitKey);
 
           // Return user object (password excluded)
           return {

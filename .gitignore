@@ -55,3 +55,4 @@ public/fallback-*.js.map
 .claude/skills/web-artifacts-builder/SKILL.md
 .claude/skills/web-artifacts-builder/scripts/bundle-artifact.sh
 .claude/skills/web-artifacts-builder/scripts/init-artifact.sh
+.cursor/plans/codebase_improvements_fbf8fb0e.plan.md

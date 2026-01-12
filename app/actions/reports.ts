@@ -6,7 +6,10 @@ import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
 import { submitReportSchema, type SubmitReportInput } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
+import { getStatusFromVoltage } from "@/lib/constants";
 import { sendReportNotificationToAdmins } from "@/lib/email";
+import { logReportAudit } from "@/lib/audit";
+import { ERROR_MESSAGES } from "@/lib/errors";
 import { type ActionResult } from "@/types";
 
 // ============================================
@@ -51,7 +54,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required. Please log in.",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -69,7 +72,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     if (!validationResult.success) {
       return {
         success: false,
-        error: "Validation failed",
+        error: ERROR_MESSAGES.VALIDATION_FAILED,
         errors: validationResult.error.flatten().fieldErrors as Record<string, string[]>,
       };
     }
@@ -94,7 +97,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     if (!unit) {
       return {
         success: false,
-        error: "PJUTS unit not found. Please check the unit ID.",
+        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
       };
     }
 
@@ -109,14 +112,14 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     if (imageFiles.length === 0) {
       return {
         success: false,
-        error: "At least one image is required.",
+        error: ERROR_MESSAGES.REPORT_IMAGE_REQUIRED,
       };
     }
 
     if (imageFiles.length > 3) {
       return {
         success: false,
-        error: "Maximum 3 images allowed per report.",
+        error: ERROR_MESSAGES.REPORT_IMAGE_MAX,
       };
     }
 
@@ -125,7 +128,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     if (imageFiles.length === 0) {
       return {
         success: false,
-        error: "Invalid image files.",
+        error: ERROR_MESSAGES.REPORT_IMAGE_REQUIRED,
       };
     }
 
@@ -135,13 +138,13 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
       if (!validTypes.includes(file.type)) {
         return {
           success: false,
-          error: `Invalid image type for ${file.name}. Please use JPEG, PNG, or WebP.`,
+          error: ERROR_MESSAGES.REPORT_IMAGE_INVALID,
         };
       }
       if (file.size > 10 * 1024 * 1024) {
         return {
           success: false,
-          error: `Image ${file.name} too large. Maximum size is 10MB.`,
+          error: ERROR_MESSAGES.REPORT_IMAGE_TOO_LARGE,
         };
       }
     }
@@ -173,7 +176,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
 
       return {
         success: false,
-        error: failedUpload.error || "Failed to upload one or more images.",
+        error: failedUpload.error || ERROR_MESSAGES.UPLOAD_FAILED,
       };
     }
 
@@ -216,13 +219,8 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
       },
     });
 
-    // 8. Update unit status based on battery voltage
-    let newStatus: UnitStatus = UnitStatus.OPERATIONAL;
-    if (validatedData.batteryVoltage < 10) {
-      newStatus = UnitStatus.OFFLINE;
-    } else if (validatedData.batteryVoltage < 20) {
-      newStatus = UnitStatus.MAINTENANCE_NEEDED;
-    }
+    // 8. Update unit status based on battery voltage (using centralized thresholds)
+    const newStatus = getStatusFromVoltage(validatedData.batteryVoltage);
 
     // Check if this is the first verification (unit was UNVERIFIED)
     // On first verification, we update: status, installDate, and coordinates
@@ -300,7 +298,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     console.error("Submit report error:", error);
     return {
       success: false,
-      error: "An unexpected error occurred. Please try again.",
+      error: ERROR_MESSAGES.REPORT_SUBMIT_FAILED,
     };
   }
 }
@@ -329,7 +327,7 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -409,7 +407,7 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
     console.error("Get reports error:", error);
     return {
       success: false,
-      error: "Failed to fetch reports",
+      error: ERROR_MESSAGES.REPORT_FETCH_FAILED,
     };
   }
 }
@@ -424,7 +422,7 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
     if (!session?.user?.id) {
       return {
         success: false,
-        error: "Authentication required",
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
       };
     }
 
@@ -432,20 +430,28 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
     if (session.user.role !== "ADMIN") {
       return {
         success: false,
-        error: "Only administrators can delete reports",
+        error: ERROR_MESSAGES.REPORT_ADMIN_ONLY,
       };
     }
 
-    // Get report to find image paths
+    // Get report to find image paths and metadata for audit
     const report = await prisma.report.findUnique({
       where: { id: reportId },
-      include: { images: true },
+      include: { 
+        images: true,
+        unit: {
+          select: { serialNumber: true },
+        },
+        user: {
+          select: { name: true, email: true },
+        },
+      },
     });
 
     if (!report) {
       return {
         success: false,
-        error: "Report not found",
+        error: ERROR_MESSAGES.REPORT_NOT_FOUND,
       };
     }
 
@@ -459,6 +465,17 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
       where: { id: reportId },
     });
 
+    // Log audit event
+    await logReportAudit("DELETE_REPORT", reportId, session.user.id, {
+      unitSerialNumber: report.unit.serialNumber,
+      unitId: report.unitId,
+      reportedBy: report.user.name,
+      reportedByEmail: report.user.email,
+      batteryVoltage: report.batteryVoltage,
+      createdAt: report.createdAt,
+      imagesDeleted: report.images.length,
+    });
+
     revalidatePath("/dashboard");
     revalidatePath("/reports");
 
@@ -467,7 +484,7 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
     console.error("Delete report error:", error);
     return {
       success: false,
-      error: "Failed to delete report",
+      error: ERROR_MESSAGES.REPORT_DELETE_FAILED,
     };
   }
 }
