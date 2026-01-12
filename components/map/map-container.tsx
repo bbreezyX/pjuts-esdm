@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useMemo, memo, useCallback } from "react";
 import { MapPoint } from "@/types";
-import { getStatusLabel } from "@/lib/utils";
 
 interface MapContainerProps {
   points: MapPoint[];
@@ -45,7 +44,9 @@ function MapContainerComponent({
   const createIcon = useCallback((status: string) => {
     if (!leafletRef.current) return null;
     const L = leafletRef.current;
-    const color = STATUS_COLORS[status as keyof typeof STATUS_COLORS] || STATUS_COLORS.UNVERIFIED;
+    const color =
+      STATUS_COLORS[status as keyof typeof STATUS_COLORS] ||
+      STATUS_COLORS.UNVERIFIED;
 
     return L.divIcon({
       className: "custom-marker",
@@ -64,28 +65,6 @@ function MapContainerComponent({
     });
   }, []);
 
-  // Create popup HTML
-  const createPopup = useCallback((point: MapPoint) => {
-    const statusColor = STATUS_COLORS[point.lastStatus] || STATUS_COLORS.UNVERIFIED;
-    return `
-      <div style="min-width:200px;padding:8px;">
-        <div style="font-weight:600;font-size:14px;margin-bottom:8px;color:#0f172a;">${point.serialNumber}</div>
-        <div style="display:flex;flex-direction:column;gap:4px;font-size:12px;color:#64748b;">
-          <div style="display:flex;justify-content:space-between;"><span>Status:</span><span style="font-weight:500;color:${statusColor};">${getStatusLabel(point.lastStatus)}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span>Provinsi:</span><span style="font-weight:500;color:#0f172a;">${point.province}</span></div>
-          <div style="display:flex;justify-content:space-between;"><span>Kabupaten:</span><span style="font-weight:500;color:#0f172a;">${point.regency}</span></div>
-          ${point.lastReport ? `
-            <hr style="border:none;border-top:1px solid #e2e8f0;margin:8px 0;">
-            <div style="font-size:11px;color:#94a3b8;">Laporan Terakhir</div>
-            <div style="display:flex;justify-content:space-between;"><span>Tegangan:</span><span style="font-weight:500;color:#0f172a;">${point.lastReport.batteryVoltage}V</span></div>
-            <div style="display:flex;justify-content:space-between;"><span>Pelapor:</span><span style="font-weight:500;color:#0f172a;">${point.lastReport.user}</span></div>
-          ` : ""}
-        </div>
-        <button onclick="window.dispatchEvent(new CustomEvent('map-point-click',{detail:'${point.id}'}))" style="width:100%;margin-top:12px;padding:8px 12px;background:#003366;color:white;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;">Lihat Detail</button>
-      </div>
-    `;
-  }, []);
-
   // Load Leaflet via script tag (more reliable than dynamic import in production)
   useEffect(() => {
     // Check if Leaflet is already loaded
@@ -101,12 +80,12 @@ function MapContainerComponent({
     script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
     script.crossOrigin = "";
     script.async = true;
-    
+
     script.onload = () => {
       leafletRef.current = (window as any).L;
       setIsLoaded(true);
     };
-    
+
     script.onerror = () => {
       setError("Gagal memuat library peta dari CDN");
     };
@@ -121,7 +100,7 @@ function MapContainerComponent({
   // Initialize map
   useEffect(() => {
     if (!isLoaded || !containerRef.current || mapRef.current) return;
-    
+
     const L = leafletRef.current;
     if (!L) return;
 
@@ -136,7 +115,8 @@ function MapContainerComponent({
 
       // Add tile layer
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
         maxZoom: 18,
       }).addTo(map);
 
@@ -152,7 +132,6 @@ function MapContainerComponent({
         map.invalidateSize();
         setIsReady(true);
       }, 100);
-
     } catch (err) {
       console.error("Map init error:", err);
       setError("Gagal menginisialisasi peta");
@@ -179,31 +158,54 @@ function MapContainerComponent({
       if (!icon) return;
 
       const marker = L.marker([point.latitude, point.longitude], { icon });
-      marker.bindPopup(createPopup(point), { maxWidth: 280 });
       marker.on("click", () => onPointClick?.(point));
       markersRef.current.addLayer(marker);
     });
-  }, [filteredPoints, isReady, createIcon, createPopup, onPointClick]);
+  }, [filteredPoints, isReady, createIcon, onPointClick]);
 
   // Fit bounds
   useEffect(() => {
-    if (!isReady || !mapRef.current || !leafletRef.current || filteredPoints.length === 0) return;
+    if (
+      !isReady ||
+      !mapRef.current ||
+      !leafletRef.current ||
+      filteredPoints.length === 0
+    )
+      return;
 
     const L = leafletRef.current;
-    const bounds = L.latLngBounds(filteredPoints.map((p) => [p.latitude, p.longitude]));
+    const bounds = L.latLngBounds(
+      filteredPoints.map((p) => [p.latitude, p.longitude])
+    );
     mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
   }, [filteredPoints, isReady]);
 
   // Error state
   if (error) {
     return (
-      <div className="w-full h-full rounded-xl bg-red-50 flex items-center justify-center" style={{ minHeight: "500px" }}>
+      <div
+        className="w-full h-full rounded-xl bg-red-50 flex items-center justify-center"
+        style={{ minHeight: "500px" }}
+      >
         <div className="text-center">
-          <svg className="w-12 h-12 mx-auto text-red-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          <svg
+            className="w-12 h-12 mx-auto text-red-500 mb-2"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
           </svg>
           <p className="text-sm text-red-600 font-medium">{error}</p>
-          <button onClick={() => window.location.reload()} className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200">
+          <button
+            onClick={() => window.location.reload()}
+            className="mt-3 px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm hover:bg-red-200"
+          >
             Coba Lagi
           </button>
         </div>
@@ -214,7 +216,10 @@ function MapContainerComponent({
   // Loading state
   if (!isLoaded) {
     return (
-      <div className="w-full h-full rounded-xl bg-slate-100 flex items-center justify-center" style={{ minHeight: "500px" }}>
+      <div
+        className="w-full h-full rounded-xl bg-slate-100 flex items-center justify-center"
+        style={{ minHeight: "500px" }}
+      >
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-slate-300 border-t-primary rounded-full animate-spin mx-auto mb-2" />
           <p className="text-sm text-slate-500">Memuat peta...</p>
