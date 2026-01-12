@@ -7,7 +7,9 @@ import { cn } from "@/lib/utils";
 interface StatCardProps {
   title: string;
   value: number | string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<
+    React.SVGProps<SVGSVGElement> & { className?: string }
+  >;
   description?: string;
   trend?: {
     value: number;
@@ -88,10 +90,14 @@ export function StatCard({
         </div>
 
         <div>
-          <p className="text-xs sm:text-sm font-medium text-slate-500">{title}</p>
+          <p className="text-xs sm:text-sm font-medium text-slate-500">
+            {title}
+          </p>
           <div className="mt-1 sm:mt-2 flex items-baseline gap-2">
             <h3 className="text-xl sm:text-3xl font-bold tracking-tight text-slate-900">
-              {typeof value === "number" ? value.toLocaleString("id-ID") : value}
+              {typeof value === "number"
+                ? value.toLocaleString("id-ID")
+                : value}
             </h3>
           </div>
 
@@ -135,7 +141,12 @@ interface MiniStatProps {
   color?: "blue" | "green" | "yellow" | "red";
 }
 
-export function MiniStat({ label, value, icon, color = "blue" }: MiniStatProps) {
+export function MiniStat({
+  label,
+  value,
+  icon,
+  color = "blue",
+}: MiniStatProps) {
   const textColors = {
     blue: "text-primary-600",
     green: "text-emerald-600",

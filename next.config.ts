@@ -14,15 +14,18 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   // Silence Turbopack warning for PWA webpack config
   turbopack: {},
-  
+
   // Compiler optimizations
   compiler: {
     // Remove console.log in production
-    removeConsole: process.env.NODE_ENV === "production" ? {
-      exclude: ["error", "warn"],
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === "production"
+        ? {
+            exclude: ["error", "warn"],
+          }
+        : false,
   },
-  
+
   images: {
     remotePatterns: [
       {
@@ -40,7 +43,7 @@ const nextConfig: NextConfig = {
     formats: ["image/webp", "image/avif"],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days
   },
-  
+
   experimental: {
     serverActions: {
       bodySizeLimit: "10mb",
@@ -63,7 +66,7 @@ const nextConfig: NextConfig = {
     // Partial prerendering for faster page loads
     ppr: false, // Enable when stable
   },
-  
+
   // Enhanced Security headers
   async headers() {
     return [
@@ -150,17 +153,26 @@ const nextConfig: NextConfig = {
 
   // Reduce bundle size by marking external packages
   serverExternalPackages: ["sharp", "@prisma/client"],
-  
+
   // Webpack optimizations
   webpack: (config, { isServer }) => {
     // Optimize chunks
     if (!isServer) {
+      // Get existing cacheGroups safely
+      const existingSplitChunks = config.optimization?.splitChunks;
+      const existingCacheGroups =
+        typeof existingSplitChunks === "object" &&
+        existingSplitChunks !== null &&
+        "cacheGroups" in existingSplitChunks
+          ? (existingSplitChunks.cacheGroups as Record<string, unknown>)
+          : {};
+
       config.optimization = {
         ...config.optimization,
         splitChunks: {
-          ...config.optimization?.splitChunks,
+          ...existingSplitChunks,
           cacheGroups: {
-            ...((config.optimization?.splitChunks as any)?.cacheGroups || {}),
+            ...existingCacheGroups,
             // Separate large libraries into their own chunks
             leaflet: {
               test: /[\\/]node_modules[\\/](leaflet|leaflet\.markercluster)[\\/]/,
@@ -184,11 +196,9 @@ const nextConfig: NextConfig = {
         },
       };
     }
-    
+
     return config;
   },
 };
 
 export default withPWA(nextConfig);
-
-

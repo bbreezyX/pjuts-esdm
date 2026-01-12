@@ -19,6 +19,67 @@ const STATUS_COLORS = {
   UNVERIFIED: "#94a3b8",
 } as const;
 
+// Leaflet types for CDN-loaded library
+interface LeafletDivIcon {
+  className: string;
+  html: string;
+  iconSize: [number, number];
+  iconAnchor: [number, number];
+  popupAnchor: [number, number];
+}
+
+interface LeafletMarker {
+  on: (event: string, handler: () => void) => void;
+}
+
+interface LeafletLayerGroup {
+  addTo: (map: LeafletMap) => LeafletLayerGroup;
+  clearLayers: () => void;
+  addLayer: (marker: LeafletMarker) => void;
+}
+
+interface LeafletMap {
+  remove: () => void;
+  invalidateSize: () => void;
+  fitBounds: (
+    bounds: LeafletLatLngBounds,
+    options?: { padding?: [number, number]; maxZoom?: number }
+  ) => void;
+}
+
+// Leaflet bounds object - opaque type from CDN library
+type LeafletLatLngBounds = unknown;
+
+interface LeafletLibrary {
+  map: (
+    container: HTMLElement,
+    options?: Record<string, unknown>
+  ) => LeafletMap;
+  tileLayer: (
+    url: string,
+    options?: Record<string, unknown>
+  ) => { addTo: (map: LeafletMap) => void };
+  control: {
+    zoom: (options?: { position?: string }) => {
+      addTo: (map: LeafletMap) => void;
+    };
+  };
+  layerGroup: () => LeafletLayerGroup;
+  divIcon: (options: LeafletDivIcon) => LeafletDivIcon;
+  marker: (
+    coords: [number, number],
+    options?: { icon?: LeafletDivIcon }
+  ) => LeafletMarker;
+  latLngBounds: (coords: [number, number][]) => LeafletLatLngBounds;
+}
+
+// Extend Window interface for Leaflet
+declare global {
+  interface Window {
+    L?: LeafletLibrary;
+  }
+}
+
 function MapContainerComponent({
   points,
   onPointClick,
@@ -26,13 +87,13 @@ function MapContainerComponent({
   center = [-2.5, 118],
   zoom = 5,
 }: MapContainerProps) {
-  const mapRef = useRef<any>(null);
-  const markersRef = useRef<any>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const markersRef = useRef<LeafletLayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const leafletRef = useRef<any>(null);
+  const leafletRef = useRef<LeafletLibrary | null>(null);
 
   // Filtered points
   const filteredPoints = useMemo(() => {
@@ -68,8 +129,8 @@ function MapContainerComponent({
   // Load Leaflet via script tag (more reliable than dynamic import in production)
   useEffect(() => {
     // Check if Leaflet is already loaded
-    if ((window as any).L) {
-      leafletRef.current = (window as any).L;
+    if (window.L) {
+      leafletRef.current = window.L;
       setIsLoaded(true);
       return;
     }
@@ -82,8 +143,10 @@ function MapContainerComponent({
     script.async = true;
 
     script.onload = () => {
-      leafletRef.current = (window as any).L;
-      setIsLoaded(true);
+      if (window.L) {
+        leafletRef.current = window.L;
+        setIsLoaded(true);
+      }
     };
 
     script.onerror = () => {
@@ -159,7 +222,7 @@ function MapContainerComponent({
 
       const marker = L.marker([point.latitude, point.longitude], { icon });
       marker.on("click", () => onPointClick?.(point));
-      markersRef.current.addLayer(marker);
+      markersRef.current?.addLayer(marker);
     });
   }, [filteredPoints, isReady, createIcon, onPointClick]);
 

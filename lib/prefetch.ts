@@ -17,7 +17,7 @@ const prefetchedRoutes = new Set<string>();
  */
 export function usePrefetch(route: string) {
   const router = useRouter();
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const prefetch = useCallback(() => {
     // Don't prefetch if already done
@@ -27,7 +27,7 @@ export function usePrefetch(route: string) {
     timeoutRef.current = setTimeout(() => {
       // Prefetch the route
       router.prefetch(route);
-      
+
       // Also prefetch data for known routes
       switch (route) {
         case "/dashboard":
@@ -37,7 +37,7 @@ export function usePrefetch(route: string) {
           prefetchMap();
           break;
       }
-      
+
       prefetchedRoutes.add(route);
     }, 100);
   }, [route, router]);
@@ -64,11 +64,14 @@ export function useOptimisticNavigation() {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
-  const navigate = useCallback((href: string) => {
-    startTransition(() => {
-      router.push(href);
-    });
-  }, [router]);
+  const navigate = useCallback(
+    (href: string) => {
+      startTransition(() => {
+        router.push(href);
+      });
+    },
+    [router]
+  );
 
   return { navigate, isPending };
 }
@@ -104,7 +107,7 @@ export function PrefetchCriticalRoutes() {
     // Prefetch after initial page load
     const timeoutId = setTimeout(() => {
       const criticalRoutes = ["/dashboard", "/map", "/units", "/reports"];
-      
+
       criticalRoutes.forEach((route) => {
         if (!prefetchedRoutes.has(route)) {
           router.prefetch(route);
