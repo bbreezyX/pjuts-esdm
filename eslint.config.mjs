@@ -56,6 +56,7 @@ const eslintConfig = [
       ".next/**",
       "out/**",
       "public/**",
+      "postcss.config.js", // CommonJS required for PostCSS
     ],
   },
 ];
