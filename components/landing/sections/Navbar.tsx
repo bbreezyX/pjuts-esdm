@@ -21,6 +21,7 @@ const navItems = [
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('hero');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -28,6 +29,32 @@ export const Navbar = () => {
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const observerOptions = {
+      root: null,
+      rootMargin: '-40% 0px -40% 0px',
+      threshold: 0,
+    };
+
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          setActiveSection(entry.target.id);
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(observerCallback, observerOptions);
+
+    navItems.forEach((item) => {
+      const sectionId = item.href.replace('#', '');
+      const section = document.getElementById(sectionId);
+      if (section) observer.observe(section);
+    });
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -58,19 +85,22 @@ export const Navbar = () => {
         </div>
 
         <nav className="hidden lg:flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5">
-          {navItems.map((item, i) => (
-            <Link 
-              key={item.label} 
-              href={item.href}
-              className={`px-5 py-2 rounded-full text-[11px] font-bold tracking-wide transition-all ${
-                i === 0 
-                  ? 'bg-accent text-primary shadow-lg shadow-accent/20' 
-                  : 'text-white/70 hover:text-white hover:bg-white/10'
-              }`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {navItems.map((item) => {
+            const isActive = activeSection === item.href.replace('#', '');
+            return (
+              <Link 
+                key={item.label} 
+                href={item.href}
+                className={`px-5 py-2 rounded-full text-[11px] font-bold tracking-wide transition-all ${
+                  isActive 
+                    ? 'bg-accent text-primary shadow-lg shadow-accent/20' 
+                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -105,16 +135,21 @@ export const Navbar = () => {
             className="absolute top-24 left-6 right-6 lg:hidden bg-primary/95 backdrop-blur-2xl border border-white/10 rounded-[32px] p-8 shadow-2xl z-40 overflow-hidden"
           >
             <div className="flex flex-col gap-6">
-              {navItems.map((item, i) => (
-                <Link 
-                  key={item.label} 
-                  href={item.href}
-                  className={`text-xl font-bold tracking-tight ${i === 0 ? 'text-accent' : 'text-white/60'}`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
+              {navItems.map((item) => {
+                const isActive = activeSection === item.href.replace('#', '');
+                return (
+                  <Link 
+                    key={item.label} 
+                    href={item.href}
+                    className={`text-xl font-bold tracking-tight transition-colors ${
+                      isActive ? 'text-accent' : 'text-white/60'
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}
               <div className="h-px bg-white/10 my-2" />
               <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="flex items-center justify-center gap-3 bg-accent text-primary w-full py-4 rounded-2xl font-bold text-lg">
                 Masuk Sistem
