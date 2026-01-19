@@ -10,19 +10,31 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ESDM Brand Colors
+        // Updated ESDM Brand Colors
         primary: {
-          50: "#e6f0fa",
-          100: "#cce0f5",
-          200: "#99c2eb",
-          300: "#66a3e0",
-          400: "#3385d6",
-          500: "#0066cc",
-          600: "#003366",
-          700: "#002b57",
-          800: "#002244",
-          900: "#001a33",
-          950: "#001122",
+          DEFAULT: "#003366", // Deep Corporate Blue
+          foreground: "#FFFFFF",
+          50: "#e6ebf0",
+          100: "#ccd7e1",
+          200: "#99afc3",
+          300: "#6687a5",
+          400: "#335f87",
+          500: "#003366",
+          600: "#00295c",
+          700: "#001f52",
+          800: "#001548",
+          900: "#000b3e",
+        },
+        accent: {
+          DEFAULT: "#D4AF37", // Refined Gold
+          foreground: "#FFFFFF",
+        },
+        esdm: {
+          gold: "#D4AF37", // Refined Gold
+          gray: "#E1E6EB", // Abu Muda Inovasi
+          green: "#00B473", // Hijau Keberlanjutan
+          navy: "#003366", // Deep Corporate Blue
+          yellow: "#FFF500", // Kuning Energi (Keeping for reference)
         },
         // Status Colors
         status: {

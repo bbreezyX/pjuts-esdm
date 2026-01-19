@@ -10,18 +10,23 @@
    ============================================ */
 
 @theme {
-  /* Primary - ESDM Blue */
-  --color-primary-50: #e6f0fa;
-  --color-primary-100: #cce0f5;
-  --color-primary-200: #99c2eb;
-  --color-primary-300: #66a3e0;
-  --color-primary-400: #3385d6;
-  --color-primary-500: #0066cc;
-  --color-primary-600: #003366;
-  --color-primary-700: #002b57;
-  --color-primary-800: #002244;
-  --color-primary-900: #001a33;
-  --color-primary-950: #001122;
+  /* Primary - Deep Corporate Blue (#003366) */
+  --color-primary: #003366;
+  --color-primary-50: #e6ebf0;
+  --color-primary-100: #ccd7e1;
+  --color-primary-200: #99afc3;
+  --color-primary-300: #6687a5;
+  --color-primary-400: #335f87;
+  --color-primary-500: #003366;
+  --color-primary-600: #00295c;
+  --color-primary-700: #001f52;
+  --color-primary-800: #001548;
+  --color-primary-900: #000b3e;
+  --color-primary-950: #00052a;
+
+  /* Accent - Refined Gold (#D4AF37) */
+  --color-accent: #D4AF37;
+  --color-accent-foreground: #FFFFFF;
 
   /* Typography */
   --font-sans: var(--font-plus-jakarta), "Plus Jakarta Sans";
@@ -65,24 +70,21 @@
 
   /* ESDM Brand Colors */
   --esdm-blue: #003366;
-  --esdm-blue-light: #004d99;
-  --esdm-blue-dark: #002244;
+  --esdm-blue-light: #335f87;
+  --esdm-blue-dark: #001f52;
   --esdm-gold: #D4AF37;
   --esdm-gold-light: #E4C55B;
   --esdm-gold-dark: #B8962E;
 
-  /* Primary - ESDM Blue */
-  --primary-50: #e6f0fa;
-  --primary-100: #cce0f5;
-  --primary-200: #99c2eb;
-  --primary-300: #66a3e0;
-  --primary-400: #3385d6;
-  --primary-500: #0066cc;
-  --primary-600: #003366;
-  --primary-700: #002b57;
-  --primary-800: #002244;
-  --primary-900: #001a33;
-  --primary-950: #001122;
+  /* Primary - Deep Corporate Blue */
+  --primary: 210 100% 20%;
+  /* Approximately #003366 */
+  --primary-foreground: 0 0% 100%;
+
+  /* Accent - Refined Gold */
+  --accent: 46 65% 52%;
+  /* Approximately #D4AF37 */
+  --accent-foreground: 0 0% 100%;
 
   /* Status Colors */
   --success: #059669;
@@ -105,13 +107,15 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  --primary: oklch(0.301 0.091 251.81);
+  /* #003366 */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --accent: oklch(0.769 0.154 83.48);
+  /* #D4AF37 */
+  --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
@@ -317,8 +321,8 @@ body {
 .leaflet-marker-icon,
 .leaflet-marker-shadow,
 .leaflet-tile-container,
-.leaflet-pane > svg,
-.leaflet-pane > canvas,
+.leaflet-pane>svg,
+.leaflet-pane>canvas,
 .leaflet-zoom-box,
 .leaflet-image-layer,
 .leaflet-layer {
@@ -600,14 +604,14 @@ svg.leaflet-zoom-animated {
 .leaflet-marker-icon,
 .leaflet-marker-shadow,
 .leaflet-image-layer,
-.leaflet-pane > svg path,
+.leaflet-pane>svg path,
 .leaflet-tile-container {
   pointer-events: none;
 }
 
 .leaflet-marker-icon.leaflet-interactive,
 .leaflet-image-layer.leaflet-interactive,
-.leaflet-pane > svg path.leaflet-interactive,
+.leaflet-pane>svg path.leaflet-interactive,
 svg.leaflet-image-layer.leaflet-interactive path {
   pointer-events: visiblePainted;
   pointer-events: auto;
@@ -1335,6 +1339,7 @@ input[type="file"]::file-selector-button:hover {
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1347,6 +1352,7 @@ input[type="file"]::file-selector-button:hover {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1359,6 +1365,7 @@ input[type="file"]::file-selector-button:hover {
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -1367,10 +1374,13 @@ input[type="file"]::file-selector-button:hover {
 
 /* Slow pulse for backgrounds - GPU accelerated */
 @keyframes pulse-slow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.2;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.3;
     transform: scale(1.1);
@@ -1378,10 +1388,13 @@ input[type="file"]::file-selector-button:hover {
 }
 
 @keyframes pulse-slower {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.2;
     transform: scale(1.15);
@@ -1414,13 +1427,33 @@ input[type="file"]::file-selector-button:hover {
 }
 
 /* Stagger Animation Delays */
-.animation-delay-100 { animation-delay: 100ms; }
-.animation-delay-200 { animation-delay: 200ms; }
-.animation-delay-300 { animation-delay: 300ms; }
-.animation-delay-400 { animation-delay: 400ms; }
-.animation-delay-500 { animation-delay: 500ms; }
-.animation-delay-600 { animation-delay: 600ms; }
-.animation-delay-700 { animation-delay: 700ms; }
+.animation-delay-100 {
+  animation-delay: 100ms;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-300 {
+  animation-delay: 300ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+
+.animation-delay-500 {
+  animation-delay: 500ms;
+}
+
+.animation-delay-600 {
+  animation-delay: 600ms;
+}
+
+.animation-delay-700 {
+  animation-delay: 700ms;
+}
 
 /* Scroll-triggered animations using Intersection Observer (CSS only via :has) */
 .animate-on-scroll {
@@ -1436,6 +1469,7 @@ input[type="file"]::file-selector-button:hover {
 
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
+
   .animate-fade-in-down,
   .animate-fade-in-up,
   .animate-scale-in,

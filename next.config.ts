@@ -11,9 +11,31 @@ const withPWA = withPWAInit({
   },
 });
 
+const isDev = process.env.NODE_ENV === "development";
+
 const nextConfig: NextConfig = {
-  // Silence Turbopack warning for PWA webpack config
-  turbopack: {},
+  // Turbopack configuration for faster, more reliable HMR
+  turbopack: {
+    // Resolve aliases help prevent module duplication
+    resolveAlias: {
+      // Ensure consistent React version across all imports
+      react: "react",
+      "react-dom": "react-dom",
+    },
+  },
+
+  // Faster refresh in development
+  reactStrictMode: true,
+
+  // Development-specific: control page caching behavior
+  onDemandEntries: isDev
+    ? {
+      // Keep pages in memory for longer (ms)
+      maxInactiveAge: 60 * 1000,
+      // Number of pages to keep in memory
+      pagesBufferLength: 5,
+    }
+    : undefined,
 
   // Compiler optimizations
   compiler: {
@@ -21,8 +43,8 @@ const nextConfig: NextConfig = {
     removeConsole:
       process.env.NODE_ENV === "production"
         ? {
-            exclude: ["error", "warn"],
-          }
+          exclude: ["error", "warn"],
+        }
         : false,
   },
 
@@ -162,8 +184,8 @@ const nextConfig: NextConfig = {
       const existingSplitChunks = config.optimization?.splitChunks;
       const existingCacheGroups =
         typeof existingSplitChunks === "object" &&
-        existingSplitChunks !== null &&
-        "cacheGroups" in existingSplitChunks
+          existingSplitChunks !== null &&
+          "cacheGroups" in existingSplitChunks
           ? (existingSplitChunks.cacheGroups as Record<string, unknown>)
           : {};
 
