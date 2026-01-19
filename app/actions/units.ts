@@ -120,18 +120,18 @@ export async function createPjutsUnit(
     // Note: We await this to ensure email is sent before serverless function terminates
     try {
       const fieldStaff = await prisma.user.findMany({
-        where: { 
+        where: {
           role: Role.FIELD_STAFF,
           isActive: true,  // Only send to active users
         },
         select: { email: true, name: true },
       });
-      
+
       const recipients = fieldStaff.map((f) => ({
         email: f.email,
         name: f.name || "Petugas Lapangan"
       }));
-      
+
       if (recipients.length > 0) {
         const emailResult = await sendUnitNotificationToFieldStaff(recipients, {
           unitSerial: unit.serialNumber,
@@ -139,7 +139,7 @@ export async function createPjutsUnit(
           unitRegency: unit.regency,
           createdByName: session.user.name || "Admin",
         });
-        
+
         if (!emailResult.success) {
           console.error("Failed to send unit notification email:", emailResult.error);
         }

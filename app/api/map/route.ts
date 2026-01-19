@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getMapPoints, getMapPointsByStatus } from "@/app/actions/map";
 import { UnitStatus } from "@prisma/client";
+import {
+  createApiErrorResponse,
+  createApiSuccessResponse,
+  ApplicationError,
+  ErrorCode,
+} from "@/lib/errors";
 
 /**
  * GET /api/map
@@ -37,23 +43,18 @@ export async function GET(request: NextRequest) {
     }
 
     if (!result.success) {
-      return NextResponse.json(
-        { error: result.error },
-        { status: 401 }
+      throw new ApplicationError(
+        result.error || "Failed to fetch map data",
+        ErrorCode.AUTHENTICATION_REQUIRED
       );
     }
 
-    return NextResponse.json({
-      success: true,
+    return createApiSuccessResponse({
       data: result.data,
       count: result.data?.length || 0,
     });
   } catch (error) {
-    console.error("Map API error:", error);
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 }
-    );
+    return createApiErrorResponse(error);
   }
 }
 

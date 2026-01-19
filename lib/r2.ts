@@ -108,7 +108,9 @@ export async function uploadImageToR2(options: ImageUploadOptions): Promise<Uplo
     const config = getR2Config();
     const r2Client = getR2Client();
 
-    // Upload to R2
+    // Upload to R2 with retry for transient failures
+    const { retry, storageRetryOptions } = await import("@/lib/errors");
+    
     const command = new PutObjectCommand({
       Bucket: config.R2_BUCKET_NAME,
       Key: filePath,
@@ -124,7 +126,15 @@ export async function uploadImageToR2(options: ImageUploadOptions): Promise<Uplo
       },
     });
 
-    await r2Client.send(command);
+    await retry(
+      () => r2Client.send(command),
+      {
+        ...storageRetryOptions,
+        onRetry: (error, attempt, delay) => {
+          console.warn(`R2 upload retry ${attempt} after ${delay}ms:`, error);
+        },
+      }
+    );
 
     const publicUrl = getPublicUrl(filePath);
 

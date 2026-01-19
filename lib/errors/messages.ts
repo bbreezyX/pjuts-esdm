@@ -1,6 +1,6 @@
 /**
  * Centralized Error Messages (Indonesian)
- * 
+ *
  * Standardized error messages for consistency across the application.
  * All user-facing error messages should use these constants.
  */
@@ -12,13 +12,13 @@ export const ERROR_MESSAGES = {
   AUTH_REQUIRED: "Autentikasi diperlukan. Silakan masuk.",
   UNAUTHORIZED: "Anda tidak memiliki akses untuk melakukan tindakan ini.",
   SESSION_EXPIRED: "Sesi Anda telah berakhir. Silakan masuk kembali.",
-  
+
   // ============================================
   // VALIDATION
   // ============================================
   VALIDATION_FAILED: "Validasi gagal",
   INVALID_INPUT: "Data yang dimasukkan tidak valid",
-  
+
   // ============================================
   // USER MANAGEMENT
   // ============================================
@@ -31,7 +31,7 @@ export const ERROR_MESSAGES = {
   USER_DISABLE_SELF: "Tidak dapat menonaktifkan akun sendiri",
   USER_STATUS_FAILED: "Gagal mengubah status pengguna",
   USER_FETCH_FAILED: "Gagal mengambil data pengguna",
-  
+
   // ============================================
   // UNIT MANAGEMENT
   // ============================================
@@ -42,7 +42,7 @@ export const ERROR_MESSAGES = {
   UNIT_DELETE_FAILED: "Gagal menghapus unit PJUTS",
   UNIT_FETCH_FAILED: "Gagal mengambil data unit PJUTS",
   UNIT_ADMIN_ONLY: "Hanya administrator yang dapat mengelola unit PJUTS",
-  
+
   // ============================================
   // REPORT MANAGEMENT
   // ============================================
@@ -53,9 +53,10 @@ export const ERROR_MESSAGES = {
   REPORT_ADMIN_ONLY: "Hanya administrator yang dapat menghapus laporan",
   REPORT_IMAGE_REQUIRED: "Minimal satu foto diperlukan",
   REPORT_IMAGE_MAX: "Maksimal 3 foto per laporan",
-  REPORT_IMAGE_INVALID: "Jenis file gambar tidak valid. Gunakan JPEG, PNG, atau WebP.",
+  REPORT_IMAGE_INVALID:
+    "Jenis file gambar tidak valid. Gunakan JPEG, PNG, atau WebP.",
   REPORT_IMAGE_TOO_LARGE: "Ukuran gambar terlalu besar. Maksimal 10MB.",
-  
+
   // ============================================
   // PASSWORD RESET
   // ============================================
@@ -63,8 +64,9 @@ export const ERROR_MESSAGES = {
   TOKEN_EXPIRED: "Token sudah kadaluarsa. Silakan minta reset password baru.",
   TOKEN_USED: "Token tidak valid atau sudah digunakan",
   PASSWORD_MIN_LENGTH: "Password minimal 8 karakter",
-  PASSWORD_REQUIREMENTS: "Password harus mengandung huruf besar, huruf kecil, dan angka",
-  
+  PASSWORD_REQUIREMENTS:
+    "Password harus mengandung huruf besar, huruf kecil, dan angka",
+
   // ============================================
   // DATA FETCHING
   // ============================================
@@ -72,18 +74,19 @@ export const ERROR_MESSAGES = {
   DASHBOARD_FETCH_FAILED: "Gagal mengambil data dashboard",
   MAP_FETCH_FAILED: "Gagal mengambil data peta",
   NOTIFICATIONS_FETCH_FAILED: "Gagal mengambil notifikasi",
-  
+
   // ============================================
   // IMAGE UPLOAD
   // ============================================
   UPLOAD_FAILED: "Gagal mengunggah gambar",
-  
+
   // ============================================
   // GENERIC
   // ============================================
   GENERIC_ERROR: "Terjadi kesalahan. Silakan coba lagi.",
   NETWORK_ERROR: "Kesalahan jaringan. Periksa koneksi internet Anda.",
-  SERVER_ERROR: "Terjadi kesalahan pada server. Silakan coba beberapa saat lagi.",
+  SERVER_ERROR:
+    "Terjadi kesalahan pada server. Silakan coba beberapa saat lagi.",
 } as const;
 
 // Type for error message keys
@@ -99,9 +102,9 @@ export function getErrorMessage(key: ErrorMessageKey): string {
 
 /**
  * Create a formatted error message with dynamic values
- * 
+ *
  * @example
- * formatError("UNIT_EXISTS", { serialNumber: "PJUTS-001" })
+ * formatError("Unit dengan serial number {serialNumber} sudah ada", { serialNumber: "PJUTS-001" })
  * // Returns: "Unit dengan serial number PJUTS-001 sudah ada"
  */
 export function formatError(
