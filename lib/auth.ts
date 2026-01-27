@@ -46,8 +46,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const rateLimitKey = getLoginRateLimitKey(email);
           const rateLimitCheck = await checkRateLimit(rateLimitKey);
 
+          console.log(
+            `[AUTH DEBUG] Rate limit check - success: ${rateLimitCheck.success}, remaining: ${rateLimitCheck.remaining}`,
+          );
+
           if (!rateLimitCheck.success) {
-            console.warn(`Rate limit exceeded for: ${email}`);
+            console.warn(
+              `[AUTH DEBUG] Rate limit exceeded for: ${email}, retry after: ${rateLimitCheck.retryAfterSeconds}s`,
+            );
             // Still run bcrypt to prevent timing attacks
             await bcrypt.compare(password, DUMMY_HASH);
             return null;
@@ -66,6 +72,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
           });
 
+          // Debug logging
+          console.log(`[AUTH DEBUG] Login attempt for: ${email}`);
+          console.log(`[AUTH DEBUG] User found: ${!!user}`);
+          if (user) {
+            console.log(
+              `[AUTH DEBUG] Password hash prefix: ${user.password.substring(0, 10)}...`,
+            );
+          }
+
           // TIMING ATTACK PREVENTION:
           // Always compare password hash, even if user doesn't exist
           // This ensures consistent response time regardless of user existence
@@ -75,9 +90,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             passwordToCompare,
           );
 
+          console.log(`[AUTH DEBUG] Password valid: ${isValidPassword}`);
+
           if (!user || !isValidPassword) {
             // Increment rate limit counter on failed attempt (async for Redis support)
             await incrementRateLimit(rateLimitKey);
+            console.log(
+              `[AUTH DEBUG] Login failed - user: ${!!user}, validPassword: ${isValidPassword}`,
+            );
             return null;
           }
 
