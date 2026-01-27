@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export const Hero = () => {
   return (
-    <section id="hero" className="relative pt-48 pb-20 px-6 overflow-hidden bg-primary">
+    <section id="beranda" className="relative pt-48 pb-20 px-6 overflow-hidden bg-primary">
       {/* Background Decorative Elements */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-accent/20 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2" />
@@ -55,7 +55,7 @@ export const Hero = () => {
               Mulai Sekarang
               <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="#solutions" className="bg-white/5 backdrop-blur-md border border-white/10 text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all">
+            <Link href="#alur-kerja" className="bg-white/5 backdrop-blur-md border border-white/10 text-white px-8 py-4 rounded-full font-bold hover:bg-white/10 transition-all">
               Pelajari Sistem
             </Link>
           </motion.div>

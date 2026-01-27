@@ -32,7 +32,7 @@ const benefits = [
 
 export const Stats = () => {
   return (
-    <section id="about" className="pt-32 pb-24 px-6 bg-white border-y border-border">
+    <section id="statistik" className="pt-32 pb-24 px-6 bg-white border-y border-border">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row gap-20 items-start">
           <div className="lg:w-1/3">

@@ -26,7 +26,7 @@ const workflows = [
 
 export const Solutions = () => {
   return (
-    <section id="solutions" className="pt-40 pb-32 px-6 bg-primary text-white overflow-hidden relative">
+    <section id="alur-kerja" className="pt-40 pb-32 px-6 bg-primary text-white overflow-hidden relative">
       {/* Abstract Background Design */}
       <div className="absolute top-0 right-0 w-2/3 h-full opacity-[0.03] pointer-events-none">
         <svg viewBox="0 0 100 100" className="w-full h-full stroke-white fill-none">

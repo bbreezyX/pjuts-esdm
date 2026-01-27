@@ -18,20 +18,29 @@ const signInSchema = z.object({
 
 // Dummy hash for timing attack prevention
 // Pre-computed bcrypt hash of a random string
-const DUMMY_HASH = "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.E/XxH1d.sXuCGG";
+const DUMMY_HASH =
+  "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.E/XxH1d.sXuCGG";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
       name: "Credentials",
       credentials: {
-        email: { label: "Email", type: "email", placeholder: "email@esdm.go.id" },
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "email@esdm.go.id",
+        },
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
         try {
           // Validate credentials with Zod
-          const { email, password } = await signInSchema.parseAsync(credentials);
+          const { email: rawEmail, password } =
+            await signInSchema.parseAsync(credentials);
+
+          // Normalize email to lowercase for consistent lookup
+          const email = rawEmail.toLowerCase().trim();
 
           // Check rate limit before processing (async for Redis support)
           const rateLimitKey = getLoginRateLimitKey(email);
@@ -61,7 +70,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           // Always compare password hash, even if user doesn't exist
           // This ensures consistent response time regardless of user existence
           const passwordToCompare = user?.password ?? DUMMY_HASH;
-          const isValidPassword = await bcrypt.compare(password, passwordToCompare);
+          const isValidPassword = await bcrypt.compare(
+            password,
+            passwordToCompare,
+          );
 
           if (!user || !isValidPassword) {
             // Increment rate limit counter on failed attempt (async for Redis support)
@@ -124,7 +136,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           // If user is disabled or deleted, invalidate the session
           if (!dbUser || !dbUser.isActive) {
-            console.warn(`Session invalidated for disabled/deleted user: ${token.id}`);
+            console.warn(
+              `Session invalidated for disabled/deleted user: ${token.id}`,
+            );
             // Return an empty token to invalidate the session
             return { ...token, isActive: false };
           }
@@ -179,4 +193,3 @@ declare module "@auth/core/jwt" {
     isActive?: boolean;
   }
 }
-

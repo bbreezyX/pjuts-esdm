@@ -23,7 +23,7 @@ interface ActionResult {
  * Security: Always returns success to prevent user enumeration
  */
 export async function requestPasswordReset(
-  email: string
+  email: string,
 ): Promise<ActionResult> {
   try {
     // Validate email format
@@ -67,7 +67,7 @@ export async function requestPasswordReset(
     const emailResult = await sendPasswordResetEmail(
       user.email,
       user.name,
-      token
+      token,
     );
 
     if (!emailResult.success) {
@@ -88,7 +88,7 @@ export async function requestPasswordReset(
  */
 export async function resetPassword(
   token: string,
-  newPassword: string
+  newPassword: string,
 ): Promise<ActionResult> {
   try {
     // Validate inputs
@@ -147,17 +147,21 @@ export async function resetPassword(
     // Hash new password
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
-    // Update user password
-    await prisma.user.update({
-      where: { id: user.id },
-      data: { password: hashedPassword },
+    // Use transaction to ensure atomicity
+    await prisma.$transaction(async (tx) => {
+      // Update user password
+      await tx.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword },
+      });
+
+      // Delete the used token (single-use)
+      await tx.passwordResetToken.delete({
+        where: { id: resetToken.id },
+      });
     });
 
-    // Delete the used token (single-use)
-    await prisma.passwordResetToken.delete({
-      where: { id: resetToken.id },
-    });
-
+    console.log(`Password reset successful for user: ${user.email}`);
     return { success: true };
   } catch (error) {
     console.error("Error in resetPassword:", error);

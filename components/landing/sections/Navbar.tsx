@@ -10,18 +10,18 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 const navItems = [
-  { label: 'Beranda', href: '#hero' },
-  { label: 'Statistik', href: '#about' },
-  { label: 'Sistem', href: '#modules' },
-  { label: 'Alur Kerja', href: '#solutions' },
-  { label: 'Bantuan', href: '#faq' },
-  { label: 'Kontak', href: '#contact' },
+  { label: 'Beranda', href: '#beranda' },
+  { label: 'Statistik', href: '#statistik' },
+  { label: 'Sistem', href: '#sistem' },
+  { label: 'Alur Kerja', href: '#alur-kerja' },
+  { label: 'Bantuan', href: '#bantuan' },
+  { label: 'Kontak', href: '#kontak' },
 ];
 
 export const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeSection, setActiveSection] = useState('hero');
+  const [activeSection, setActiveSection] = useState('beranda');
 
   useEffect(() => {
     const handleScroll = () => {

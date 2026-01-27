@@ -32,7 +32,7 @@ const coreModules = [
 
 export const Challenges = () => {
   return (
-    <section id="modules" className="pt-40 pb-32 px-6 bg-white">
+    <section id="sistem" className="pt-40 pb-32 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>

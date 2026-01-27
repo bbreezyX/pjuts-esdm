@@ -33,7 +33,7 @@ const questions = [
 
 export const Features = () => {
   return (
-    <section id="faq" className="pt-40 pb-32 px-6 bg-esdm-gray/10">
+    <section id="bantuan" className="pt-40 pb-32 px-6 bg-esdm-gray/10">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col lg:flex-row justify-between items-start mb-24 gap-12">
            <div className="flex flex-col gap-4">

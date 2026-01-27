@@ -9,7 +9,7 @@ import Image from 'next/image';
 
 export const Footer = () => {
   return (
-    <footer id="contact" className="py-32 px-6 bg-white border-t border-border">
+    <footer id="kontak" className="py-32 px-6 bg-white border-t border-border">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-24 mb-32">
           <div>
