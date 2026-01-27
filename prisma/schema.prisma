@@ -74,6 +74,8 @@ model PjutsUnit {
   @@index([regency])
   @@index([lastStatus])
   @@index([latitude, longitude])
+  // Composite index for filtered listing queries
+  @@index([province, regency, lastStatus])
 }
 
 // ============================================
@@ -102,6 +104,8 @@ model Report {
   @@index([unitId])
   @@index([submittedBy])
   @@index([createdAt])
+  // Composite index for date-range queries by unit
+  @@index([createdAt, unitId])
 }
 
 model ReportImage {
@@ -149,6 +153,8 @@ model AuditLog {
   @@index([performedBy])
   @@index([createdAt])
   @@index([entityId])
+  // Composite index for admin filtering
+  @@index([createdAt, entityType, action])
 }
 
 
