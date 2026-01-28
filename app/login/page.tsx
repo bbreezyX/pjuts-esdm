@@ -16,11 +16,13 @@ import {
 } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useLanguage } from "@/lib/language-context";
 
 // Separate component that uses useSearchParams (needs Suspense boundary)
 function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useLanguage();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -48,13 +50,13 @@ function LoginFormContent() {
       });
 
       if (result?.error) {
-        setError("Email atau password salah");
+        setError(t("login.error_credentials"));
       } else {
         router.push("/dashboard");
         router.refresh();
       }
     } catch {
-      setError("Terjadi kesalahan. Silakan coba lagi.");
+      setError(t("login.error_general"));
     } finally {
       setLoading(false);
     }
@@ -67,10 +69,7 @@ function LoginFormContent() {
           <div className="p-2 bg-amber-100 rounded-xl">
             <Clock className="w-4 h-4 text-amber-600" />
           </div>
-          <span className="font-medium">
-            Sesi Anda berakhir karena tidak ada aktivitas. Silakan masuk
-            kembali.
-          </span>
+          <span className="font-medium">{t("login.idle_message")}</span>
         </div>
       )}
 
@@ -98,10 +97,10 @@ function LoginFormContent() {
         <div className="space-y-2">
           <Input
             type="email"
-            label="Email Kedinasan"
+            label={t("login.email_label")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="nama@esdm.go.id"
+            placeholder={t("login.email_placeholder")}
             required
             className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all shadow-sm"
           />
@@ -110,10 +109,10 @@ function LoginFormContent() {
         <div className="relative space-y-2">
           <Input
             type={showPassword ? "text" : "password"}
-            label="Password"
+            label={t("login.password_label")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Masukkan password anda"
+            placeholder={t("login.password_placeholder")}
             required
             className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all pr-12 shadow-sm"
           />
@@ -139,14 +138,14 @@ function LoginFormContent() {
             className="w-4 h-4 rounded-md border-slate-300 text-primary-600 focus:ring-primary-500 focus:ring-offset-0 transition-colors"
           />
           <span className="group-hover:text-slate-800 transition-colors">
-            Ingat saya
+            {t("login.remember")}
           </span>
         </label>
         <Link
           href="/forgot-password"
           className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4 transition-colors"
         >
-          Lupa password?
+          {t("login.forgot")}
         </Link>
       </div>
 
@@ -155,19 +154,19 @@ function LoginFormContent() {
         className="w-full h-13 rounded-xl text-base font-bold shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 bg-primary-600 hover:bg-primary-700"
         loading={loading}
       >
-        Masuk ke Dashboard
+        {t("login.submit")}
       </Button>
 
       {/* Trust indicators */}
       <div className="flex items-center justify-center gap-6 pt-2">
         <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <ShieldCheck className="w-4 h-4 text-emerald-500" />
-          <span>Terenkripsi</span>
+          <span>{t("login.encrypted")}</span>
         </div>
         <div className="w-1 h-1 rounded-full bg-slate-300" />
         <div className="flex items-center gap-1.5 text-xs text-slate-400">
           <Flash className="w-4 h-4 text-[#D4AF37]" />
-          <span>Akses Cepat</span>
+          <span>{t("login.fast_access")}</span>
         </div>
       </div>
     </form>
@@ -191,7 +190,9 @@ function LoginFormFallback() {
   );
 }
 
-export default function LoginPage() {
+function LoginPageContent() {
+  const { t } = useLanguage();
+
   return (
     <main className="min-h-screen flex bg-gradient-to-br from-slate-50 via-white to-primary-50/30">
       {/* Left Panel - Illustration */}
@@ -231,7 +232,7 @@ export default function LoginPage() {
                 PJUTS <span className="text-[#E4C55B]">ESDM</span>
               </h1>
               <p className="text-xs text-primary-100 font-medium tracking-wide uppercase opacity-90">
-                Kementerian ESDM RI
+                {t("login.ministry")}
               </p>
             </div>
           </Link>
@@ -243,18 +244,16 @@ export default function LoginPage() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#E4C55B]"></span>
               </span>
-              Portal Monitoring Nasional
+              {t("login.badge")}
             </div>
             <h2 className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6">
-              Sistem Monitoring <br />
+              {t("login.title")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E4C55B] via-[#D4AF37] to-[#E4C55B]">
-                Infrastruktur PJUTS
+                {t("login.title_highlight")}
               </span>
             </h2>
             <p className="text-primary-100 text-lg leading-relaxed mb-12 opacity-90 max-w-lg">
-              Platform terintegrasi untuk pemantauan real-time, manajemen aset,
-              dan pelaporan kinerja Penerangan Jalan Umum Tenaga Surya di
-              seluruh Indonesia.
+              {t("login.description")}
             </p>
 
             {/* Stats Cards */}
@@ -264,10 +263,10 @@ export default function LoginPage() {
                   <LightBulb className="w-5 h-5 text-[#E4C55B]" />
                 </div>
                 <p className="text-2xl xl:text-3xl font-bold text-white mb-1 group-hover:scale-105 transition-transform origin-left">
-                  12.5K+
+                  {t("login.stat_units_value")}
                 </p>
                 <p className="text-xs text-primary-200 uppercase tracking-wider font-medium">
-                  Unit Terpasang
+                  {t("login.stat_units")}
                 </p>
               </div>
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
@@ -284,10 +283,10 @@ export default function LoginPage() {
                   </svg>
                 </div>
                 <p className="text-2xl xl:text-3xl font-bold text-white mb-1 group-hover:scale-105 transition-transform origin-left">
-                  34
+                  {t("login.stat_districts_value")}
                 </p>
                 <p className="text-xs text-primary-200 uppercase tracking-wider font-medium">
-                  Provinsi
+                  {t("login.stat_districts")}
                 </p>
               </div>
               <div className="bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/10 backdrop-blur-md rounded-2xl p-5 border border-[#D4AF37]/30 hover:from-[#D4AF37]/30 hover:to-[#D4AF37]/20 transition-all duration-300 group cursor-default">
@@ -295,10 +294,10 @@ export default function LoginPage() {
                   <Flash className="w-5 h-5 text-[#E4C55B]" />
                 </div>
                 <p className="text-2xl xl:text-3xl font-bold text-[#E4C55B] mb-1 group-hover:scale-105 transition-transform origin-left">
-                  99.9%
+                  {t("login.stat_uptime_value")}
                 </p>
                 <p className="text-xs text-[#E4C55B]/80 uppercase tracking-wider font-medium">
-                  Uptime
+                  {t("login.stat_uptime")}
                 </p>
               </div>
             </div>
@@ -307,10 +306,7 @@ export default function LoginPage() {
           {/* Footer */}
           <div className="flex items-center gap-3 text-xs text-primary-300/60 font-medium">
             <ShieldCheck className="w-4 h-4" />
-            <span>
-              © 2026 Kementerian Energi dan Sumber Daya Mineral Republik
-              Indonesia
-            </span>
+            <span>{t("login.copyright")}</span>
           </div>
         </div>
       </div>
@@ -346,7 +342,7 @@ export default function LoginPage() {
                   PJUTS <span className="text-[#E4C55B]">ESDM</span>
                 </span>
                 <span className="text-[10px] text-primary-200 uppercase tracking-wider">
-                  Kementerian ESDM
+                  {t("login.ministry")}
                 </span>
               </div>
             </Link>
@@ -355,17 +351,17 @@ export default function LoginPage() {
               className="text-xs font-medium text-primary-200 hover:text-white transition-colors flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-sm"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Beranda
+              {t("nav.beranda")}
             </Link>
           </div>
 
           {/* Mobile Welcome */}
           <div className="relative text-center">
             <h2 className="text-2xl font-bold text-white tracking-tight mb-1">
-              Selamat Datang 👋
+              {t("login.welcome")} 👋
             </h2>
             <p className="text-primary-200 text-sm">
-              Masuk ke portal monitoring PJUTS
+              {t("login.mobile_welcome")}
             </p>
           </div>
         </div>
@@ -383,7 +379,7 @@ export default function LoginPage() {
               className="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"
             >
               <ArrowLeft className="w-4 h-4" />
-              Kembali ke Beranda
+              {t("login.back_home")}
             </Link>
           </div>
 
@@ -391,11 +387,11 @@ export default function LoginPage() {
             {/* Desktop Welcome Header */}
             <div className="hidden lg:block text-left space-y-3">
               <h2 className="text-3xl xl:text-4xl font-bold text-slate-900 tracking-tight">
-                Selamat Datang{" "}
+                {t("login.welcome")}{" "}
                 <span className="inline-block animate-bounce">👋</span>
               </h2>
               <p className="text-slate-500 text-base">
-                Silakan masuk menggunakan kredensial akun terdaftar Anda.
+                {t("login.welcome_sub")}
               </p>
             </div>
 
@@ -409,12 +405,12 @@ export default function LoginPage() {
 
             {/* Help Text */}
             <p className="text-center text-sm text-slate-500 pb-4 lg:pb-0">
-              Belum punya akun akses?{" "}
+              {t("login.no_account")}{" "}
               <Link
                 href="#"
                 className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4 transition-colors"
               >
-                Hubungi Administrator
+                {t("login.contact_admin")}
               </Link>
             </p>
           </div>
@@ -422,4 +418,8 @@ export default function LoginPage() {
       </div>
     </main>
   );
+}
+
+export default function LoginPage() {
+  return <LoginPageContent />;
 }

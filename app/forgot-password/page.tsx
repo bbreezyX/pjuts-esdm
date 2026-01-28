@@ -7,11 +7,13 @@ import { ArrowLeft, Mail, Check, ShieldCheck, Flash } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { requestPasswordReset } from "@/app/actions/auth";
+import { useLanguage } from "@/lib/language-context";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,7 +66,7 @@ export default function ForgotPasswordPage() {
                 PJUTS <span className="text-[#E4C55B]">ESDM</span>
               </h1>
               <p className="text-xs text-primary-100 font-medium tracking-wide uppercase opacity-90">
-                Kementerian ESDM RI
+                {t("forgot.ministry")}
               </p>
             </div>
           </Link>
@@ -73,17 +75,16 @@ export default function ForgotPasswordPage() {
           <div className="max-w-xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded-full text-[#E4C55B] text-sm font-medium mb-8 backdrop-blur-md shadow-xl">
               <Mail className="w-4 h-4" />
-              Pemulihan Akun
+              {t("forgot.badge")}
             </div>
             <h2 className="text-4xl xl:text-5xl font-bold text-white leading-tight mb-6">
-              Lupa Password? <br />
+              {t("forgot.title")} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#E4C55B] via-[#D4AF37] to-[#E4C55B]">
-                Kami Bantu Reset
+                {t("forgot.title_highlight")}
               </span>
             </h2>
             <p className="text-primary-100 text-lg leading-relaxed mb-12 opacity-90 max-w-lg">
-              Masukkan email terdaftar Anda dan kami akan mengirimkan link untuk
-              mengatur ulang password akun Anda.
+              {t("forgot.description")}
             </p>
 
             {/* Info Cards */}
@@ -93,10 +94,10 @@ export default function ForgotPasswordPage() {
                   <ShieldCheck className="w-5 h-5 text-emerald-400" />
                 </div>
                 <p className="text-lg font-bold text-white mb-1">
-                  Aman & Terenkripsi
+                  {t("forgot.secure")}
                 </p>
                 <p className="text-xs text-primary-200 font-medium">
-                  Link reset valid 1 jam
+                  {t("forgot.secure_desc")}
                 </p>
               </div>
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
@@ -104,10 +105,10 @@ export default function ForgotPasswordPage() {
                   <Flash className="w-5 h-5 text-[#E4C55B]" />
                 </div>
                 <p className="text-lg font-bold text-white mb-1">
-                  Proses Cepat
+                  {t("forgot.fast")}
                 </p>
                 <p className="text-xs text-primary-200 font-medium">
-                  Email dalam 2 menit
+                  {t("forgot.fast_desc")}
                 </p>
               </div>
             </div>
@@ -116,10 +117,7 @@ export default function ForgotPasswordPage() {
           {/* Footer */}
           <div className="flex items-center gap-3 text-xs text-primary-300/60 font-medium">
             <ShieldCheck className="w-4 h-4" />
-            <span>
-              © 2026 Kementerian Energi dan Sumber Daya Mineral Republik
-              Indonesia
-            </span>
+            <span>{t("forgot.copyright")}</span>
           </div>
         </div>
       </div>
@@ -155,7 +153,7 @@ export default function ForgotPasswordPage() {
                   PJUTS <span className="text-[#E4C55B]">ESDM</span>
                 </span>
                 <span className="text-[10px] text-primary-200 uppercase tracking-wider">
-                  Kementerian ESDM
+                  {t("forgot.ministry")}
                 </span>
               </div>
             </Link>
@@ -171,11 +169,9 @@ export default function ForgotPasswordPage() {
           {/* Mobile Welcome */}
           <div className="relative text-center">
             <h2 className="text-2xl font-bold text-white tracking-tight mb-1">
-              Lupa Password 🔐
+              {t("forgot.mobile_title")} 🔐
             </h2>
-            <p className="text-primary-200 text-sm">
-              Reset password akun Anda dengan mudah
-            </p>
+            <p className="text-primary-200 text-sm">{t("forgot.mobile_sub")}</p>
           </div>
         </div>
 
@@ -192,7 +188,7 @@ export default function ForgotPasswordPage() {
               className="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"
             >
               <ArrowLeft className="w-4 h-4" />
-              Kembali ke Login
+              {t("forgot.back_login")}
             </Link>
           </div>
 
@@ -205,10 +201,10 @@ export default function ForgotPasswordPage() {
                     <Mail className="w-8 h-8 text-primary-600" />
                   </div>
                   <h2 className="text-3xl xl:text-4xl font-bold text-slate-900 tracking-tight">
-                    Lupa Password
+                    {t("forgot.desktop_title")}
                   </h2>
                   <p className="text-slate-500 text-base">
-                    Masukkan alamat email yang terdaftar pada akun Anda.
+                    {t("forgot.desktop_sub")}
                   </p>
                 </div>
 
@@ -218,10 +214,10 @@ export default function ForgotPasswordPage() {
                     <div className="space-y-2">
                       <Input
                         type="email"
-                        label="Email Kedinasan"
+                        label={t("forgot.email_label")}
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        placeholder="nama@esdm.go.id"
+                        placeholder={t("forgot.email_placeholder")}
                         required
                         className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all shadow-sm"
                       />
@@ -232,19 +228,19 @@ export default function ForgotPasswordPage() {
                       className="w-full h-13 rounded-xl text-base font-bold shadow-lg shadow-primary-600/25 hover:shadow-xl hover:shadow-primary-600/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 bg-primary-600 hover:bg-primary-700"
                       loading={loading}
                     >
-                      Kirim Link Reset
+                      {t("forgot.submit")}
                     </Button>
 
                     {/* Trust indicators */}
                     <div className="flex items-center justify-center gap-6 pt-2">
                       <div className="flex items-center gap-1.5 text-xs text-slate-400">
                         <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                        <span>Terenkripsi</span>
+                        <span>{t("forgot.encrypted")}</span>
                       </div>
                       <div className="w-1 h-1 rounded-full bg-slate-300" />
                       <div className="flex items-center gap-1.5 text-xs text-slate-400">
                         <Flash className="w-4 h-4 text-[#D4AF37]" />
-                        <span>2 Menit</span>
+                        <span>{t("forgot.time")}</span>
                       </div>
                     </div>
                   </form>
@@ -252,12 +248,12 @@ export default function ForgotPasswordPage() {
 
                 {/* Help Text */}
                 <p className="text-center text-sm text-slate-500 pb-4 lg:pb-0">
-                  Ingat password Anda?{" "}
+                  {t("forgot.remember")}{" "}
                   <Link
                     href="/login"
                     className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4 transition-colors"
                   >
-                    Masuk di sini
+                    {t("forgot.login_here")}
                   </Link>
                 </p>
               </>
@@ -266,29 +262,31 @@ export default function ForgotPasswordPage() {
               <div className="bg-white rounded-2xl lg:rounded-3xl p-6 sm:p-8 shadow-lg shadow-slate-200/60 lg:shadow-xl lg:shadow-slate-200/50 border border-slate-100/80">
                 <div className="text-center space-y-6">
                   <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-emerald-100 to-emerald-50 rounded-full shadow-lg shadow-emerald-100">
-                    <Check className="w-10 h-10 text-emerald-600" strokeWidth={2.5} />
+                    <Check
+                      className="w-10 h-10 text-emerald-600"
+                      strokeWidth={2.5}
+                    />
                   </div>
                   <div>
                     <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
-                      Email Terkirim! ✉️
+                      {t("forgot.success_title")} ✉️
                     </h2>
                     <p className="text-slate-500 text-sm">
-                      Jika email{" "}
-                      <span className="font-medium text-slate-700">{email}</span>{" "}
-                      terdaftar di sistem kami, Anda akan menerima link untuk reset
-                      password dalam beberapa menit.
+                      {t("forgot.success_desc").replace("{email}", email)}
                     </p>
                   </div>
                   <div className="bg-gradient-to-r from-[#D4AF37]/10 to-[#E4C55B]/10 border border-[#D4AF37]/30 rounded-2xl p-4 text-sm text-[#D4AF37]">
-                    <p className="font-semibold mb-1">Tidak menerima email?</p>
-                    <p className="text-[#D4AF37]/80">Cek folder spam atau coba lagi dengan email yang berbeda.</p>
+                    <p className="font-semibold mb-1">
+                      {t("forgot.check_spam")}
+                    </p>
+                    <p className="text-[#D4AF37]/80">{t("forgot.spam_hint")}</p>
                   </div>
                   <Link
                     href="/login"
                     className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors"
                   >
                     <ArrowLeft className="w-4 h-4" />
-                    Kembali ke halaman login
+                    {t("forgot.back_to_login")}
                   </Link>
                 </div>
               </div>

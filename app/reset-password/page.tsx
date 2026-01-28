@@ -8,6 +8,7 @@ import { ArrowLeft, Eye, EyeClosed, Lock, Check, Xmark } from "iconoir-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { resetPassword, validateResetToken } from "@/app/actions/auth";
+import { useLanguage } from "@/lib/language-context";
 
 // Password requirements checker
 function checkPasswordStrength(password: string) {
@@ -23,6 +24,7 @@ function ResetPasswordFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token") || "";
+  const { t } = useLanguage();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,9 +45,7 @@ function ResetPasswordFormContent() {
   useEffect(() => {
     async function validate() {
       if (!token) {
-        setTokenError(
-          "Token tidak ditemukan. Silakan minta link reset password baru."
-        );
+        setTokenError(t("reset.token_missing"));
         setValidating(false);
         return;
       }
@@ -53,24 +53,24 @@ function ResetPasswordFormContent() {
       const result = await validateResetToken(token);
       setTokenValid(result.valid);
       if (!result.valid) {
-        setTokenError(result.error || "Token tidak valid");
+        setTokenError(result.error || t("reset.token_invalid"));
       }
       setValidating(false);
     }
     validate();
-  }, [token]);
+  }, [token, t]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     if (!allRequirementsMet) {
-      setError("Password tidak memenuhi persyaratan");
+      setError(t("reset.error_requirements"));
       return;
     }
 
     if (!passwordsMatch) {
-      setError("Konfirmasi password tidak cocok");
+      setError(t("reset.error_mismatch"));
       return;
     }
 
@@ -84,7 +84,7 @@ function ResetPasswordFormContent() {
           router.push("/login");
         }, 3000);
       } else {
-        setError(result.error || "Terjadi kesalahan");
+        setError(result.error || t("reset.token_invalid"));
       }
     } finally {
       setLoading(false);
@@ -98,7 +98,7 @@ function ResetPasswordFormContent() {
         <div className="inline-flex items-center justify-center w-16 h-16 bg-slate-100 rounded-2xl animate-pulse">
           <Lock className="w-8 h-8 text-slate-400" />
         </div>
-        <p className="text-slate-500">Memvalidasi link reset password...</p>
+        <p className="text-slate-500">{t("reset.validating")}</p>
       </div>
     );
   }
@@ -112,7 +112,7 @@ function ResetPasswordFormContent() {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
-            Link Tidak Valid
+            {t("reset.invalid_title")}
           </h2>
           <p className="text-slate-500 text-sm">{tokenError}</p>
         </div>
@@ -120,14 +120,14 @@ function ResetPasswordFormContent() {
           href="/forgot-password"
           className="inline-flex items-center justify-center w-full h-12 rounded-xl text-base font-semibold bg-primary-600 text-white hover:bg-primary-700 transition-colors"
         >
-          Minta Link Reset Baru
+          {t("reset.request_new")}
         </Link>
         <Link
           href="/login"
           className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-700 font-medium text-sm justify-center"
         >
           <ArrowLeft className="w-4 h-4" />
-          Kembali ke halaman login
+          {t("reset.back_to_login")}
         </Link>
       </div>
     );
@@ -142,18 +142,15 @@ function ResetPasswordFormContent() {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
-            Password Berhasil Direset!
+            {t("reset.success_title")}
           </h2>
-          <p className="text-slate-500 text-sm">
-            Password Anda telah diperbarui. Anda akan dialihkan ke halaman login
-            dalam beberapa detik...
-          </p>
+          <p className="text-slate-500 text-sm">{t("reset.success_desc")}</p>
         </div>
         <Link
           href="/login"
           className="inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
         >
-          Masuk sekarang
+          {t("reset.login_now")}
         </Link>
       </div>
     );
@@ -167,11 +164,9 @@ function ResetPasswordFormContent() {
           <Lock className="w-8 h-8 text-primary-600" />
         </div>
         <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">
-          Reset Password
+          {t("reset.form_title")}
         </h2>
-        <p className="text-slate-500 text-sm">
-          Buat password baru untuk akun Anda.
-        </p>
+        <p className="text-slate-500 text-sm">{t("reset.form_sub")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-5">
@@ -197,10 +192,10 @@ function ResetPasswordFormContent() {
           <div className="relative space-y-2">
             <Input
               type={showPassword ? "text" : "password"}
-              label="Password Baru"
+              label={t("reset.new_password")}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Masukkan password baru"
+              placeholder={t("reset.new_password_placeholder")}
               required
               className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white transition-all pr-12"
             />
@@ -222,7 +217,7 @@ function ResetPasswordFormContent() {
           {password && (
             <div className="bg-slate-50 rounded-xl p-4 space-y-2">
               <p className="text-xs font-medium text-slate-600 mb-2">
-                Persyaratan password:
+                {t("reset.requirements")}
               </p>
               <div className="grid grid-cols-2 gap-2 text-xs">
                 <div
@@ -237,7 +232,7 @@ function ResetPasswordFormContent() {
                   ) : (
                     <Xmark className="w-3.5 h-3.5" />
                   )}
-                  Minimal 8 karakter
+                  {t("reset.min_length")}
                 </div>
                 <div
                   className={`flex items-center gap-2 ${
@@ -251,7 +246,7 @@ function ResetPasswordFormContent() {
                   ) : (
                     <Xmark className="w-3.5 h-3.5" />
                   )}
-                  Huruf besar
+                  {t("reset.has_uppercase")}
                 </div>
                 <div
                   className={`flex items-center gap-2 ${
@@ -265,7 +260,7 @@ function ResetPasswordFormContent() {
                   ) : (
                     <Xmark className="w-3.5 h-3.5" />
                   )}
-                  Huruf kecil
+                  {t("reset.has_lowercase")}
                 </div>
                 <div
                   className={`flex items-center gap-2 ${
@@ -279,7 +274,7 @@ function ResetPasswordFormContent() {
                   ) : (
                     <Xmark className="w-3.5 h-3.5" />
                   )}
-                  Angka
+                  {t("reset.has_number")}
                 </div>
               </div>
             </div>
@@ -288,10 +283,10 @@ function ResetPasswordFormContent() {
           <div className="relative space-y-2">
             <Input
               type={showConfirmPassword ? "text" : "password"}
-              label="Konfirmasi Password"
+              label={t("reset.confirm_password")}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="Ulangi password baru"
+              placeholder={t("reset.confirm_placeholder")}
               required
               className="h-12 rounded-xl bg-slate-50 border-slate-200 focus:bg-white transition-all pr-12"
             />
@@ -320,7 +315,7 @@ function ResetPasswordFormContent() {
               ) : (
                 <Xmark className="w-3.5 h-3.5" />
               )}
-              {passwordsMatch ? "Password cocok" : "Password tidak cocok"}
+              {passwordsMatch ? t("reset.match") : t("reset.no_match")}
             </div>
           )}
         </div>
@@ -331,7 +326,7 @@ function ResetPasswordFormContent() {
           loading={loading}
           disabled={!allRequirementsMet || !passwordsMatch}
         >
-          Reset Password
+          {t("reset.submit")}
         </Button>
       </form>
     </>
@@ -352,7 +347,9 @@ function ResetPasswordFormFallback() {
   );
 }
 
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
+  const { t } = useLanguage();
+
   return (
     <main className="min-h-screen flex bg-slate-50">
       {/* Left Panel - Illustration */}
@@ -389,27 +386,26 @@ export default function ResetPasswordPage() {
                 PJUTS <span className="text-amber-400">ESDM</span>
               </h1>
               <p className="text-xs text-primary-100 font-medium tracking-wide uppercase opacity-90">
-                Kementerian ESDM RI
+                {t("reset.ministry")}
               </p>
             </div>
           </Link>
 
           <div className="max-w-xl">
             <h2 className="text-4xl font-bold text-white leading-tight mb-6">
-              Keamanan Akun
+              {t("reset.title")}
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-amber-500">
-                Adalah Prioritas
+                {t("reset.title_highlight")}
               </span>
             </h2>
             <p className="text-primary-100 text-lg leading-relaxed opacity-90 max-w-lg">
-              Gunakan password yang kuat dengan kombinasi huruf besar, huruf
-              kecil, dan angka untuk melindungi akun Anda.
+              {t("reset.description")}
             </p>
           </div>
 
           <div className="text-xs text-primary-300/60 font-medium">
-            © 2026 Kementerian Energi dan Sumber Daya Mineral Republik Indonesia
+            {t("reset.copyright")}
           </div>
         </div>
       </div>
@@ -442,7 +438,7 @@ export default function ResetPasswordPage() {
             className="text-sm font-medium text-slate-500 hover:text-primary-600 transition-colors flex items-center gap-2"
           >
             <ArrowLeft className="w-4 h-4" />
-            Kembali ke Login
+            {t("reset.back_login")}
           </Link>
         </div>
 
@@ -455,4 +451,8 @@ export default function ResetPasswordPage() {
       </div>
     </main>
   );
+}
+
+export default function ResetPasswordPage() {
+  return <ResetPasswordPageContent />;
 }
