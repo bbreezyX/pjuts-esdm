@@ -15,25 +15,26 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://esdm.cloud"),
   title: {
     default:
-      "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
-    template: "%s | PJUTS ESDM",
+      "PJUTS ESDM Jambi - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+    template: "%s | PJUTS ESDM Jambi",
   },
   description:
-    "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Kementerian ESDM Republik Indonesia. Pantau kondisi lampu jalan tenaga surya secara real-time.",
+    "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Dinas ESDM Provinsi Jambi. Pantau kondisi lampu jalan tenaga surya secara real-time di seluruh wilayah Provinsi Jambi.",
   keywords: [
     "PJUTS",
     "ESDM",
+    "Jambi",
+    "Provinsi Jambi",
     "Solar Street Light",
     "Monitoring",
-    "Indonesia",
     "Penerangan Jalan",
     "Energi Terbarukan",
     "Lampu Jalan Tenaga Surya",
-    "Kementerian ESDM",
+    "Dinas ESDM Jambi",
   ],
-  authors: [{ name: "Kementerian ESDM RI" }],
-  creator: "Kementerian ESDM Republik Indonesia",
-  publisher: "Kementerian ESDM Republik Indonesia",
+  authors: [{ name: "Dinas ESDM Provinsi Jambi" }],
+  creator: "Dinas Energi dan Sumber Daya Mineral Provinsi Jambi",
+  publisher: "Dinas ESDM Provinsi Jambi",
   manifest: "/manifest.json",
   icons: {
     icon: [
@@ -46,30 +47,32 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "PJUTS ESDM",
+    title: "PJUTS ESDM Jambi",
   },
   openGraph: {
     type: "website",
     locale: "id_ID",
     url: "https://esdm.cloud",
-    siteName: "PJUTS ESDM",
-    title: "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+    siteName: "PJUTS ESDM Jambi",
+    title:
+      "PJUTS ESDM Jambi - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
     description:
-      "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Kementerian ESDM Republik Indonesia",
+      "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Dinas ESDM Provinsi Jambi",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "PJUTS ESDM - Monitoring Lampu Jalan Tenaga Surya",
+        alt: "PJUTS ESDM Jambi - Monitoring Lampu Jalan Tenaga Surya Provinsi Jambi",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PJUTS ESDM - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
+    title:
+      "PJUTS ESDM Jambi - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
     description:
-      "Sistem monitoring dan pelaporan PJUTS Kementerian ESDM Republik Indonesia",
+      "Sistem monitoring dan pelaporan PJUTS Dinas ESDM Provinsi Jambi",
     images: ["/og-image.png"],
   },
   robots: {

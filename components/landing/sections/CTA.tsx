@@ -1,13 +1,17 @@
 /**
  * CTA section for the PJUTS ESDM Landing Page.
+ * Supports ID/EN language switching.
  */
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { ArrowRight } from 'lucide-react';
+import React from "react";
+import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { useLanguage } from "@/lib/language-context";
 
 export const CTA = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="pt-40 pb-32 px-6">
       <motion.div
@@ -18,11 +22,14 @@ export const CTA = () => {
       >
         <div className="relative z-10 max-w-2xl mx-auto">
           <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-8 leading-tight text-white">
-            Siap Monitoring <br />
-            PJUTS <span className="text-accent italic font-serif">Lebih Efisien?</span>
+            {t("cta.title_1")} <br />
+            {t("cta.title_2")}{" "}
+            <span className="text-accent italic font-serif">
+              {t("cta.title_3")}
+            </span>
           </h2>
           <p className="text-lg text-white/60 mb-12 max-w-lg mx-auto">
-            Bergabunglah dengan ribuan petugas di seluruh Indonesia untuk membangun infrastruktur energi yang lebih baik.
+            {t("cta.description")}
           </p>
           <motion.a
             whileHover={{ scale: 1.05 }}
@@ -30,7 +37,7 @@ export const CTA = () => {
             href="/login"
             className="bg-accent text-primary h-16 px-12 inline-flex items-center gap-3 rounded-2xl font-bold text-xl shadow-2xl shadow-accent/40"
           >
-            Masuk ke Dashboard
+            {t("cta.button")}
             <ArrowRight className="w-6 h-6" />
           </motion.a>
         </div>

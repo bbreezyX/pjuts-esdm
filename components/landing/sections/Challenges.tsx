@@ -1,51 +1,56 @@
 /**
  * Challenges section updated with ESDM-specific focus.
+ * Supports ID/EN language switching.
  */
 "use client";
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Layout, Shield, FileText, BarChart3 } from 'lucide-react';
-
-const coreModules = [
-  {
-    icon: Layout,
-    title: "Dashboard Terpadu",
-    desc: "Visualisasi data real-time untuk memudahkan pengambilan keputusan strategis oleh pimpinan."
-  },
-  {
-    icon: Shield,
-    title: "Keamanan Data",
-    desc: "Protokol keamanan tingkat tinggi untuk melindungi aset data strategis kementerian."
-  },
-  {
-    icon: FileText,
-    title: "Pelaporan Digital",
-    desc: "Otomasi dokumen laporan untuk efisiensi birokrasi dan akuntabilitas kerja."
-  },
-  {
-    icon: BarChart3,
-    title: "Analisis Kinerja",
-    desc: "Algoritma cerdas untuk menganalisis efisiensi penggunaan energi setiap unit lampu."
-  }
-];
+import React from "react";
+import { motion } from "framer-motion";
+import { Layout, Shield, FileText, BarChart3 } from "lucide-react";
+import { useLanguage } from "@/lib/language-context";
 
 export const Challenges = () => {
+  const { t } = useLanguage();
+
+  const coreModules = [
+    {
+      icon: Layout,
+      titleKey: "system.dashboard",
+      descKey: "system.dashboard_desc",
+    },
+    {
+      icon: Shield,
+      titleKey: "system.security",
+      descKey: "system.security_desc",
+    },
+    {
+      icon: FileText,
+      titleKey: "system.reporting",
+      descKey: "system.reporting_desc",
+    },
+    {
+      icon: BarChart3,
+      titleKey: "system.analysis",
+      descKey: "system.analysis_desc",
+    },
+  ];
+
   return (
     <section id="sistem" className="pt-40 pb-32 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
         <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>
             <span className="inline-block px-3 py-1 bg-accent/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-md mb-6 border border-accent/20">
-              Modul Sistem
+              {t("system.badge")}
             </span>
             <h2 className="text-5xl md:text-7xl font-bold tracking-tight text-foreground leading-[0.95]">
-              Arsitektur <br />
-              <span className="text-primary">Ecosystem</span> Monitoring
+              {t("system.title_1")} <br />
+              <span className="text-primary">{t("system.title_2")}</span>{" "}
+              {t("system.title_3")}
             </h2>
           </div>
           <p className="text-muted-foreground max-w-sm mb-2 text-sm leading-relaxed font-medium">
-            Ekosistem monitoring PJUTS dirancang untuk menangani kompleksitas data dari puluhan ribu unit di seluruh pelosok negeri.
+            {t("system.description")}
           </p>
         </div>
 
@@ -64,13 +69,15 @@ export const Challenges = () => {
                   <item.icon className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="text-xs font-bold opacity-30 group-hover:opacity-100 transition-opacity">
-                  MODULE 0{i+1}
+                  MODULE 0{i + 1}
                 </div>
               </div>
               <div>
-                <h3 className="text-3xl font-bold mb-6 tracking-tight">{item.title}</h3>
+                <h3 className="text-3xl font-bold mb-6 tracking-tight">
+                  {t(item.titleKey)}
+                </h3>
                 <p className="opacity-60 group-hover:opacity-80 leading-relaxed font-medium">
-                  {item.desc}
+                  {t(item.descKey)}
                 </p>
               </div>
             </motion.div>
