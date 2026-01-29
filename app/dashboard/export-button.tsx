@@ -1,9 +1,8 @@
-"use strict";
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, SystemRestart } from "iconoir-react";
+import { Download, RefreshCw } from "lucide-react";
 import { utils, writeFile } from "xlsx";
 import { format } from "date-fns";
 import { ProvinceStats, DashboardStats } from "@/app/actions/dashboard";
@@ -74,7 +73,7 @@ export function ExportDashboardButton({
 
             toast({
                 title: "Ekspor Berhasil",
-                description: "Statistik dashboard berhasil diekspor.",
+                description: "Statistik dashboard berhasil diepor.",
                 variant: "success",
             });
         } catch (error) {
@@ -90,13 +89,13 @@ export function ExportDashboardButton({
     };
 
     return (
-        <Button variant="outline" size="sm" onClick={handleExport} disabled={loading}>
+        <Button variant="outline" size="lg" onClick={handleExport} disabled={loading} className="rounded-2xl border-border hover:bg-muted h-12 font-bold transition-all px-6">
             {loading ? (
-                <SystemRestart className="h-4 w-4 mr-2 animate-spin" />
+                <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
             ) : (
-                <Download className="h-4 w-4 mr-2" />
+                <Download className="h-5 w-5 mr-2" />
             )}
-            Export Excel
+            Ekspor Excel
         </Button>
     );
 }

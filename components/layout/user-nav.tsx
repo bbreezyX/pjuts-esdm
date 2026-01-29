@@ -1,6 +1,6 @@
 "use client";
 
-import { LogOut, User, NavArrowDown } from "iconoir-react";
+import { LogOut, User, ChevronDown, ShieldCheck, UserCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -11,6 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
+import { cn } from "@/lib/utils";
 
 interface UserNavProps {
     user: {
@@ -26,49 +27,66 @@ export function UserNav({ user }: UserNavProps) {
         window.location.href = "/login";
     };
 
+    const isAdmin = user.role === "ADMIN";
+
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="ghost"
-                    className="flex items-center gap-2 px-2 hover:bg-slate-100"
+                    className="flex items-center gap-3 px-2 h-12 rounded-xl hover:bg-muted/50 transition-all border border-transparent hover:border-border active:scale-95 group"
                 >
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-primary-700 flex items-center justify-center">
-                        <span className="text-white text-sm font-semibold">
-                            {user.name.charAt(0).toUpperCase()}
-                        </span>
+                    <div className="relative">
+                        <div className="w-9 h-9 rounded-xl bg-foreground text-background flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
+                            <span className="text-sm font-black uppercase">
+                                {user.name.charAt(0)}
+                            </span>
+                        </div>
+                        {isAdmin && (
+                            <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center border-2 border-card">
+                                <ShieldCheck size={10} />
+                            </div>
+                        )}
                     </div>
-                    <div className="hidden lg:block text-left">
-                        <p className="text-sm font-medium text-slate-900">{user.name}</p>
-                        <p className="text-xs text-slate-500">
-                            {user.role === "ADMIN" ? "Administrator" : "Petugas Lapangan"}
+                    <div className="hidden lg:block text-left mr-1">
+                        <p className="text-xs font-black text-foreground leading-none mb-1">{user.name}</p>
+                        <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest leading-none">
+                            {isAdmin ? "System Admin" : "Field Officer"}
                         </p>
                     </div>
-                    <NavArrowDown className="h-4 w-4 text-slate-400 hidden lg:block" />
+                    <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-                <DropdownMenuLabel>
-                    <div className="flex flex-col">
-                        <span>{user.name}</span>
-                        <span className="text-xs font-normal text-slate-500">
+            <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl shadow-2xl border-border bg-card">
+                <DropdownMenuLabel className="p-4">
+                    <div className="flex flex-col gap-1">
+                        <span className="text-sm font-bold text-foreground">{user.name}</span>
+                        <span className="text-[10px] font-medium text-muted-foreground truncate">
                             {user.email}
                         </span>
                     </div>
                 </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                    <User className="mr-2 h-4 w-4" />
-                    Profil Saya
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                    className="text-red-600 focus:text-red-600 cursor-pointer"
-                    onClick={handleLogout}
-                >
-                    <LogOut className="mr-2 h-4 w-4" />
-                    Keluar
-                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <div className="p-1 space-y-1">
+                    <DropdownMenuItem className="p-3 rounded-xl focus:bg-muted cursor-pointer font-bold text-xs gap-3">
+                        <UserCircle className="h-4 w-4 text-primary" />
+                        Profil Saya
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="p-3 rounded-xl focus:bg-muted cursor-pointer font-bold text-xs gap-3">
+                        <ShieldCheck className="h-4 w-4 text-primary" />
+                        Pengaturan Akun
+                    </DropdownMenuItem>
+                </div>
+                <DropdownMenuSeparator className="bg-border/50" />
+                <div className="p-1">
+                    <DropdownMenuItem
+                        className="p-3 rounded-xl focus:bg-red-500/10 text-red-500 focus:text-red-600 cursor-pointer font-bold text-xs gap-3"
+                        onClick={handleLogout}
+                    >
+                        <LogOut className="h-4 w-4" />
+                        Keluar Sesi
+                    </DropdownMenuItem>
+                </div>
             </DropdownMenuContent>
         </DropdownMenu>
     );

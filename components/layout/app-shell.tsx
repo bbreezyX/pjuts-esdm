@@ -20,7 +20,7 @@ export function AppShell({ children, user }: AppShellProps) {
   const pathname = usePathname();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       {/* Offline banner for PWA */}
       <OfflineBanner />
       
@@ -30,12 +30,12 @@ export function AppShell({ children, user }: AppShellProps) {
       </Suspense>
 
       <Navbar user={user} />
-      <main className="pb-20 md:pb-8">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
-          {/* Page content with fade animation */}
+      <main className="pb-24 md:pb-12 pt-4">
+        <div className="mx-auto max-w-[1700px] px-4 sm:px-8 lg:px-12 py-6">
+          {/* Page content with refined animation */}
           <div
             key={pathname}
-            className="animate-fade-in"
+            className="animate-fade-in transition-all duration-500"
           >
             {children}
           </div>

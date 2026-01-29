@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { SystemRestart } from "iconoir-react";
+import { Loader2 } from "lucide-react";
 
 interface SpinnerProps {
     size?: "sm" | "md" | "lg";
@@ -14,7 +14,7 @@ const sizeClasses = {
 
 export function Spinner({ size = "md", className }: SpinnerProps) {
     return (
-        <SystemRestart
+        <Loader2
             className={cn("animate-spin text-primary-600", sizeClasses[size], className)}
         />
     );

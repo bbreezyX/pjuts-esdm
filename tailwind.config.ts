@@ -9,6 +9,9 @@ export default {
   ],
   theme: {
     extend: {
+      borderRadius: {
+        bento: "2.5rem",
+      },
       colors: {
         // Updated ESDM Brand Colors
         primary: {

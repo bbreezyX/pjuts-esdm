@@ -402,3 +402,71 @@ export async function getRecentActivity(limit: number = 10): Promise<ActionResul
         };
     }
 }
+
+// ============================================
+// RECENT USERS FOR DASHBOARD DISPLAY
+// ============================================
+
+export interface DashboardUser {
+    id: string;
+    name: string;
+    role: string;
+}
+
+/**
+ * Internal function to fetch recent active users
+ */
+async function fetchRecentActiveUsers(limit: number = 5): Promise<DashboardUser[]> {
+    const users = await prisma.user.findMany({
+        where: { isActive: true },
+        orderBy: { updatedAt: "desc" },
+        take: limit,
+        select: {
+            id: true,
+            name: true,
+            role: true,
+        },
+    });
+
+    return users;
+}
+
+// Cached version - refreshes every 5 minutes
+const getCachedRecentUsers = unstable_cache(
+    () => fetchRecentActiveUsers(5),
+    ["recent-users"],
+    {
+        revalidate: CacheDurations.MEDIUM,
+        tags: [CacheTags.DASHBOARD_STATS],
+    }
+);
+
+/**
+ * Get recent active users for dashboard display (avatars)
+ */
+export async function getRecentActiveUsers(limit: number = 5): Promise<ActionResult<DashboardUser[]>> {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return {
+                success: false,
+                error: "Authentication required",
+            };
+        }
+
+        // Use cached version for default limit
+        if (limit === 5) {
+            const data = await getCachedRecentUsers();
+            return { success: true, data };
+        }
+
+        const data = await fetchRecentActiveUsers(limit);
+        return { success: true, data };
+    } catch (error) {
+        console.error("Get recent users error:", error);
+        return {
+            success: false,
+            error: "Failed to fetch recent users",
+        };
+    }
+}

@@ -17,7 +17,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { DashboardStats, ProvinceStats } from "@/app/actions/dashboard";
 import { cn } from "@/lib/utils";
-import { LightBulb, CheckCircle, Notes } from "iconoir-react";
+import { Lightbulb, CheckCircle2, ClipboardList } from "lucide-react";
 
 interface AnalyticsChartsProps {
   stats: DashboardStats | undefined;
@@ -129,19 +129,19 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
           title="Total Unit"
           value={stats?.totalUnits?.toLocaleString("id-ID") || 0}
           variant="primary"
-          icon={LightBulb}
+          icon={Lightbulb}
         />
         <StatCard
           title="Tingkat Operasional"
           value={`${stats?.totalUnits
             ? Math.round((stats.operationalUnits / stats.totalUnits) * 100)
             : 0}%`}
-          icon={CheckCircle}
+          icon={CheckCircle2}
         />
         <StatCard
           title="Total Laporan"
           value={stats?.totalReports?.toLocaleString("id-ID") || 0}
-          icon={Notes}
+          icon={ClipboardList}
         />
         <StatCard
           title="Rata-rata/Bulan"
@@ -150,7 +150,7 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
               trend.data.reduce((a, b) => a + b, 0) / trend.data.length
             ).toLocaleString("id-ID")
             : 0}
-            icon={CheckCircle}
+            icon={CheckCircle2}
         />
       </div>
 

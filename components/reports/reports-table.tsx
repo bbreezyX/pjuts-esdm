@@ -4,16 +4,16 @@ import { useState } from "react";
 import Image from "next/image";
 import {
   Eye,
-  Trash,
+  Trash2,
   MapPin,
-  Flash,
+  Zap,
   Calendar,
   User,
-  NavArrowLeft,
-  NavArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Download,
-  WarningTriangle,
-} from "iconoir-react";
+  AlertTriangle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -69,132 +69,135 @@ export function ReportsTable({
   return (
     <>
       {/* Desktop Table */}
-      <Card className="hidden md:block overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="data-table">
-            <thead>
+      <div className="hidden md:block overflow-x-auto pb-4">
+        <table className="w-full text-left border-separate border-spacing-y-4">
+          <thead>
+            <tr className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+              <th className="px-6 py-4">Unit PJUTS</th>
+              <th className="px-6 py-4">Dokumentasi</th>
+              <th className="px-6 py-4 text-center">Tegangan</th>
+              <th className="px-6 py-4">Wilayah</th>
+              <th className="px-6 py-4">Pelapor</th>
+              <th className="px-6 py-4">Waktu Lapor</th>
+              <th className="px-6 py-4 text-center">Opsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {reports.length === 0 ? (
               <tr>
-                <th>Unit</th>
-                <th>Foto</th>
-                <th className="text-center">Tegangan</th>
-                <th>Lokasi</th>
-                <th>Pelapor</th>
-                <th>Tanggal</th>
-                <th className="text-center">Aksi</th>
+                <td colSpan={7} className="text-center py-20 bg-card rounded-[2rem] border border-border/50 shadow-sm">
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-16 h-16 rounded-3xl bg-muted flex items-center justify-center text-muted-foreground/40">
+                      <Zap size={32} />
+                    </div>
+                    <p className="text-sm font-bold text-muted-foreground">Tidak ada laporan yang ditemukan</p>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {reports.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="text-center py-12 text-slate-500">
-                    Tidak ada laporan ditemukan
-                  </td>
-                </tr>
-              ) : (
-                reports.map((report, index) => (
-                  <tr
-                    key={report.id}
-                    className="animate-fade-in"
-                    style={{ animationDelay: `${index * 0.03}s` }}
-                  >
-                    <td>
-                      <div>
-                        <p className="font-medium text-slate-900">
-                          {report.unit.serialNumber}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {report.unit.regency}
-                        </p>
+            ) : (
+              reports.map((report, index) => (
+                <tr
+                  key={report.id}
+                  className="group animate-in fade-in slide-in-from-bottom-2 duration-500"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <td className="px-6 py-5 bg-card group-hover:bg-muted/30 rounded-l-[2rem] border-y border-l border-border/50 transition-all duration-300">
+                    <div>
+                      <p className="font-black text-foreground text-sm tracking-tight leading-none mb-1.5">
+                        {report.unit.serialNumber}
+                      </p>
+                      <div className="flex items-center gap-2 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                        {report.unit.regency}
                       </div>
-                    </td>
-                    <td>
-                      <div
-                        className="relative w-12 h-12 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-primary-500 group"
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300">
+                    <div
+                      className="relative w-14 h-14 rounded-2xl overflow-hidden cursor-pointer hover:ring-4 hover:ring-primary/10 transition-all duration-300 shadow-sm group/img"
+                      onClick={() => setSelectedReport(report)}
+                    >
+                      <Image
+                        src={
+                          (report.images && report.images.length > 0
+                            ? report.images[0].url
+                            : report.imageUrl) || "/placeholder-image.jpg"
+                        }
+                        alt="Report"
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover/img:scale-110"
+                      />
+                      {report.images && report.images.length > 1 && (
+                        <div className="absolute inset-0 bg-primary/60 backdrop-blur-[2px] opacity-0 group-hover/img:opacity-100 flex items-center justify-center transition-all duration-300">
+                          <span className="text-white text-[10px] font-black">+{report.images.length - 1}</span>
+                        </div>
+                      )}
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300 text-center">
+                    <Badge 
+                      variant={getStatusVariant(report.batteryVoltage)}
+                      className="rounded-xl px-3 py-1 text-[11px] font-black border-none shadow-sm"
+                    >
+                      {report.batteryVoltage}V
+                    </Badge>
+                  </td>
+                  <td className="px-6 py-5 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300">
+                    <div className="flex items-center gap-2 text-xs font-bold text-foreground tracking-tight">
+                      <div className="w-7 h-7 rounded-lg bg-primary/5 flex items-center justify-center text-primary">
+                        <MapPin className="h-3.5 w-3.5" />
+                      </div>
+                      {report.unit.province}
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/10 shadow-sm overflow-hidden">
+                        <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${report.user.name}`} alt="avatar" />
+                      </div>
+                      <span className="text-sm font-bold text-foreground tracking-tight">
+                        {report.user.name}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300">
+                    <div>
+                      <p className="text-xs font-bold text-foreground tracking-tight">
+                        {formatDateTime(report.createdAt)}
+                      </p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">
+                        {getRelativeTime(report.createdAt)}
+                      </p>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5 bg-card group-hover:bg-muted/30 rounded-r-[2rem] border-y border-r border-border/50 transition-all duration-300 text-center">
+                    <div className="flex items-center justify-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-9 w-9 rounded-xl bg-primary/5 hover:bg-primary/10 text-primary transition-all"
                         onClick={() => setSelectedReport(report)}
                       >
-                        <Image
-                          src={
-                            (report.images && report.images.length > 0
-                              ? report.images[0].url
-                              : report.imageUrl) || "/placeholder-image.jpg" // Fallback or handle empty
-                          }
-                          alt="Report"
-                          fill
-                          className="object-cover"
-                        />
-                        {report.images && report.images.length > 1 && (
-                          <div className="absolute inset-0 bg-black/40 hidden group-hover:flex items-center justify-center transition-all">
-                            <span className="text-white text-[10px] font-bold">+{report.images.length - 1}</span>
-                          </div>
-                        )}
-                        {report.images && report.images.length > 1 && (
-                          <div className="absolute bottom-0 right-0 bg-black/50 px-1 py-0.5 rounded-tl-md group-hover:hidden">
-                            <span className="text-white text-[8px] font-medium leading-none block">+{report.images.length - 1}</span>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="text-center">
-                      <Badge variant={getStatusVariant(report.batteryVoltage)}>
-                        {report.batteryVoltage}V
-                      </Badge>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-1 text-sm text-slate-600">
-                        <MapPin className="h-3 w-3" />
-                        {report.unit.province}
-                      </div>
-                    </td>
-                    <td>
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center">
-                          <span className="text-xs font-medium text-primary-700">
-                            {report.user.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <span className="text-sm text-slate-700">
-                          {report.user.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td>
-                      <div>
-                        <p className="text-sm text-slate-900">
-                          {formatDateTime(report.createdAt)}
-                        </p>
-                        <p className="text-xs text-slate-500">
-                          {getRelativeTime(report.createdAt)}
-                        </p>
-                      </div>
-                    </td>
-                    <td className="text-center">
-                      <div className="flex items-center justify-center gap-1">
+                        <Eye className="h-4.5 w-4.5" />
+                      </Button>
+                      {isAdmin && (
                         <Button
                           variant="ghost"
-                          size="icon-sm"
-                          onClick={() => setSelectedReport(report)}
+                          size="icon"
+                          className="h-9 w-9 rounded-xl bg-red-50 hover:bg-red-100 text-red-600 transition-all"
+                          onClick={() => setDeleteConfirm(report)}
                         >
-                          <Eye className="h-4 w-4" />
+                          <Trash2 className="h-4.5 w-4.5" />
                         </Button>
-                        {isAdmin && (
-                          <Button
-                            variant="ghost"
-                            size="icon-sm"
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => setDeleteConfirm(report)}
-                          >
-                            <Trash className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {/* Mobile Cards */}
       <div className="md:hidden space-y-3">
@@ -269,7 +272,7 @@ export function ReportsTable({
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
                           onClick={() => setDeleteConfirm(report)}
                         >
-                          <Trash className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       )}
                     </div>
@@ -321,7 +324,7 @@ export function ReportsTable({
               onClick={() => onPageChange(page - 1)}
               disabled={page <= 1}
             >
-              <NavArrowLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4" />
             </Button>
             <span className="text-sm text-slate-600 px-2">
               {page} / {totalPages}
@@ -332,7 +335,7 @@ export function ReportsTable({
               onClick={() => onPageChange(page + 1)}
               disabled={page >= totalPages}
             >
-              <NavArrowRight className="h-4 w-4" />
+              <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
         </div>
@@ -399,7 +402,7 @@ export function ReportsTable({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="bg-slate-50 rounded-lg p-3">
                     <div className="flex items-center gap-2 mb-1">
-                      <Flash className="h-4 w-4 text-amber-500" />
+                      <Zap className="h-4 w-4 text-amber-500" />
                       <span className="text-sm text-slate-500">Tegangan</span>
                     </div>
                     <p className="text-xl font-bold text-slate-900">
@@ -455,7 +458,7 @@ export function ReportsTable({
           <DialogHeader>
             <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
               <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
-                <WarningTriangle className="h-6 w-6 text-red-600" />
+                <AlertTriangle className="h-6 w-6 text-red-600" />
               </div>
               <div className="space-y-1">
                 <DialogTitle className="text-red-600 text-lg sm:text-xl">Hapus Laporan</DialogTitle>
@@ -487,4 +490,3 @@ export function ReportsTable({
     </>
   );
 }
-

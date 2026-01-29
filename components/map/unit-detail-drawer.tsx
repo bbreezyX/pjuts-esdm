@@ -3,22 +3,22 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
-  Xmark,
+  X,
   MapPin,
-  Flash,
+  Zap,
   Calendar,
   User,
-  OpenNewWindow,
-  CheckCircle,
-  WarningTriangle,
-  XmarkCircle,
+  ExternalLink,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
   HelpCircle,
   BatteryFull,
   Copy,
-  NavArrowRight,
+  ChevronRight,
   Clock,
-  InfoCircle,
-} from "iconoir-react";
+  Info,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -127,7 +127,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
             onClick={onClose}
             className="rounded-full hover:bg-slate-100"
           >
-            <Xmark className="h-5 w-5 text-slate-500" />
+            <X className="h-5 w-5 text-slate-500" />
           </Button>
         </div>
 
@@ -203,12 +203,12 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                           )}
                         >
                           {detail.unit.lastStatus === "OPERATIONAL" ? (
-                            <CheckCircle className="h-6 w-6" />
+                            <CheckCircle2 className="h-6 w-6" />
                           ) : detail.unit.lastStatus ===
                             "MAINTENANCE_NEEDED" ? (
-                            <WarningTriangle className="h-6 w-6" />
+                            <AlertTriangle className="h-6 w-6" />
                           ) : detail.unit.lastStatus === "OFFLINE" ? (
-                            <XmarkCircle className="h-6 w-6" />
+                            <XCircle className="h-6 w-6" />
                           ) : (
                             <HelpCircle className="h-6 w-6" />
                           )}
@@ -294,7 +294,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                           </p>
                           {detail.unit.address && (
                             <p className="text-xs text-slate-400 mt-1 flex items-center gap-1">
-                              <InfoCircle className="h-3 w-3" />
+                              <Info className="h-3 w-3" />
                               {detail.unit.address}
                             </p>
                           )}
@@ -317,7 +317,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                           }}
                         >
                           <div className="flex items-center gap-2">
-                            <NavArrowRight className="h-3.5 w-3.5 text-slate-400" />
+                            <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
                             <code className="text-xs text-slate-700 font-medium">
                               {detail.unit.latitude.toFixed(6)},{" "}
                               {detail.unit.longitude.toFixed(6)}
@@ -336,7 +336,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                             );
                           }}
                         >
-                          <OpenNewWindow className="h-4 w-4" />
+                          <ExternalLink className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -371,7 +371,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                                     className="object-cover transition-transform duration-500 group-hover/image:scale-110"
                                   />
                                   <div className="absolute inset-0 bg-black/0 group-hover/image:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover/image:opacity-100">
-                                    <OpenNewWindow className="w-5 h-5 text-white drop-shadow-md" />
+                                    <ExternalLink className="w-5 h-5 text-white drop-shadow-md" />
                                   </div>
                                 </div>
                               ) : (
@@ -396,7 +396,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
 
                                 <div className="grid grid-cols-2 gap-2 mb-3">
                                   <div className="flex items-center gap-2">
-                                    <Flash className="h-3.5 w-3.5 text-amber-500" />
+                                    <Zap className="h-3.5 w-3.5 text-amber-500" />
                                     <span className="text-sm font-bold text-slate-900">
                                       {report.batteryVoltage}V
                                     </span>
@@ -451,7 +451,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
             className="absolute top-4 right-4 text-white/50 hover:text-white hover:bg-white/10 rounded-full w-12 h-12"
             onClick={() => setSelectedImage(null)}
           >
-            <Xmark className="h-6 w-6" />
+            <X className="h-6 w-6" />
           </Button>
           <div className="relative w-full max-w-5xl aspect-[16/10] sm:aspect-video rounded-lg overflow-hidden shadow-2xl">
             <Image

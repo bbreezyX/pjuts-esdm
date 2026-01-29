@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Mail, Check, ShieldCheck, Flash } from "iconoir-react";
+import { ArrowLeft, Mail, Check, ShieldCheck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { requestPasswordReset } from "@/app/actions/auth";
@@ -102,7 +102,7 @@ export default function ForgotPasswordPage() {
               </div>
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
                 <div className="flex items-center gap-2 mb-2">
-                  <Flash className="w-5 h-5 text-[#E4C55B]" />
+                  <Zap className="w-5 h-5 text-[#E4C55B]" />
                 </div>
                 <p className="text-lg font-bold text-white mb-1">
                   {t("forgot.fast")}
@@ -239,7 +239,7 @@ export default function ForgotPasswordPage() {
                       </div>
                       <div className="w-1 h-1 rounded-full bg-slate-300" />
                       <div className="flex items-center gap-1.5 text-xs text-slate-400">
-                        <Flash className="w-4 h-4 text-[#D4AF37]" />
+                        <Zap className="w-4 h-4 text-[#D4AF37]" />
                         <span>{t("forgot.time")}</span>
                       </div>
                     </div>

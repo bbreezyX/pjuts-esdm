@@ -7,13 +7,13 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   Eye,
-  EyeClosed,
+  EyeOff,
   ArrowLeft,
   Clock,
   ShieldCheck,
-  LightBulb,
-  Flash,
-} from "iconoir-react";
+  Lightbulb,
+  Zap,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/language-context";
@@ -123,7 +123,7 @@ function LoginFormContent() {
             tabIndex={-1}
           >
             {showPassword ? (
-              <EyeClosed className="h-5 w-5" />
+              <EyeOff className="h-5 w-5" />
             ) : (
               <Eye className="h-5 w-5" />
             )}
@@ -165,7 +165,7 @@ function LoginFormContent() {
         </div>
         <div className="w-1 h-1 rounded-full bg-slate-300" />
         <div className="flex items-center gap-1.5 text-xs text-slate-400">
-          <Flash className="w-4 h-4 text-[#D4AF37]" />
+          <Zap className="w-4 h-4 text-[#D4AF37]" />
           <span>{t("login.fast_access")}</span>
         </div>
       </div>
@@ -260,7 +260,7 @@ function LoginPageContent() {
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white/5 backdrop-blur-md rounded-2xl p-5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default">
                 <div className="flex items-center gap-2 mb-2">
-                  <LightBulb className="w-5 h-5 text-[#E4C55B]" />
+                  <Lightbulb className="w-5 h-5 text-[#E4C55B]" />
                 </div>
                 <p className="text-2xl xl:text-3xl font-bold text-white mb-1 group-hover:scale-105 transition-transform origin-left">
                   {t("login.stat_units_value")}
@@ -291,7 +291,7 @@ function LoginPageContent() {
               </div>
               <div className="bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/10 backdrop-blur-md rounded-2xl p-5 border border-[#D4AF37]/30 hover:from-[#D4AF37]/30 hover:to-[#D4AF37]/20 transition-all duration-300 group cursor-default">
                 <div className="flex items-center gap-2 mb-2">
-                  <Flash className="w-5 h-5 text-[#E4C55B]" />
+                  <Zap className="w-5 h-5 text-[#E4C55B]" />
                 </div>
                 <p className="text-2xl xl:text-3xl font-bold text-[#E4C55B] mb-1 group-hover:scale-105 transition-transform origin-left">
                   {t("login.stat_uptime_value")}

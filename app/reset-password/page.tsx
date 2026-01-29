@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Eye, EyeClosed, Lock, Check, Xmark } from "iconoir-react";
+import { ArrowLeft, Eye, EyeOff, Lock, Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { resetPassword, validateResetToken } from "@/app/actions/auth";
@@ -108,7 +108,7 @@ function ResetPasswordFormContent() {
     return (
       <div className="text-center space-y-6">
         <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-full">
-          <Xmark className="w-10 h-10 text-red-600" strokeWidth={2.5} />
+          <X className="w-10 h-10 text-red-600" strokeWidth={2.5} />
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">
@@ -206,7 +206,7 @@ function ResetPasswordFormContent() {
               tabIndex={-1}
             >
               {showPassword ? (
-                <EyeClosed className="h-5 w-5" />
+                <EyeOff className="h-5 w-5" />
               ) : (
                 <Eye className="h-5 w-5" />
               )}
@@ -230,7 +230,7 @@ function ResetPasswordFormContent() {
                   {passwordStrength.minLength ? (
                     <Check className="w-3.5 h-3.5" />
                   ) : (
-                    <Xmark className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5" />
                   )}
                   {t("reset.min_length")}
                 </div>
@@ -244,7 +244,7 @@ function ResetPasswordFormContent() {
                   {passwordStrength.hasUppercase ? (
                     <Check className="w-3.5 h-3.5" />
                   ) : (
-                    <Xmark className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5" />
                   )}
                   {t("reset.has_uppercase")}
                 </div>
@@ -258,7 +258,7 @@ function ResetPasswordFormContent() {
                   {passwordStrength.hasLowercase ? (
                     <Check className="w-3.5 h-3.5" />
                   ) : (
-                    <Xmark className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5" />
                   )}
                   {t("reset.has_lowercase")}
                 </div>
@@ -272,7 +272,7 @@ function ResetPasswordFormContent() {
                   {passwordStrength.hasNumber ? (
                     <Check className="w-3.5 h-3.5" />
                   ) : (
-                    <Xmark className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5" />
                   )}
                   {t("reset.has_number")}
                 </div>
@@ -297,7 +297,7 @@ function ResetPasswordFormContent() {
               tabIndex={-1}
             >
               {showConfirmPassword ? (
-                <EyeClosed className="h-5 w-5" />
+                <EyeOff className="h-5 w-5" />
               ) : (
                 <Eye className="h-5 w-5" />
               )}
@@ -313,7 +313,7 @@ function ResetPasswordFormContent() {
               {passwordsMatch ? (
                 <Check className="w-3.5 h-3.5" />
               ) : (
-                <Xmark className="w-3.5 h-3.5" />
+                <X className="w-3.5 h-3.5" />
               )}
               {passwordsMatch ? t("reset.match") : t("reset.no_match")}
             </div>

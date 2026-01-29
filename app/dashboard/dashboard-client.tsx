@@ -3,26 +3,25 @@
 import { use, Suspense } from "react";
 import Link from "next/link";
 import {
-  LightBulb,
-  CheckCircle,
-  WarningTriangle,
-  XmarkCircle,
-  StatsReport,
-  ArrowRight,
-  Globe
-} from "iconoir-react";
+  TrendingUp,
+  ArrowUpRight,
+  Plus,
+  Briefcase,
+  AlertCircle,
+  CheckCircle2,
+  AlertTriangle,
+  WifiOff,
+  FileText,
+  Globe,
+  ArrowRight
+} from "lucide-react";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
-import { ProvinceChart, StatusDonutChart } from "@/components/dashboard/charts-lazy";
+import { ProvinceChart } from "@/components/dashboard/charts-lazy";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { DashboardStats, ProvinceStats, ActionResult } from "@/app/actions/dashboard";
+import { DashboardStats, ProvinceStats, ActionResult, DashboardUser } from "@/app/actions/dashboard";
 import { ExportDashboardButton } from "./export-button";
-import {
-  StatsGridSkeleton,
-  ChartsGridSkeleton,
-  TableSkeleton
-} from "@/components/dashboard/skeletons";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 // Define Promise Types
 type StatsPromise = Promise<ActionResult<DashboardStats>>;
@@ -35,14 +34,39 @@ type ActivityPromise = Promise<ActionResult<Array<{
   user: string;
   province?: string;
 }>>>;
+type UsersPromise = Promise<ActionResult<DashboardUser[]>>;
 
 interface DashboardClientProps {
   statsPromise: StatsPromise;
   provincesPromise: ProvincesPromise;
   activitiesPromise: ActivityPromise;
+  usersPromise: UsersPromise;
   user?: {
     name?: string | null;
   };
+}
+
+/**
+ * Get the initial letter(s) from a user's name for avatar display
+ */
+function getUserInitial(name: string): string {
+  return name.charAt(0).toUpperCase();
+}
+
+/**
+ * Generate a consistent background color based on user ID
+ * Uses theme-consistent primary blue shades for a clean look
+ */
+function getAvatarColor(userId: string): string {
+  const colors = [
+    "bg-primary-500",
+    "bg-primary-600",
+    "bg-primary-700",
+    "bg-primary-400",
+  ];
+  // Simple hash based on userId to get consistent color
+  const hash = userId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return colors[hash % colors.length];
 }
 
 function getGreeting() {
@@ -54,83 +78,25 @@ function getGreeting() {
 }
 
 // ==========================================
-// CUSTOM COMPONENTS FOR NEW DESIGN
+// BENTO COMPONENTS
 // ==========================================
 
-function ModernStatCard({ 
-  title, 
-  value, 
-  subtext, 
-  trend, 
-  variant = "white", 
-  icon: Icon 
+function BentoCard({ 
+  children, 
+  className,
+  padding = "p-8"
 }: { 
-  title: string; 
-  value: string | number; 
-  subtext?: string;
-  trend?: { value: number; isPositive: boolean };
-  variant?: "primary" | "white" | "dark";
-  icon?: React.ElementType;
+  children: React.ReactNode; 
+  className?: string;
+  padding?: string;
 }) {
-  const isPrimary = variant === "primary";
-  const isDark = variant === "dark";
-  const isColored = isPrimary || isDark;
-  
   return (
     <div className={cn(
-      "relative flex flex-col justify-between p-7 h-52 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
-      "rounded-[2rem] shadow-sm group border",
-      isPrimary 
-        ? "bg-primary-600 text-white border-primary-500 shadow-primary-900/20" 
-        : isDark
-          ? "bg-slate-900 text-white border-slate-800 shadow-slate-900/20"
-          : "bg-white text-slate-900 border-slate-200/60 shadow-slate-100"
+      "bg-card rounded-bento border border-border shadow-sm overflow-hidden",
+      padding,
+      className
     )}>
-      <div className="flex justify-between items-start">
-        <div className="flex flex-col">
-           <span className={cn("text-base font-medium tracking-wide", isColored ? "text-primary-100" : "text-slate-500")}>
-            {title}
-          </span>
-        </div>
-        <div className={cn(
-          "p-2.5 rounded-full transition-colors", 
-          isColored 
-            ? "bg-white/10 text-white group-hover:bg-white/20" 
-            : "bg-slate-50 text-slate-600 group-hover:bg-slate-100"
-        )}>
-          {Icon ? <Icon className="w-5 h-5"/> : <ArrowRight className="w-5 h-5 -rotate-45" />}
-        </div>
-      </div>
-      
-      <div className="space-y-3 z-10">
-        <div className="text-4xl lg:text-5xl font-bold tracking-tight">
-          {value}
-        </div>
-        
-        <div className="flex items-center gap-3">
-             {trend && (
-                 <Badge className={cn(
-                   "rounded-full px-2.5 py-0.5 text-xs font-semibold border-0",
-                   isColored 
-                    ? "bg-white/20 text-white hover:bg-white/30" 
-                    : trend.isPositive ? "bg-emerald-50 text-emerald-600 hover:bg-emerald-100" : "bg-red-50 text-red-600 hover:bg-red-100"
-                 )}>
-                     {trend.isPositive ? "+" : ""}{trend.value}%
-                 </Badge>
-             )}
-             {subtext && (
-               <span className={cn("text-sm font-medium", isColored ? "text-primary-100/80" : "text-slate-500")}>
-                {subtext}
-              </span>
-             )}
-        </div>
-      </div>
-
-      {Icon && isColored && (
-        <div className={cn("absolute bottom-6 right-6 opacity-0 group-hover:opacity-10 transition-opacity transform scale-150 pointer-events-none")}>
-           <Icon className="w-24 h-24" />
-        </div>
-      )}
+      {children}
     </div>
   );
 }
@@ -139,8 +105,18 @@ function ModernStatCard({
 // SUB-COMPONENTS USING use()
 // ==========================================
 
-function StatsGrid({ dataPromise }: { dataPromise: StatsPromise }) {
-  const { data: stats } = use(dataPromise);
+function DashboardBentoGrid({ 
+  statsPromise, 
+  provincesPromise, 
+  activitiesPromise,
+}: { 
+  statsPromise: StatsPromise, 
+  provincesPromise: ProvincesPromise, 
+  activitiesPromise: ActivityPromise,
+}) {
+  const { data: stats } = use(statsPromise);
+  const { data: provinces } = use(provincesPromise);
+  const { data: activities } = use(activitiesPromise);
 
   const totalUnits = stats?.totalUnits || 0;
   const operationalUnits = stats?.operationalUnits || 0;
@@ -150,331 +126,497 @@ function StatsGrid({ dataPromise }: { dataPromise: StatsPromise }) {
   const operationalPercentage = totalUnits > 0
     ? Math.round((operationalUnits / totalUnits) * 100)
     : 0;
-  
-  const maintenancePercentage = totalUnits > 0
-    ? Math.round((maintenanceUnits / totalUnits) * 100)
-    : 0;
-
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-      <ModernStatCard
-        title="Total Unit"
-        value={totalUnits.toLocaleString('id-ID')}
-        variant="primary"
-        subtext="Terpasang"
-        trend={{ value: 12, isPositive: true }} // Mock trend
-        icon={LightBulb}
-      />
-      <ModernStatCard
-        title="Operasional"
-        value={operationalUnits.toLocaleString('id-ID')}
-        variant="white"
-        trend={{ value: operationalPercentage, isPositive: true }}
-        icon={CheckCircle}
-      />
-      <ModernStatCard
-        title="Perlu Perawatan"
-        value={maintenanceUnits.toLocaleString('id-ID')}
-        variant="white"
-        trend={{ value: maintenancePercentage, isPositive: false }}
-        icon={WarningTriangle}
-      />
-      <ModernStatCard
-        title="Offline"
-        value={offlineUnits.toLocaleString('id-ID')}
-        variant="white"
-        subtext="Tidak terhubung"
-        icon={XmarkCircle}
-      />
-    </div>
-  );
-}
-
-function MainContentGrid({ 
-  statsPromise, 
-  provincesPromise, 
-  activitiesPromise 
-}: { 
-  statsPromise: StatsPromise, 
-  provincesPromise: ProvincesPromise, 
-  activitiesPromise: ActivityPromise 
-}) {
-  const { data: stats } = use(statsPromise);
-  const { data: provinces } = use(provincesPromise);
-  const { data: activities } = use(activitiesPromise);
 
   const safeProvinces = provinces || [];
   const safeActivities = activities || [];
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-10">
-      {/* Province Chart - Takes 2 columns */}
-      <div className="xl:col-span-2 space-y-8">
-        {/* Charts Section */}
-        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60 relative overflow-hidden">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h3 className="text-xl font-bold text-slate-900">Sebaran Provinsi</h3>
-              <p className="text-slate-500 mt-1">Distribusi unit PJUTS per wilayah</p>
+    <div className="grid grid-cols-12 gap-6">
+      
+      {/* 1. Main Stat Card (Income Project Style) */}
+      <BentoCard className="col-span-12 lg:col-span-8 flex flex-col gap-6">
+        <div className="flex justify-between items-start">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-xl font-bold text-foreground">Total Unit Terpasang</h3>
+              <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full">Nasional</span>
             </div>
-            <div className="flex gap-2">
-               <span className="px-4 py-2 bg-slate-50 rounded-full text-xs font-semibold uppercase tracking-wider text-slate-500 border border-slate-200">
-                  Nasional
-               </span>
+            <div className="flex items-center gap-2 text-emerald-500 font-bold text-sm">
+              <TrendingUp size={14} />
+              +12.8%
             </div>
           </div>
-          <div className="h-[400px] w-full">
-            <ProvinceChart data={safeProvinces} />
+          <div className="flex items-center gap-3">
+            <div className="bg-muted px-3 py-1.5 rounded-xl text-xs font-semibold text-muted-foreground">
+              Tahun 2026
+            </div>
+            <button className="p-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground">
+              <ArrowUpRight size={18} />
+            </button>
           </div>
         </div>
 
-        {/* Status & Reports Row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-           {/* Status Donut */}
-           <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60 flex flex-col">
-              <div className="mb-6">
-                 <h3 className="text-lg font-bold text-slate-900">Status Unit</h3>
-                 <p className="text-slate-500 text-sm">Rasio performa keseluruhan</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-12 mt-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-6xl font-bold tracking-tighter text-foreground">
+              {totalUnits.toLocaleString('id-ID')}
+            </span>
+            <p className="text-xs text-muted-foreground">Pertumbuhan unit baru di 34 provinsi</p>
+            <div className="flex items-center gap-3 mt-4">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl">
+                <Globe size={14} className="text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">34 Provinsi</span>
               </div>
-              <div className="flex-1 flex items-center justify-center min-h-[250px]">
-                 <StatusDonutChart
-                  data={{
-                    operational: stats?.operationalUnits || 0,
-                    maintenanceNeeded: stats?.maintenanceNeeded || 0,
-                    offline: stats?.offlineUnits || 0,
-                    unverified: stats?.unverifiedUnits || 0,
-                  }}
+              <Link href="/units" className="flex items-center gap-1 text-xs font-bold text-primary hover:text-primary/80 transition-colors">
+                Lihat Semua Unit <ArrowRight size={14} />
+              </Link>
+            </div>
+          </div>
+
+          {/* Waveform-like Visual for Stats */}
+          <div className="flex-1 flex items-end justify-between h-32 px-4 relative max-w-md">
+            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+               <div className="w-full border-t border-dashed border-muted/50"></div>
+               <div className="w-full border-t border-dashed border-muted/50"></div>
+               <div className="w-full border-t border-dashed border-muted/50"></div>
+            </div>
+            {[40, 70, 45, 90, 65, 80, 50, 85].map((h, i) => (
+              <div key={i} className="flex flex-col items-center gap-2 relative z-10 group">
+                <motion.div 
+                  initial={{ height: 0 }}
+                  animate={{ height: `${h}%` }}
+                  transition={{ duration: 1, delay: i * 0.1 }}
+                  className={cn(
+                    "w-6 md:w-8 rounded-t-lg transition-all duration-500",
+                    i === 3 ? "bg-primary shadow-lg shadow-primary/20" : "bg-muted group-hover:bg-primary/40"
+                  )}
                 />
               </div>
+            ))}
+          </div>
+        </div>
+      </BentoCard>
+
+      {/* 2. Operational Progress (Share Progress style) */}
+      <BentoCard className="col-span-12 lg:col-span-4 flex flex-col justify-between">
+        <div className="flex justify-between items-start">
+          <h3 className="text-xl font-bold leading-tight text-foreground">Status<br/>Operasional</h3>
+          <button className="p-2 border border-border rounded-xl text-muted-foreground hover:text-foreground hover:bg-muted transition-all">
+            <ArrowUpRight size={18} />
+          </button>
+        </div>
+
+        <div className="relative py-4 flex items-center justify-center">
+          <svg className="w-48 h-48 transform -rotate-90">
+            <circle cx="96" cy="96" r="80" className="stroke-muted fill-none" strokeWidth="16" />
+            <motion.circle 
+              cx="96" cy="96" r="80" 
+              className="stroke-primary fill-none" 
+              strokeWidth="16" 
+              strokeDasharray="502.4" 
+              initial={{ strokeDashoffset: 502.4 }}
+              animate={{ strokeDashoffset: 502.4 * (1 - operationalPercentage / 100) }}
+              transition={{ duration: 1.5, ease: "easeOut" }}
+              strokeLinecap="round"
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-4xl font-bold text-foreground">{operationalPercentage}%</span>
+            <span className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Berfungsi</span>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3">
+           <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                 <div className="w-2.5 h-2.5 rounded-full bg-primary"></div>
+                 <span className="text-xs font-semibold text-muted-foreground">Normal</span>
+              </div>
+              <span className="text-xs font-bold text-foreground">{operationalUnits.toLocaleString('id-ID')}</span>
+           </div>
+           <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                 <div className="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+                 <span className="text-xs font-semibold text-muted-foreground">Maintenance</span>
+              </div>
+              <span className="text-xs font-bold text-foreground">{maintenanceUnits.toLocaleString('id-ID')}</span>
+           </div>
+           <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                 <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                 <span className="text-xs font-semibold text-muted-foreground">Offline</span>
+              </div>
+              <span className="text-xs font-bold text-foreground">{offlineUnits.toLocaleString('id-ID')}</span>
+           </div>
+        </div>
+      </BentoCard>
+
+      {/* 3. Issues & Reminders (Reminders style) */}
+      <BentoCard className="col-span-12 lg:col-span-4 flex flex-col gap-6">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-bold text-foreground">Perhatian Khusus</h3>
+          <button className="text-[10px] font-bold text-muted-foreground hover:text-foreground">Lihat Semua</button>
+        </div>
+        <div className="space-y-4">
+           <div className="p-5 bg-primary text-primary-foreground rounded-3xl shadow-lg shadow-primary/20">
+              <div className="flex justify-between items-center mb-2">
+                 <span className="text-[10px] font-bold opacity-80 uppercase tracking-wider">Perbaikan Mendesak</span>
+                 <AlertTriangle size={16} />
+              </div>
+              <p className="text-lg font-bold leading-tight">{maintenanceUnits} Unit memerlukan pengecekan teknis segera.</p>
+           </div>
+           
+           <div className="p-5 bg-muted rounded-3xl flex justify-between items-center group hover:bg-muted/80 transition-colors cursor-pointer">
+              <div className="flex items-center gap-4">
+                 <div className="w-10 h-10 rounded-2xl bg-card flex items-center justify-center text-red-500 shadow-sm">
+                    <WifiOff size={20} />
+                 </div>
+                 <div>
+                    <p className="text-sm font-bold text-foreground">{offlineUnits} Unit Offline</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Koneksi terputus hari ini</p>
+                 </div>
+              </div>
+              <ArrowRight size={16} className="text-muted-foreground group-hover:text-foreground transition-transform group-hover:translate-x-1" />
            </div>
 
-           {/* Quick Reports Stats */}
-           <div className="bg-slate-900 rounded-[2rem] p-8 shadow-sm text-white flex flex-col justify-between group relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-10 transition-transform group-hover:scale-110 duration-700">
-                 <StatsReport className="w-32 h-32 rotate-12 text-slate-200" />
-              </div>
-              
-              <div className="relative z-10">
-                 <div className="flex items-center gap-3 mb-2">
-                    <div className="p-2 bg-white/10 rounded-xl">
-                      <StatsReport className="w-5 h-5 text-white" />
-                    </div>
-                    <h3 className="text-lg font-medium text-slate-300">Laporan Masuk</h3>
+           <div className="p-5 bg-muted rounded-3xl flex justify-between items-center group hover:bg-muted/80 transition-colors cursor-pointer">
+              <div className="flex items-center gap-4">
+                 <div className="w-10 h-10 rounded-2xl bg-card flex items-center justify-center text-primary shadow-sm">
+                    <FileText size={20} />
                  </div>
-                 <p className="text-5xl font-bold mt-4 tracking-tight">{stats?.totalReports || 0}</p>
-                 <div className="mt-2 text-slate-400">Total laporan diterima</div>
+                 <div>
+                    <p className="text-sm font-bold text-foreground">{stats?.reportsToday || 0} Laporan Baru</p>
+                    <p className="text-[10px] text-muted-foreground font-medium">Menunggu verifikasi admin</p>
+                 </div>
               </div>
+              <ArrowRight size={16} className="text-muted-foreground group-hover:text-foreground transition-transform group-hover:translate-x-1" />
+           </div>
+        </div>
+      </BentoCard>
 
-              <div className="space-y-4 mt-8 bg-white/5 rounded-2xl p-5 backdrop-blur-sm border border-white/5 relative z-10 transition-colors hover:bg-white/10">
-                 <div className="flex justify-between items-center">
-                    <span className="text-slate-400 text-sm">Bulan Ini</span>
-                    <span className="text-xl font-semibold">{stats?.reportsThisMonth || 0}</span>
+      {/* 4. Province Chart (Meeting Schedule style header + Large Grid) */}
+      <BentoCard className="col-span-12 lg:col-span-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
+          <div>
+             <h3 className="text-xl font-bold mb-1 text-foreground">Sebaran Provinsi</h3>
+             <p className="text-xs text-muted-foreground">Top 8 provinsi dengan unit PJUTS terbanyak</p>
+          </div>
+          <div className="flex items-center gap-2">
+             <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl text-[10px] font-bold text-muted-foreground">
+               <Globe size={12} />
+               <span>{safeProvinces.length} Provinsi</span>
+             </div>
+             <Link href="/map">
+               <Button variant="outline" size="sm" className="rounded-xl text-xs font-bold h-8">
+                 Lihat Peta
+               </Button>
+             </Link>
+          </div>
+        </div>
+
+        {/* Quick Stats Row */}
+        <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="bg-primary/5 rounded-xl p-3 border border-primary/10">
+            <p className="text-lg font-bold text-primary">{safeProvinces.reduce((sum, p) => sum + p.operational, 0).toLocaleString('id-ID')}</p>
+            <p className="text-[10px] font-medium text-muted-foreground">Operasional</p>
+          </div>
+          <div className="bg-amber-500/5 rounded-xl p-3 border border-amber-500/10">
+            <p className="text-lg font-bold text-amber-600">{safeProvinces.reduce((sum, p) => sum + p.maintenanceNeeded, 0).toLocaleString('id-ID')}</p>
+            <p className="text-[10px] font-medium text-muted-foreground">Perawatan</p>
+          </div>
+          <div className="bg-red-500/5 rounded-xl p-3 border border-red-500/10">
+            <p className="text-lg font-bold text-red-500">{safeProvinces.reduce((sum, p) => sum + p.offline, 0).toLocaleString('id-ID')}</p>
+            <p className="text-[10px] font-medium text-muted-foreground">Offline</p>
+          </div>
+        </div>
+
+        <div className="h-[340px] w-full">
+          <ProvinceChart data={safeProvinces} />
+        </div>
+      </BentoCard>
+
+      {/* 5. Detail Table (Project Outsourcing style header + Table) */}
+      <BentoCard className="col-span-12 lg:col-span-8" padding="p-0">
+        <div className="p-8 pb-4">
+           <div className="flex justify-between items-center mb-6">
+              <div className="flex flex-col gap-1">
+                 <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full w-fit">Data Wilayah</span>
+                 <h3 className="text-2xl font-bold text-foreground">Detail Performa Provinsi</h3>
+              </div>
+              <Link href="/analytics">
+                <Button variant="outline" className="rounded-2xl border-border hover:bg-muted text-xs font-bold">
+                  Lihat Selengkapnya
+                </Button>
+              </Link>
+           </div>
+        </div>
+        
+        <div className="overflow-x-auto px-8 pb-8">
+          <table className="w-full text-left border-separate border-spacing-y-3">
+            <thead>
+              <tr className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+                <th className="px-4 py-2">Provinsi</th>
+                <th className="px-4 py-2">Total Unit</th>
+                <th className="px-4 py-2">Status</th>
+                <th className="px-4 py-2 text-right">Performa</th>
+              </tr>
+            </thead>
+            <tbody>
+              {safeProvinces.slice(0, 5).map((prov) => (
+                <tr key={prov.province} className="group cursor-pointer">
+                  <td className="px-4 py-4 bg-muted/40 group-hover:bg-muted rounded-l-[1.5rem] transition-colors border-y border-l border-transparent group-hover:border-border">
+                    <div className="flex items-center gap-3">
+                       <div className="w-10 h-10 rounded-full bg-card border border-border flex items-center justify-center font-bold text-xs text-primary shadow-sm">
+                          {prov.province.substring(0, 2).toUpperCase()}
+                       </div>
+                       <span className="font-bold text-sm text-foreground">{prov.province}</span>
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 bg-muted/40 group-hover:bg-muted border-y border-transparent group-hover:border-border transition-colors">
+                    <span className="font-bold text-sm text-foreground">{prov.totalUnits.toLocaleString('id-ID')}</span>
+                  </td>
+                  <td className="px-4 py-4 bg-muted/40 group-hover:bg-muted border-y border-transparent group-hover:border-border transition-colors">
+                     <div className="flex gap-2">
+                         {prov.operational > 0 && (
+                            <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-emerald-500/20">
+                               <CheckCircle2 size={10} />
+                               {prov.operational} OK
+                            </div>
+                         )}
+                         {(prov.maintenanceNeeded + prov.offline > 0) && (
+                            <div className="flex items-center gap-1 bg-amber-500/10 text-amber-600 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-amber-500/20">
+                               <AlertCircle size={10} />
+                               {prov.maintenanceNeeded + prov.offline} Issue
+                            </div>
+                         )}
+                     </div>
+                  </td>
+                  <td className="px-4 py-4 bg-muted/40 group-hover:bg-muted rounded-r-[1.5rem] text-right border-y border-r border-transparent group-hover:border-border transition-colors">
+                     <div className="flex flex-col items-end gap-1.5">
+                        <span className="font-bold text-sm text-foreground">
+                          {prov.totalUnits > 0 ? Math.round((prov.operational / prov.totalUnits) * 100) : 0}%
+                        </span>
+                        <div className="w-20 h-1.5 bg-border rounded-full overflow-hidden">
+                           <motion.div 
+                             initial={{ width: 0 }}
+                             animate={{ width: `${prov.totalUnits > 0 ? (prov.operational / prov.totalUnits) * 100 : 0}%` }}
+                             className="h-full bg-primary rounded-full" 
+                           />
+                        </div>
+                     </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </BentoCard>
+
+      {/* 6. Reports Summary (Project Outsourcing style) */}
+      <BentoCard className="col-span-12 lg:col-span-4 flex flex-col justify-between gap-6">
+        <div>
+           <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full mb-3 inline-block uppercase tracking-wider">Statistik Laporan</span>
+           <h3 className="text-2xl font-bold mb-4 text-foreground">Ringkasan Laporan</h3>
+           <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/50">
+                 <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-primary shadow-sm">
+                    <Briefcase size={18} />
                  </div>
-                 <div className="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-primary-500 rounded-full" 
-                      style={{ width: '75%' }} // Mock width
-                    ></div>
+                 <div>
+                    <p className="text-xs font-bold leading-none text-foreground">{stats?.totalReports || 0}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase mt-1">Total</p>
                  </div>
-                 <div className="flex justify-between items-center pt-1">
-                    <span className="text-slate-400 text-sm">Hari Ini</span>
-                    <span className="text-white font-medium bg-emerald-500/20 px-2 py-0.5 rounded text-xs text-emerald-400">
-                      +{stats?.reportsToday || 0}
-                    </span>
+              </div>
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/50">
+                 <div className="w-10 h-10 rounded-xl bg-card flex items-center justify-center text-emerald-500 shadow-sm">
+                    <CheckCircle2 size={18} />
+                 </div>
+                 <div>
+                    <p className="text-xs font-bold leading-none text-foreground">{stats?.reportsToday || 0}</p>
+                    <p className="text-[10px] text-muted-foreground font-medium uppercase mt-1">Hari Ini</p>
                  </div>
               </div>
            </div>
         </div>
-      </div>
 
-      {/* Right Column: Activity & Hot Lists */}
-      <div className="space-y-8">
-        {/* Activity Feed */}
-        <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60 h-full max-h-[900px] overflow-hidden flex flex-col">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-slate-900">Aktivitas Terbaru</h3>
+        <div className="space-y-4">
+           <div className="flex justify-between items-end mb-1">
+              <div>
+                 <p className="text-3xl font-bold tracking-tighter text-foreground">{stats?.reportsThisMonth || 0}</p>
+                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Laporan Bulan Ini</p>
+              </div>
+              <div className="flex items-center gap-1 text-emerald-500 font-bold text-xs bg-emerald-500/10 px-2 py-0.5 rounded-full mb-1">
+                +2.4%
+                <TrendingUp size={12} />
+              </div>
+           </div>
+           
+           <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+              <motion.div 
+                initial={{ width: 0 }}
+                animate={{ width: "75%" }} // Mocked as in original
+                className="h-full bg-primary rounded-full" 
+              />
+           </div>
+        </div>
+      </BentoCard>
+
+      {/* 7. Activity Feed (Unified Bottom Card or separate?) */}
+      <BentoCard className="col-span-12 flex flex-col gap-8">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="text-xl font-bold text-foreground">Aktivitas Sistem Terbaru</h3>
+            <p className="text-xs text-muted-foreground mt-1">Log aktivitas operasional dan pemeliharaan secara real-time</p>
+          </div>
+          <div className="flex items-center gap-3">
+            {safeActivities.length > 0 && (
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl">
+                <div 
+                  className="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white text-[10px] font-bold"
+                  title={safeActivities[0].user}
+                >
+                  {getUserInitial(safeActivities[0].user)}
+                </div>
+                <span className="text-xs text-muted-foreground">
+                  {safeActivities[0].user}
+                </span>
+              </div>
+            )}
             <Link href="/reports">
-               <div className="p-2 hover:bg-slate-50 rounded-full transition-colors cursor-pointer border border-slate-100 group">
-                  <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-slate-900" />
-               </div>
+               <Button variant="outline" className="rounded-xl border-border hover:bg-muted text-xs font-bold">
+                 Buka Log Aktivitas
+               </Button>
             </Link>
           </div>
-          
-          <div className="flex-1 overflow-y-auto pr-2 -mr-2 custom-scrollbar">
-             <ActivityFeed
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+           <div className="lg:col-span-2">
+              <ActivityFeed
                 activities={safeActivities.map((a) => ({
                   ...a,
                   timestamp: new Date(a.timestamp),
                 }))}
                 maxHeight="100%"
               />
-          </div>
+           </div>
+           <div className="bg-muted/30 rounded-[2rem] p-6 border border-border/50 flex flex-col justify-center items-center text-center">
+              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-4">
+                 <WifiOff size={32} />
+              </div>
+              <h4 className="font-bold text-foreground mb-2">Pusat Bantuan</h4>
+              <p className="text-xs text-muted-foreground mb-6">Butuh bantuan teknis atau ingin melaporkan kendala sistem?</p>
+              <Button className="w-full rounded-xl font-bold bg-foreground text-background">Hubungi Support</Button>
+           </div>
         </div>
-      </div>
+      </BentoCard>
+
+
     </div>
   );
 }
 
-function ProvinceTableSection({ provincesPromise }: { provincesPromise: ProvincesPromise }) {
-  const { data: provinces } = use(provincesPromise);
-  const safeProvinces = provinces || [];
-
-  return (
-    <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div>
-           <h3 className="text-xl font-bold text-slate-900">Detail Wilayah</h3>
-           <p className="text-slate-500 mt-1">Status performa per provinsi</p>
-        </div>
-        <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-full text-sm font-medium text-slate-600 border border-slate-200">
-               <Globe className="w-4 h-4" />
-               <span>Indonesia</span>
-            </div>
-            <Link href="/analytics">
-              <Button variant="outline" className="rounded-full px-6 border-slate-200 hover:bg-slate-50 hover:text-slate-900">
-                Lihat Semua
-              </Button>
-            </Link>
-        </div>
-      </div>
-      
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-separate border-spacing-y-3">
-          <thead>
-            <tr className="text-slate-400 text-sm font-medium">
-              <th className="px-6 py-2 font-medium">Provinsi</th>
-              <th className="px-6 py-2 font-medium">Total Unit</th>
-              <th className="px-6 py-2 font-medium">Status</th>
-              <th className="px-6 py-2 text-right font-medium">Performa</th>
-            </tr>
-          </thead>
-          <tbody className="">
-            {safeProvinces.slice(0, 8).map((prov) => (
-              <tr
-                key={prov.province}
-                className="group transition-all hover:scale-[1.005]"
-              >
-                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 rounded-l-2xl border-y border-l border-transparent group-hover:border-slate-200 transition-colors">
-                  <div className="flex items-center gap-4">
-                     <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-slate-400 font-bold text-xs shadow-sm border border-slate-200 group-hover:border-primary-200 group-hover:text-primary-600 transition-colors">
-                        {prov.province.substring(0, 2).toUpperCase()}
-                     </div>
-                     <span className="font-semibold text-slate-700 group-hover:text-slate-900">{prov.province}</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 border-y border-transparent group-hover:border-slate-200 transition-colors">
-                  <div className="flex flex-col">
-                     <span className="font-bold text-slate-900">{prov.totalUnits}</span>
-                     <span className="text-xs text-slate-400">Unit terpasang</span>
-                  </div>
-                </td>
-                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 border-y border-transparent group-hover:border-slate-200 transition-colors">
-                   <div className="flex gap-2">
-                       {prov.operational > 0 && (
-                           <Badge className="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border-0 shadow-none rounded-lg px-3">
-                              {prov.operational} OK
-                           </Badge>
-                       )}
-                       {(prov.maintenanceNeeded > 0 || prov.offline > 0) && (
-                           <Badge className="bg-white border-slate-200 text-slate-600 hover:bg-slate-50 shadow-none rounded-lg px-3">
-                              {prov.maintenanceNeeded + prov.offline} Issue
-                           </Badge>
-                       )}
-                   </div>
-                </td>
-                <td className="px-6 py-4 bg-slate-50/50 group-hover:bg-slate-50 rounded-r-2xl border-y border-r border-transparent group-hover:border-slate-200 text-right transition-colors">
-                   <div className="flex flex-col items-end gap-1">
-                      <span className="font-bold text-slate-900">
-                        {prov.totalUnits > 0 ? Math.round((prov.operational / prov.totalUnits) * 100) : 0}%
-                      </span>
-                      <div className="w-24 h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                         <div 
-                           className="h-full bg-primary-500 rounded-full" 
-                           style={{ width: `${prov.totalUnits > 0 ? (prov.operational / prov.totalUnits) * 100 : 0}%` }}
-                         ></div>
-                      </div>
-                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-}
-
-// Wrapper to unwrap stats for export button only - optional or can just pass promise
+// Wrapper to unwrap stats for export button only
 function ExportButtonWrapper({ statsPromise, provincesPromise }: { statsPromise: StatsPromise, provincesPromise: ProvincesPromise }) {
   const { data: stats } = use(statsPromise);
   const { data: provinces } = use(provincesPromise);
   return <ExportDashboardButton stats={stats} provinces={provinces || []} />;
 }
 
-
 // ==========================================
 // MAIN COMPONENT
 // ==========================================
+
+// Header users component that unwraps the promise
+function HeaderUsers({ usersPromise }: { usersPromise: UsersPromise }) {
+  const { data: users } = use(usersPromise);
+  const safeUsers = users || [];
+
+  return (
+    <div className="hidden xl:flex -space-x-4 mr-2">
+      {safeUsers.map((user) => (
+        <div 
+          key={user.id} 
+          className={cn("w-14 h-14 rounded-2xl border-[4px] border-background shadow-xl shadow-primary/5 transition-transform hover:scale-110 hover:z-10 cursor-pointer flex items-center justify-center text-white text-lg font-bold", getAvatarColor(user.id))}
+          title={`${user.name} (${user.role})`}
+        >
+          {getUserInitial(user.name)}
+        </div>
+      ))}
+      <Link href="/users" className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted/50 flex items-center justify-center text-primary/60 hover:bg-primary/10 hover:text-primary transition-all shadow-xl shadow-primary/5 cursor-pointer">
+        <Plus size={24} />
+      </Link>
+    </div>
+  );
+}
 
 export function DashboardClient({
   statsPromise,
   provincesPromise,
   activitiesPromise,
+  usersPromise,
   user,
 }: DashboardClientProps) {
   const greeting = getGreeting();
   const displayName = user?.name?.split(' ')[0] || 'Admin';
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-4 md:p-8 font-sans selection:bg-primary-100 selection:text-primary-900">
-      <div className="max-w-[1600px] mx-auto space-y-8">
+    <div className="min-h-screen bg-background pt-8 font-sans selection:bg-primary/20 selection:text-primary">
+      <div className="max-w-[1700px] mx-auto space-y-12 animate-fade-in px-4">
         
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+        {/* Header Section (Premium Bento Inspired) */}
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-4">
            <div>
-              <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
-                {greeting}, {displayName}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-1 w-12 bg-primary rounded-full" />
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Ringkasan Eksekutif</span>
+              </div>
+              <h1 className="text-5xl font-black text-foreground tracking-tighter mb-3">
+                {greeting}, <span className="text-primary/80">{displayName}</span>
               </h1>
-              <p className="text-slate-500 mt-2 text-lg">Pantau status & performa PJUTS Nasional</p>
+              <p className="text-muted-foreground text-base font-bold tracking-tight">Pantau infrastruktur energi terbarukan Provinsi Jambi secara real-time.</p>
            </div>
            
-           <div className="flex items-center gap-3">
-              <Suspense fallback={<Button disabled size="lg" className="rounded-full px-6">Loading...</Button>}>
-                <ExportButtonWrapper statsPromise={statsPromise} provincesPromise={provincesPromise} />
+           <div className="flex flex-wrap items-center gap-6">
+              <Suspense fallback={
+                <div className="hidden xl:flex -space-x-4 mr-2">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted animate-pulse" />
+                  ))}
+                </div>
+              }>
+                <HeaderUsers usersPromise={usersPromise} />
               </Suspense>
-              
-              <Link href="/report/new">
-                <Button size="lg" className="bg-primary-600 text-white hover:bg-primary-700 rounded-full px-6 shadow-lg shadow-primary-900/20 h-11">
-                  <StatsReport className="h-5 w-5 mr-2" />
-                  Buat Laporan
-                </Button>
-              </Link>
+
+              <div className="flex items-center gap-4 bg-muted/20 p-2 rounded-3xl border border-border/40 backdrop-blur-sm">
+                 <Suspense fallback={<div className="w-40 h-12 bg-muted animate-pulse rounded-2xl" />}>
+                   <ExportButtonWrapper statsPromise={statsPromise} provincesPromise={provincesPromise} />
+                 </Suspense>
+                 
+                 <Link href="/report/new">
+                   <Button size="lg" className="bg-primary text-white hover:bg-primary/90 rounded-[1.25rem] px-8 h-14 font-black text-sm tracking-wide transition-all shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 group">
+                     <Plus className="h-5 w-5 mr-3 group-hover:rotate-90 transition-transform duration-300" />
+                     BUAT LAPORAN
+                   </Button>
+                 </Link>
+              </div>
            </div>
         </div>
 
-        {/* Stats Grid - "The Cards" */}
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest pl-1">Ringkasan Utama</p>
-        <Suspense fallback={<StatsGridSkeleton />}>
-          <StatsGrid dataPromise={statsPromise} />
-        </Suspense>
-
-        {/* Main Content Grid: Charts + Side Content */}
-        <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest pl-1">Analisis & Aktivitas</p>
-        <Suspense fallback={<ChartsGridSkeleton />}>
-           <MainContentGrid 
+        {/* Bento Grid Content */}
+        <Suspense fallback={
+          <div className="grid grid-cols-12 gap-6">
+            <div className="col-span-12 lg:col-span-8 h-[400px] bg-muted animate-pulse rounded-bento" />
+            <div className="col-span-12 lg:col-span-4 h-[400px] bg-muted animate-pulse rounded-bento" />
+          </div>
+        }>
+           <DashboardBentoGrid 
              statsPromise={statsPromise} 
              provincesPromise={provincesPromise} 
-             activitiesPromise={activitiesPromise} 
+             activitiesPromise={activitiesPromise}
            />
-        </Suspense>
-
-        {/* Bottom Section: Table */}
-        <Suspense fallback={<TableSkeleton />}>
-          <ProvinceTableSection provincesPromise={provincesPromise} />
         </Suspense>
       </div>
     </div>
   );
 }
-

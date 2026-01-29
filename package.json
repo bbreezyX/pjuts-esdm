@@ -11,10 +11,13 @@
   "scripts": {
     "dev": "node scripts/clean-dev.mjs && next dev --turbopack",
     "dev:fast": "next dev --turbopack",
+    "dev:clean": "node scripts/clean-dev.mjs --full && next dev --turbopack",
     "dev:webpack": "node scripts/clean-dev.mjs && next dev",
-    "build": "next build --webpack",
+    "dev:poll": "cross-env WATCHPACK_POLLING=true next dev --turbopack",
+    "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "clean": "node scripts/clean-dev.mjs --full",
     "postinstall": "prisma generate"
   },
   "dependencies": {
@@ -47,7 +50,6 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.25.0",
-    "iconoir-react": "^7.11.0",
     "leaflet": "^1.9.4",
     "leaflet.markercluster": "^1.5.3",
     "lucide-react": "^0.562.0",
@@ -75,6 +77,7 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@typescript-eslint/parser": "^8.52.0",
+    "cross-env": "^7.0.3",
     "eslint": "^9.20.0",
     "eslint-config-next": "^16.1.1",
     "globals": "^17.0.0",

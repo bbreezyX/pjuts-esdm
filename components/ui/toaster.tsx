@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 import {
-  CheckCircle,
-  WarningTriangle,
-  XmarkCircle,
-  InfoCircle,
-  WarningCircle,
-} from "iconoir-react"
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Info,
+  AlertCircle,
+} from "lucide-react"
 
 export function Toaster() {
   const { toasts } = useToast()
@@ -29,19 +29,19 @@ export function Toaster() {
           <Toast key={id} {...props}>
             <div className="flex gap-3 items-start">
               {variant === "success" && (
-                <CheckCircle className="h-5 w-5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                <CheckCircle2 className="h-5 w-5 mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400" />
               )}
               {variant === "warning" && (
-                <WarningTriangle className="h-5 w-5 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
+                <AlertTriangle className="h-5 w-5 mt-0.5 shrink-0 text-amber-600 dark:text-amber-400" />
               )}
               {variant === "destructive" && (
-                <XmarkCircle className="h-5 w-5 mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
+                <XCircle className="h-5 w-5 mt-0.5 shrink-0 text-red-600 dark:text-red-400" />
               )}
               {variant === "info" && (
-                <InfoCircle className="h-5 w-5 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
+                <Info className="h-5 w-5 mt-0.5 shrink-0 text-blue-600 dark:text-blue-400" />
               )}
               {variant === "default" && (
-                <WarningCircle className="h-5 w-5 mt-0.5 shrink-0 text-slate-500 opacity-0 w-0 h-0 hidden" />
+                <AlertCircle className="h-5 w-5 mt-0.5 shrink-0 text-slate-500 opacity-0 w-0 h-0 hidden" />
               )}
 
               <div className="grid gap-1">
@@ -60,4 +60,3 @@ export function Toaster() {
     </ToastProvider>
   )
 }
-

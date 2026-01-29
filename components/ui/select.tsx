@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import * as SelectPrimitive from "@radix-ui/react-select";
-import { Check, NavArrowDown, NavArrowUp } from "iconoir-react";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Select = SelectPrimitive.Root;
@@ -35,7 +35,7 @@ const SelectTrigger = React.forwardRef<
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <NavArrowDown className="h-4 w-4 opacity-50" />
+        <ChevronDown className="h-4 w-4 opacity-50" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
     {error && <p className="text-sm text-red-600">{error}</p>}
@@ -55,7 +55,7 @@ const SelectScrollUpButton = React.forwardRef<
     )}
     {...props}
   >
-    <NavArrowUp className="h-4 w-4" />
+    <ChevronUp className="h-4 w-4" />
   </SelectPrimitive.ScrollUpButton>
 ));
 SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
@@ -72,7 +72,7 @@ const SelectScrollDownButton = React.forwardRef<
     )}
     {...props}
   >
-    <NavArrowDown className="h-4 w-4" />
+    <ChevronDown className="h-4 w-4" />
   </SelectPrimitive.ScrollDownButton>
 ));
 SelectScrollDownButton.displayName =

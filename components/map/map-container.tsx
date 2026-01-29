@@ -112,17 +112,23 @@ function MapContainerComponent({
     return L.divIcon({
       className: "custom-marker",
       html: `
-        <div style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;position:relative;">
-          <svg viewBox="0 0 24 24" width="32" height="32">
-            <path fill="${color}" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-            <circle cx="12" cy="9" r="3" fill="white"/>
+        <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+          <svg viewBox="0 0 24 24" width="40" height="40">
+            <defs>
+              <linearGradient id="grad-${status}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:${color};stop-opacity:1" />
+                <stop offset="100%" style="stop-color:${color};stop-opacity:0.8" />
+              </linearGradient>
+            </defs>
+            <path fill="url(#grad-${status})" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="3.5" fill="white"/>
           </svg>
-          <div style="position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);width:8px;height:8px;background:${color};border-radius:50%;box-shadow:0 0 0 2px white,0 0 8px ${color};"></div>
+          <div style="position:absolute;bottom:0px;left:50%;transform:translateX(-50%);width:10px;height:10px;background:${color};border-radius:50%;border:2px solid white;box-shadow:0 0 10px ${color};"></div>
         </div>
       `,
-      iconSize: [32, 32],
-      iconAnchor: [16, 32],
-      popupAnchor: [0, -32],
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -40],
     });
   }, []);
 
@@ -192,8 +198,10 @@ function MapContainerComponent({
 
       // Force resize after a short delay
       setTimeout(() => {
-        map.invalidateSize();
-        setIsReady(true);
+        if (mapRef.current === map) {
+          map.invalidateSize();
+          setIsReady(true);
+        }
       }, 100);
     } catch (err) {
       console.error("Map init error:", err);
@@ -294,8 +302,8 @@ function MapContainerComponent({
   return (
     <div
       ref={containerRef}
-      className="w-full h-full rounded-xl overflow-hidden"
-      style={{ minHeight: "500px", height: "100%", background: "#e5e7eb" }}
+      className="w-full h-full rounded-bento overflow-hidden shadow-2xl shadow-primary/5 border border-border/50"
+      style={{ minHeight: "600px", height: "100%", background: "#f8fafc" }}
     />
   );
 }

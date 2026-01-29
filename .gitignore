@@ -50,6 +50,12 @@ public/worker-*.js
 public/worker-*.js.map
 public/fallback-*.js
 public/fallback-*.js.map
+public/swe-worker-*.js
+public/swe-worker-*.js.map
+
+# Cache files
+.eslintcache
+.turbo
 .claude/skills/frontend-design/SKILL.md
 .github/copilot-instructions.md
 .claude/skills/web-artifacts-builder/SKILL.md

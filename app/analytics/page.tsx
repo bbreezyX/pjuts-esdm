@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getDashboardStats, getStatsByProvince, getMonthlyReportTrend } from "@/app/actions/dashboard";
 import { AppShell, PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Download } from "iconoir-react";
+import { Download } from "lucide-react";
 import { AnalyticsCharts } from "./analytics-client";
 
 export default async function AnalyticsPage() {
@@ -35,7 +35,7 @@ export default async function AnalyticsPage() {
         title="Analitik"
         description="Visualisasi data dan tren PJUTS di Indonesia"
       >
-        <Button variant="outline" size="sm">
+        <Button variant="outline" size="sm" className="rounded-xl font-bold">
           <Download className="h-4 w-4 mr-2" />
           Export PDF
         </Button>
@@ -49,4 +49,3 @@ export default async function AnalyticsPage() {
     </AppShell>
   );
 }
-

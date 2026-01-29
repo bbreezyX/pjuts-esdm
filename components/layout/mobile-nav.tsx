@@ -3,28 +3,28 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Dashboard,
-  Map,
-  ClipboardCheck,
-  LightBulb,
-  PlusCircle,
-} from "iconoir-react";
+  LayoutGrid,
+  Map as MapIcon,
+  ClipboardList,
+  Lightbulb,
+  Plus,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", icon: Dashboard },
-  { href: "/map", label: "Peta", icon: Map },
-  { href: "/report/new", label: "Lapor", icon: PlusCircle, isMain: true },
-  { href: "/units", label: "Unit", icon: LightBulb },
-  { href: "/reports", label: "Laporan", icon: ClipboardCheck },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
+  { href: "/map", label: "Peta", icon: MapIcon },
+  { href: "/report/new", label: "Lapor", icon: Plus, isMain: true },
+  { href: "/units", label: "Unit", icon: Lightbulb },
+  { href: "/reports", label: "Laporan", icon: ClipboardList },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-white border-t border-slate-200 safe-area-pb">
-      <div className="flex items-center justify-around px-2 py-2">
+    <nav className="fixed bottom-4 left-4 right-4 z-40 md:hidden bg-card/80 backdrop-blur-xl border border-border shadow-2xl rounded-3xl safe-area-pb overflow-hidden">
+      <div className="flex items-center justify-around p-2">
         {navItems.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
           const Icon = item.icon;
@@ -34,14 +34,11 @@ export function MobileNav() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center justify-center -mt-6 group active:scale-95 transition-transform duration-200"
+                className="flex flex-col items-center justify-center group active:scale-90 transition-transform duration-200"
               >
-                <div className="w-14 h-14 rounded-full bg-esdm-gradient shadow-lg shadow-primary-500/25 flex items-center justify-center ring-4 ring-white group-hover:shadow-primary-500/40 transition-shadow duration-200">
-                  <Icon className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 rounded-2xl bg-primary shadow-lg shadow-primary/30 flex items-center justify-center group-hover:shadow-primary/40 transition-all">
+                  <Icon className="w-6 h-6 text-primary-foreground" />
                 </div>
-                <span className="text-[10px] font-medium text-primary-600 mt-1">
-                  {item.label}
-                </span>
               </Link>
             );
           }
@@ -51,25 +48,20 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl transition-all duration-200 group flex-1",
+                "relative flex flex-col items-center justify-center gap-1 p-3 rounded-2xl transition-all duration-200 group flex-1",
                 isActive 
-                  ? "text-primary-600" 
-                  : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                  ? "text-primary bg-primary/5" 
+                  : "text-muted-foreground hover:text-foreground"
               )}
             >
-              <div className={cn(
-                "relative p-1.5 rounded-xl transition-all duration-200",
-                isActive && "bg-primary-50"
-              )}>
-                <Icon className={cn(
-                  "w-5 h-5 transition-transform duration-200",
-                  isActive && "scale-110",
-                  "group-active:scale-95"
-                )} />
-              </div>
+              <Icon className={cn(
+                "w-5 h-5 transition-transform duration-200",
+                isActive && "scale-110",
+                "group-active:scale-95"
+              )} />
               <span className={cn(
-                "text-[10px] font-medium transition-colors duration-200",
-                isActive ? "text-primary-600" : "text-slate-500"
+                "text-[9px] font-bold uppercase tracking-widest transition-colors duration-200",
+                isActive ? "text-primary" : "text-muted-foreground"
               )}>
                 {item.label}
               </span>
@@ -80,4 +72,3 @@ export function MobileNav() {
     </nav>
   );
 }
-

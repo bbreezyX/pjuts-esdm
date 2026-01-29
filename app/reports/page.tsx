@@ -4,7 +4,7 @@ import { getReports } from "@/app/actions/reports";
 import { getProvinces } from "@/app/actions/units";
 import { AppShell, PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { Plus } from "iconoir-react";
+import { Plus } from "lucide-react";
 import Link from "next/link";
 import { ReportsPageClient } from "./reports-client";
 import { ExportReportsButton } from "./export-button";
@@ -67,7 +67,7 @@ export default async function ReportsPage({
           endDate={endDate}
         />
         <Link href="/report/new">
-          <Button size="sm">
+          <Button size="sm" className="rounded-xl font-bold">
             <Plus className="h-4 w-4 mr-2" />
             Buat Laporan
           </Button>
@@ -86,4 +86,3 @@ export default async function ReportsPage({
     </AppShell>
   );
 }
-

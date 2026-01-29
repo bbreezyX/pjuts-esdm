@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, Xmark, Calendar } from "iconoir-react";
+import { Search, Filter, X, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -11,6 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface ReportsFiltersProps {
   provinces: string[];
@@ -43,38 +44,45 @@ export function ReportsFilters({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Search and Filter Toggle */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1 group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-slate-600 transition-colors z-10" />
           <input
             type="text"
-            placeholder="Cari berdasarkan Pole ID..."
+            placeholder="Cari laporan berdasarkan Pole ID..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+            className="relative w-full h-12 pl-12 pr-4 rounded-full border border-slate-200/60 bg-white/80 backdrop-blur-md text-sm font-medium shadow-sm shadow-slate-200/20 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-300 transition-all placeholder:text-slate-400"
           />
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Button
-            variant={showFilters ? "secondary" : "outline"}
+            variant={showFilters ? "default" : "outline"}
             onClick={() => setShowFilters(!showFilters)}
-            className="shrink-0"
+            className={cn(
+              "h-12 px-6 rounded-2xl font-bold transition-all shrink-0",
+              showFilters ? "bg-primary shadow-lg shadow-primary/20" : "hover:bg-muted"
+            )}
           >
             <Filter className="h-4 w-4 mr-2" />
-            Filter
+            Filter Lanjutan
             {hasActiveFilters && (
-              <Badge variant="default" className="ml-2 h-5 w-5 p-0 justify-center">
-                !
-              </Badge>
+              <span className="ml-2 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-lg bg-white/20 text-[10px] font-black">
+                {Object.values(dateRange).filter(Boolean).length + (selectedProvince ? 1 : 0)}
+              </span>
             )}
           </Button>
 
           {hasActiveFilters && (
-            <Button variant="ghost" onClick={clearFilters} className="shrink-0">
-              <Xmark className="h-4 w-4 mr-2" />
+            <Button 
+              variant="ghost" 
+              onClick={clearFilters} 
+              className="h-12 px-5 rounded-2xl font-bold text-red-500 hover:bg-red-50 hover:text-red-600 shrink-0 transition-all"
+            >
+              <X className="h-4 w-4 mr-2" />
               Reset
             </Button>
           )}
@@ -83,12 +91,17 @@ export function ReportsFilters({
 
       {/* Filter Panel */}
       {showFilters && (
-        <div className="bg-slate-50 rounded-lg p-4 space-y-4 animate-fade-in">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-muted/30 backdrop-blur-md rounded-[2rem] p-8 border border-border/50 space-y-6 animate-in slide-in-from-top-4 fade-in duration-500">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-4 bg-primary rounded-full" />
+            <h3 className="text-sm font-black text-foreground uppercase tracking-wider">Kriteria Filter</h3>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Province Filter */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Provinsi
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
+                Wilayah Provinsi
               </label>
               <Select
                 value={selectedProvince || "all"}
@@ -96,13 +109,13 @@ export function ReportsFilters({
                   onProvinceChange(v === "all" ? undefined : v)
                 }
               >
-                <SelectTrigger>
+                <SelectTrigger className="h-12 rounded-xl border-border/60 bg-card/50 font-bold text-sm">
                   <SelectValue placeholder="Semua Provinsi" />
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Semua Provinsi</SelectItem>
+                <SelectContent className="rounded-2xl border-border shadow-2xl">
+                  <SelectItem value="all" className="font-bold">Semua Provinsi</SelectItem>
                   {provinces.map((prov) => (
-                    <SelectItem key={prov} value={prov}>
+                    <SelectItem key={prov} value={prov} className="font-medium">
                       {prov}
                     </SelectItem>
                   ))}
@@ -111,12 +124,12 @@ export function ReportsFilters({
             </div>
 
             {/* Date Start */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Tanggal Mulai
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
+                Rentang Awal
               </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+              <div className="relative group">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" />
                 <input
                   type="date"
                   value={
@@ -132,18 +145,18 @@ export function ReportsFilters({
                         : undefined,
                     })
                   }
-                  className="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-12 pl-12 pr-4 rounded-xl border border-border/60 bg-card/50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
 
             {/* Date End */}
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1.5">
-                Tanggal Akhir
+            <div className="space-y-2">
+              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
+                Rentang Akhir
               </label>
-              <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+              <div className="relative group">
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" />
                 <input
                   type="date"
                   value={
@@ -157,7 +170,7 @@ export function ReportsFilters({
                       end: e.target.value ? new Date(e.target.value) : undefined,
                     })
                   }
-                  className="w-full h-10 pl-10 pr-4 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="w-full h-12 pl-12 pr-4 rounded-xl border border-border/60 bg-card/50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
             </div>
@@ -167,32 +180,37 @@ export function ReportsFilters({
 
       {/* Active Filters Display */}
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5 px-1 animate-in fade-in slide-in-from-left-2 duration-300">
           {selectedProvince && (
-            <Badge variant="secondary" className="gap-1.5">
+            <Badge variant="secondary" className="gap-2 px-3 py-1.5 rounded-xl bg-primary/5 text-primary border-primary/10 font-bold text-[10px] uppercase tracking-wider">
               Provinsi: {selectedProvince}
-              <button onClick={() => onProvinceChange(undefined)}>
-                <Xmark className="h-3 w-3" />
+              <button 
+                onClick={() => onProvinceChange(undefined)}
+                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
+              >
+                <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
           {dateRange.start && (
-            <Badge variant="secondary" className="gap-1.5">
+            <Badge variant="secondary" className="gap-2 px-3 py-1.5 rounded-xl bg-primary/5 text-primary border-primary/10 font-bold text-[10px] uppercase tracking-wider">
               Dari: {dateRange.start.toLocaleDateString("id-ID")}
               <button
                 onClick={() => onDateRangeChange({ ...dateRange, start: undefined })}
+                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
               >
-                <Xmark className="h-3 w-3" />
+                <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
           {dateRange.end && (
-            <Badge variant="secondary" className="gap-1.5">
+            <Badge variant="secondary" className="gap-2 px-3 py-1.5 rounded-xl bg-primary/5 text-primary border-primary/10 font-bold text-[10px] uppercase tracking-wider">
               Sampai: {dateRange.end.toLocaleDateString("id-ID")}
               <button
                 onClick={() => onDateRangeChange({ ...dateRange, end: undefined })}
+                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
               >
-                <Xmark className="h-3 w-3" />
+                <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
@@ -201,4 +219,3 @@ export function ReportsFilters({
     </div>
   );
 }
-

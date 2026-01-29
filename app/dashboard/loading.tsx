@@ -1,6 +1,6 @@
 import { PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
-import { StatsReport } from "iconoir-react";
+import { FileText, Plus } from "lucide-react";
 import {
     StatsGridSkeleton,
     ReportStatsSkeleton,
@@ -11,42 +11,24 @@ import {
 
 export default function DashboardLoading() {
     return (
-        <>
-            <PageHeader
-                title="Dashboard"
-                description="Pantau status PJUTS secara real-time di seluruh Indonesia"
-            >
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" disabled>
-                        Export Data
-                    </Button>
-                    <Button size="sm" disabled>
-                        <StatsReport className="h-4 w-4 mr-2" />
-                        Buat Laporan
-                    </Button>
+        <div className="max-w-[1400px] mx-auto p-4 md:p-8 space-y-8 animate-pulse">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-2">
+                <div className="space-y-3">
+                    <div className="h-10 w-64 bg-muted rounded-xl" />
+                    <div className="h-4 w-96 bg-muted rounded-lg" />
                 </div>
-            </PageHeader>
-
-            <StatsGridSkeleton />
-
-            <div className="relative my-8">
-                <div className="absolute inset-0 flex items-center" aria-hidden="true">
-                    <div className="w-full border-t border-slate-200/60 shadow-sm"></div>
-                </div>
-                <div className="relative flex justify-center">
-                    <div className="flex items-center gap-2 bg-slate-50 px-4 py-1.5 rounded-full border border-slate-200/60 shadow-sm text-slate-500">
-                        <StatsReport className="h-3.5 w-3.5" />
-                        <span className="text-xs font-medium uppercase tracking-wider">
-                            Statistik Laporan
-                        </span>
-                    </div>
+                <div className="flex gap-3">
+                    <div className="h-12 w-32 bg-muted rounded-2xl" />
+                    <div className="h-12 w-40 bg-muted rounded-2xl" />
                 </div>
             </div>
 
-            <ReportStatsSkeleton />
-            <ChartsGridSkeleton />
-            <ActivityGridSkeleton />
-            <TableSkeleton />
-        </>
+            <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-12 lg:col-span-8 h-64 bg-muted rounded-bento" />
+                <div className="col-span-12 lg:col-span-4 h-64 bg-muted rounded-bento" />
+                <div className="col-span-12 lg:col-span-4 h-96 bg-muted rounded-bento" />
+                <div className="col-span-12 lg:col-span-8 h-96 bg-muted rounded-bento" />
+            </div>
+        </div>
     );
 }

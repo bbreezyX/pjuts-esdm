@@ -31,7 +31,7 @@ export default async function UsersPage() {
         role: session.user.role,
       }}
     >
-      <div className="container mx-auto py-6">
+      <div className="mx-auto max-w-[1700px] px-4 sm:px-8 lg:px-12 py-6">
         <UsersClient users={users} />
       </div>
     </AppShell>

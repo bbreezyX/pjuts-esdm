@@ -101,7 +101,8 @@
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --radius-bento: 2.5rem;
+  --background: oklch(0.99 0 0); /* Slightly off-white for bento look */
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
@@ -1282,6 +1283,7 @@ input[type="file"]::file-selector-button:hover {
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --radius-bento: var(--radius-bento);
 }
 
 .dark {

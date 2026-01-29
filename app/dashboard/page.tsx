@@ -4,6 +4,7 @@ import {
   getDashboardStats,
   getStatsByProvince,
   getRecentActivity,
+  getRecentActiveUsers,
 } from "@/app/actions/dashboard";
 import { AppShell } from "@/components/layout";
 import { DashboardClient } from "./dashboard-client";
@@ -19,6 +20,7 @@ export default async function DashboardPage() {
   const statsPromise = getDashboardStats();
   const provincesPromise = getStatsByProvince();
   const activitiesPromise = getRecentActivity(10);
+  const usersPromise = getRecentActiveUsers(5);
 
   return (
     <AppShell
@@ -32,6 +34,7 @@ export default async function DashboardPage() {
         statsPromise={statsPromise}
         provincesPromise={provincesPromise}
         activitiesPromise={activitiesPromise}
+        usersPromise={usersPromise}
         user={{ name: session.user.name }}
       />
     </AppShell>

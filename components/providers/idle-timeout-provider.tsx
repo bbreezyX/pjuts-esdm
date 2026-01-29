@@ -12,7 +12,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Clock, LogOut, Refresh } from "iconoir-react";
+import { Clock, LogOut, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Configuration for idle timeout based on role
@@ -251,7 +251,7 @@ export function IdleTimeoutProvider({ children }: IdleTimeoutProviderProps) {
               onClick={extendSession}
               className="w-full sm:w-auto"
             >
-              <Refresh className="mr-2 h-4 w-4" />
+              <RefreshCw className="mr-2 h-4 w-4" />
               Tetap Masuk
             </AlertDialogAction>
           </AlertDialogFooter>
