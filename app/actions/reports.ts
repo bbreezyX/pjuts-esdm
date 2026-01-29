@@ -3,7 +3,11 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { uploadReportImage, processImage, deleteFromR2 } from "@/lib/r2";
-import { submitReportSchema, type SubmitReportInput, isValidCuid } from "@/lib/validations";
+import {
+  submitReportSchema,
+  type SubmitReportInput,
+  isValidCuid,
+} from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { getStatusFromVoltage } from "@/lib/constants";
@@ -47,7 +51,9 @@ export interface ReportData {
 /**
  * Submit a new field report with multiple image uploads to R2
  */
-export async function submitReport(formData: FormData): Promise<ActionResult<ReportData>> {
+export async function submitReport(
+  formData: FormData,
+): Promise<ActionResult<ReportData>> {
   try {
     // 1. Authenticate user
     const session = await auth();
@@ -73,7 +79,10 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
       return {
         success: false,
         error: ERROR_MESSAGES.VALIDATION_FAILED,
-        errors: validationResult.error.flatten().fieldErrors as Record<string, string[]>,
+        errors: validationResult.error.flatten().fieldErrors as Record<
+          string,
+          string[]
+        >,
       };
     }
 
@@ -124,7 +133,7 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     }
 
     // Filter out empty files
-    imageFiles = imageFiles.filter(f => f.size > 0);
+    imageFiles = imageFiles.filter((f) => f.size > 0);
     if (imageFiles.length === 0) {
       return {
         success: false,
@@ -158,20 +167,20 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
         processedImage,
         "image/webp",
         unit.province,
-        unit.serialNumber
+        unit.serialNumber,
       );
     });
 
     const uploadResults = await Promise.all(uploadPromises);
 
     // Check if any failed
-    const failedUpload = uploadResults.find(r => !r.success);
+    const failedUpload = uploadResults.find((r) => !r.success);
     if (failedUpload) {
       // Cleanup any successful uploads
       await Promise.all(
         uploadResults
-          .filter(r => r.success && r.path)
-          .map(r => deleteFromR2(r.path!))
+          .filter((r) => r.success && r.path)
+          .map((r) => deleteFromR2(r.path!)),
       );
 
       return {
@@ -190,11 +199,11 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
         notes: validatedData.notes || null,
         submittedBy: session.user.id,
         images: {
-          create: uploadResults.map(r => ({
+          create: uploadResults.map((r) => ({
             url: r.url!,
-            path: r.path!
-          }))
-        }
+            path: r.path!,
+          })),
+        },
       },
       include: {
         unit: {
@@ -213,9 +222,9 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
         images: {
           select: {
             id: true,
-            url: true
-          }
-        }
+            url: true,
+          },
+        },
       },
     });
 
@@ -225,16 +234,17 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     // Check if this is the first verification (unit was UNVERIFIED)
     // On first verification, we update: status, installDate, and coordinates
     const isFirstVerification = unit.lastStatus === UnitStatus.UNVERIFIED;
-    
+
     // Check if unit has default/empty coordinates (0,0)
     const hasDefaultCoordinates = unit.latitude === 0 && unit.longitude === 0;
-    
+
     await prisma.pjutsUnit.update({
       where: { id: validatedData.unitId },
       data: {
         lastStatus: newStatus,
         // Set installDate on first verification (when unit was UNVERIFIED)
-        ...(isFirstVerification && !unit.installDate && { installDate: new Date() }),
+        ...(isFirstVerification &&
+          !unit.installDate && { installDate: new Date() }),
         // Update coordinates on first verification OR if unit has default coordinates (0,0)
         ...((isFirstVerification || hasDefaultCoordinates) && {
           latitude: validatedData.latitude,
@@ -253,18 +263,18 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
     // Note: We await this to ensure email is sent before serverless function terminates
     try {
       const admins = await prisma.user.findMany({
-        where: { 
+        where: {
           role: Role.ADMIN,
-          isActive: true,  // Only send to active users
+          isActive: true, // Only send to active users
         },
         select: { email: true, name: true },
       });
-      
+
       const recipients = admins.map((a) => ({
         email: a.email,
-        name: a.name || "Admin"
+        name: a.name || "Admin",
       }));
-      
+
       if (recipients.length > 0) {
         const emailResult = await sendReportNotificationToAdmins(recipients, {
           unitSerial: report.unit.serialNumber,
@@ -274,9 +284,12 @@ export async function submitReport(formData: FormData): Promise<ActionResult<Rep
           batteryVoltage: validatedData.batteryVoltage,
           reportId: report.id,
         });
-        
+
         if (!emailResult.success) {
-          console.error("Failed to send report notification email:", emailResult.error);
+          console.error(
+            "Failed to send report notification email:",
+            emailResult.error,
+          );
         }
       }
     } catch (emailError) {
@@ -311,17 +324,19 @@ interface GetReportsOptions {
   page?: number;
   limit?: number;
   unitId?: string;
-  province?: string;
+  regency?: string;
   startDate?: Date;
   endDate?: Date;
 }
 
-export async function getReports(options: GetReportsOptions = {}): Promise<ActionResult<{
-  reports: ReportData[];
-  total: number;
-  page: number;
-  totalPages: number;
-}>> {
+export async function getReports(options: GetReportsOptions = {}): Promise<
+  ActionResult<{
+    reports: ReportData[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>
+> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -331,7 +346,14 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
       };
     }
 
-    const { page = 1, limit = 20, unitId, province, startDate, endDate } = options;
+    const {
+      page = 1,
+      limit = 20,
+      unitId,
+      regency,
+      startDate,
+      endDate,
+    } = options;
     const skip = (page - 1) * limit;
 
     // Build where clause
@@ -341,8 +363,8 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
       where.unitId = unitId;
     }
 
-    if (province) {
-      where.unit = { province };
+    if (regency) {
+      where.unit = { regency };
     }
 
     if (startDate || endDate) {
@@ -380,16 +402,16 @@ export async function getReports(options: GetReportsOptions = {}): Promise<Actio
           images: {
             select: {
               id: true,
-              url: true
-            }
-          }
+              url: true,
+            },
+          },
         },
       }),
       prisma.report.count({ where }),
     ]);
 
     // Map to ReportData
-    const mappedReports: ReportData[] = reports.map(r => ({
+    const mappedReports: ReportData[] = reports.map((r) => ({
       ...r,
       imageUrl: r.images[0]?.url || "",
     }));
@@ -445,7 +467,7 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
     // Get report to find image paths and metadata for audit
     const report = await prisma.report.findUnique({
       where: { id: reportId },
-      include: { 
+      include: {
         images: true,
         unit: {
           select: { serialNumber: true },
@@ -464,9 +486,7 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
     }
 
     // Delete all images from R2
-    await Promise.all(
-      report.images.map(img => deleteFromR2(img.path))
-    );
+    await Promise.all(report.images.map((img) => deleteFromR2(img.path)));
 
     // Delete report from database (Cascade will delete ReportImage records)
     await prisma.report.delete({
@@ -496,4 +516,3 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
     };
   }
 }
-

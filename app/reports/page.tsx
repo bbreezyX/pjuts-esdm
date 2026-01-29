@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getReports } from "@/app/actions/reports";
-import { getProvinces } from "@/app/actions/units";
+import { getRegencies } from "@/app/actions/units";
 import { AppShell, PageHeader } from "@/components/layout";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -11,7 +11,7 @@ import { ExportReportsButton } from "./export-button";
 
 interface SearchParams {
   page?: string;
-  province?: string;
+  regency?: string;
   search?: string;
   startDate?: string;
   endDate?: string;
@@ -30,24 +30,24 @@ export default async function ReportsPage({
 
   const params = await searchParams;
   const page = parseInt(params.page || "1", 10);
-  const province = params.province;
+  const regency = params.regency;
   const startDate = params.startDate ? new Date(params.startDate) : undefined;
   const endDate = params.endDate ? new Date(params.endDate) : undefined;
 
-  const [reportsResult, provincesResult] = await Promise.all([
+  const [reportsResult, regenciesResult] = await Promise.all([
     getReports({
       page,
-      province,
+      regency,
       startDate,
       endDate,
     }),
-    getProvinces(),
+    getRegencies(),
   ]);
 
   const reports = reportsResult.data?.reports || [];
   const total = reportsResult.data?.total || 0;
   const totalPages = reportsResult.data?.totalPages || 1;
-  const provinces = provincesResult.data || [];
+  const regencies = regenciesResult.data || [];
 
   return (
     <AppShell
@@ -58,18 +58,23 @@ export default async function ReportsPage({
       }}
     >
       <PageHeader
-        title="Laporan"
-        description="Kelola dan pantau semua laporan petugas lapangan"
+        title="Laporan Monitoring"
+        description="Kelola dan pantau semua laporan inspeksi petugas lapangan"
+        badge="Data Laporan"
       >
         <ExportReportsButton
-          province={province}
+          regency={regency}
           startDate={startDate}
           endDate={endDate}
         />
         <Link href="/report/new">
-          <Button size="sm" className="rounded-xl font-bold">
-            <Plus className="h-4 w-4 mr-2" />
-            Buat Laporan
+          <Button
+            size="sm"
+            className="rounded-xl sm:rounded-2xl font-bold h-10 sm:h-11 px-4 sm:px-6 shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-200"
+          >
+            <Plus className="h-4 w-4 mr-1.5 sm:mr-2" />
+            <span className="hidden sm:inline">Buat Laporan</span>
+            <span className="sm:hidden">Buat</span>
           </Button>
         </Link>
       </PageHeader>
@@ -79,8 +84,8 @@ export default async function ReportsPage({
         total={total}
         page={page}
         totalPages={totalPages}
-        provinces={provinces}
-        initialProvince={province}
+        regencies={regencies}
+        initialRegency={regency}
         isAdmin={session.user.role === "ADMIN"}
       />
     </AppShell>

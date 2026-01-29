@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search, Filter, X, Calendar } from "lucide-react";
+import { Search, X, Calendar, SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -14,109 +14,170 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface ReportsFiltersProps {
-  provinces: string[];
-  selectedProvince: string | undefined;
-  onProvinceChange: (province: string | undefined) => void;
+  regencies: string[];
+  selectedRegency: string | undefined;
+  onRegencyChange: (regency: string | undefined) => void;
   searchQuery: string;
   onSearchChange: (query: string) => void;
   dateRange: { start?: Date; end?: Date };
   onDateRangeChange: (range: { start?: Date; end?: Date }) => void;
+  onResetFilters: () => void;
 }
 
 export function ReportsFilters({
-  provinces,
-  selectedProvince,
-  onProvinceChange,
+  regencies,
+  selectedRegency,
+  onRegencyChange,
   searchQuery,
   onSearchChange,
   dateRange,
   onDateRangeChange,
+  onResetFilters,
 }: ReportsFiltersProps) {
   const [showFilters, setShowFilters] = useState(false);
 
   const hasActiveFilters =
-    selectedProvince || searchQuery || dateRange.start || dateRange.end;
+    selectedRegency || searchQuery || dateRange.start || dateRange.end;
+
+  const activeFilterCount =
+    (selectedRegency ? 1 : 0) +
+    (dateRange.start ? 1 : 0) +
+    (dateRange.end ? 1 : 0);
 
   const clearFilters = () => {
-    onProvinceChange(undefined);
-    onSearchChange("");
-    onDateRangeChange({});
+    // Clear all filters with single URL update (also clears local state in parent)
+    onResetFilters();
   };
 
   return (
-    <div className="space-y-6">
-      {/* Search and Filter Toggle */}
-      <div className="flex flex-col sm:flex-row gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      {/* Search and Filter Toggle - Refined Layout */}
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+        {/* Search Input - Enhanced */}
         <div className="relative flex-1 group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-slate-600 transition-colors z-10" />
+          <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10">
+            <Search className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground group-focus-within:text-primary transition-colors duration-200" />
+          </div>
           <input
             type="text"
             placeholder="Cari laporan berdasarkan Pole ID..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="relative w-full h-12 pl-12 pr-4 rounded-full border border-slate-200/60 bg-white/80 backdrop-blur-md text-sm font-medium shadow-sm shadow-slate-200/20 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-300 transition-all placeholder:text-slate-400"
+            className={cn(
+              "relative w-full h-11 sm:h-12 pl-11 sm:pl-12 pr-4 rounded-xl sm:rounded-2xl",
+              "border border-border/60 bg-card/80 backdrop-blur-sm",
+              "text-sm font-medium shadow-sm",
+              "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40",
+              "transition-all duration-200 placeholder:text-muted-foreground/60",
+            )}
           />
+          {searchQuery && (
+            <button
+              onClick={() => onSearchChange("")}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
-        <div className="flex gap-3">
+        {/* Action Buttons */}
+        <div className="flex gap-2 sm:gap-3">
           <Button
             variant={showFilters ? "default" : "outline"}
             onClick={() => setShowFilters(!showFilters)}
             className={cn(
-              "h-12 px-6 rounded-2xl font-bold transition-all shrink-0",
-              showFilters ? "bg-primary shadow-lg shadow-primary/20" : "hover:bg-muted"
+              "h-11 sm:h-12 px-4 sm:px-6 rounded-xl sm:rounded-2xl font-bold transition-all duration-300 shrink-0",
+              showFilters
+                ? "bg-primary shadow-lg shadow-primary/25 hover:shadow-primary/35"
+                : "hover:bg-muted border-border/60",
             )}
           >
-            <Filter className="h-4 w-4 mr-2" />
-            Filter Lanjutan
-            {hasActiveFilters && (
-              <span className="ml-2 flex h-5 min-w-[20px] px-1 items-center justify-center rounded-lg bg-white/20 text-[10px] font-black">
-                {Object.values(dateRange).filter(Boolean).length + (selectedProvince ? 1 : 0)}
+            <SlidersHorizontal className="h-4 w-4 mr-2" />
+            <span className="hidden sm:inline">Filter Lanjutan</span>
+            <span className="sm:hidden">Filter</span>
+            {activeFilterCount > 0 && (
+              <span
+                className={cn(
+                  "ml-2 flex h-5 min-w-[20px] px-1.5 items-center justify-center rounded-full text-[10px] font-black",
+                  showFilters
+                    ? "bg-white/20 text-white"
+                    : "bg-primary/10 text-primary",
+                )}
+              >
+                {activeFilterCount}
               </span>
             )}
           </Button>
 
           {hasActiveFilters && (
-            <Button 
-              variant="ghost" 
-              onClick={clearFilters} 
-              className="h-12 px-5 rounded-2xl font-bold text-red-500 hover:bg-red-50 hover:text-red-600 shrink-0 transition-all"
+            <Button
+              variant="ghost"
+              onClick={clearFilters}
+              className={cn(
+                "h-11 sm:h-12 px-4 sm:px-5 rounded-xl sm:rounded-2xl font-bold shrink-0",
+                "text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/50",
+                "transition-all duration-200",
+              )}
             >
-              <X className="h-4 w-4 mr-2" />
-              Reset
+              <X className="h-4 w-4 mr-1.5" />
+              <span className="hidden sm:inline">Reset Filter</span>
+              <span className="sm:hidden">Reset</span>
             </Button>
           )}
         </div>
       </div>
 
-      {/* Filter Panel */}
-      {showFilters && (
-        <div className="bg-muted/30 backdrop-blur-md rounded-[2rem] p-8 border border-border/50 space-y-6 animate-in slide-in-from-top-4 fade-in duration-500">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-4 bg-primary rounded-full" />
-            <h3 className="text-sm font-black text-foreground uppercase tracking-wider">Kriteria Filter</h3>
+      {/* Expandable Filter Panel - Enhanced */}
+      <div
+        className={cn(
+          "overflow-hidden transition-all duration-500 ease-out",
+          showFilters ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0",
+        )}
+      >
+        <div
+          className={cn(
+            "bg-muted/30 backdrop-blur-md rounded-2xl sm:rounded-[1.5rem] p-5 sm:p-8",
+            "border border-border/50 space-y-5 sm:space-y-6",
+            "animate-in slide-in-from-top-4 fade-in duration-500",
+          )}
+        >
+          {/* Section Header */}
+          <div className="flex items-center gap-2">
+            <div className="w-1 sm:w-1.5 h-3 sm:h-4 bg-primary rounded-full" />
+            <h3 className="text-xs sm:text-sm font-black text-foreground uppercase tracking-widest">
+              Kriteria Filter
+            </h3>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+          {/* Filter Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             {/* Province Filter */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
-                Wilayah Provinsi
+            {/* Regency/City Filter */}
+            <div className="space-y-2.5">
+              <label className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1 block">
+                Kabupaten/Kota
               </label>
               <Select
-                value={selectedProvince || "all"}
+                value={selectedRegency || "all"}
                 onValueChange={(v) =>
-                  onProvinceChange(v === "all" ? undefined : v)
+                  onRegencyChange(v === "all" ? undefined : v)
                 }
               >
-                <SelectTrigger className="h-12 rounded-xl border-border/60 bg-card/50 font-bold text-sm">
-                  <SelectValue placeholder="Semua Provinsi" />
+                <SelectTrigger className="h-11 sm:h-12 rounded-xl sm:rounded-2xl border-border/60 bg-card/50 font-bold text-sm">
+                  <SelectValue placeholder="Semua Kab/Kota" />
                 </SelectTrigger>
-                <SelectContent className="rounded-2xl border-border shadow-2xl">
-                  <SelectItem value="all" className="font-bold">Semua Provinsi</SelectItem>
-                  {provinces.map((prov) => (
-                    <SelectItem key={prov} value={prov} className="font-medium">
-                      {prov}
+                <SelectContent className="rounded-xl sm:rounded-2xl border-border shadow-2xl">
+                  <SelectItem value="all" className="font-bold py-2.5">
+                    Semua Kab/Kota
+                  </SelectItem>
+                  {regencies.map((regency) => (
+                    <SelectItem
+                      key={regency}
+                      value={regency}
+                      className="font-medium py-2.5"
+                    >
+                      {regency}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -124,12 +185,12 @@ export function ReportsFilters({
             </div>
 
             {/* Date Start */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
+            <div className="space-y-2.5">
+              <label className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1 block">
                 Rentang Awal
               </label>
               <div className="relative group">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" />
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-focus-within:text-primary transition-colors duration-200" />
                 <input
                   type="date"
                   value={
@@ -145,18 +206,23 @@ export function ReportsFilters({
                         : undefined,
                     })
                   }
-                  className="w-full h-12 pl-12 pr-4 rounded-xl border border-border/60 bg-card/50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  className={cn(
+                    "w-full h-11 sm:h-12 pl-11 sm:pl-12 pr-4 rounded-xl sm:rounded-2xl",
+                    "border border-border/60 bg-card/50 text-sm font-bold",
+                    "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40",
+                    "transition-all duration-200",
+                  )}
                 />
               </div>
             </div>
 
             {/* Date End */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
+            <div className="space-y-2.5">
+              <label className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1 block">
                 Rentang Akhir
               </label>
               <div className="relative group">
-                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none group-focus-within:text-primary transition-colors" />
+                <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none group-focus-within:text-primary transition-colors duration-200" />
                 <input
                   type="date"
                   value={
@@ -167,48 +233,85 @@ export function ReportsFilters({
                   onChange={(e) =>
                     onDateRangeChange({
                       ...dateRange,
-                      end: e.target.value ? new Date(e.target.value) : undefined,
+                      end: e.target.value
+                        ? new Date(e.target.value)
+                        : undefined,
                     })
                   }
-                  className="w-full h-12 pl-12 pr-4 rounded-xl border border-border/60 bg-card/50 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+                  className={cn(
+                    "w-full h-11 sm:h-12 pl-11 sm:pl-12 pr-4 rounded-xl sm:rounded-2xl",
+                    "border border-border/60 bg-card/50 text-sm font-bold",
+                    "focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40",
+                    "transition-all duration-200",
+                  )}
                 />
               </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
-      {/* Active Filters Display */}
+      {/* Active Filters Pills - Enhanced */}
       {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2.5 px-1 animate-in fade-in slide-in-from-left-2 duration-300">
-          {selectedProvince && (
-            <Badge variant="secondary" className="gap-2 px-3 py-1.5 rounded-xl bg-primary/5 text-primary border-primary/10 font-bold text-[10px] uppercase tracking-wider">
-              Provinsi: {selectedProvince}
-              <button 
-                onClick={() => onProvinceChange(undefined)}
-                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
+        <div className="flex flex-wrap gap-2 sm:gap-2.5 px-0.5 animate-in fade-in slide-in-from-left-2 duration-300">
+          {selectedRegency && (
+            <Badge
+              variant="secondary"
+              className={cn(
+                "gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg sm:rounded-xl",
+                "bg-primary/5 text-primary border border-primary/10",
+                "font-bold text-[9px] sm:text-[10px] uppercase tracking-wider",
+                "hover:bg-primary/10 transition-colors duration-200",
+              )}
+            >
+              <span className="opacity-60">Kab/Kota:</span> {selectedRegency}
+              <button
+                onClick={() => onRegencyChange(undefined)}
+                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors -mr-0.5"
               >
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
           {dateRange.start && (
-            <Badge variant="secondary" className="gap-2 px-3 py-1.5 rounded-xl bg-primary/5 text-primary border-primary/10 font-bold text-[10px] uppercase tracking-wider">
-              Dari: {dateRange.start.toLocaleDateString("id-ID")}
+            <Badge
+              variant="secondary"
+              className={cn(
+                "gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg sm:rounded-xl",
+                "bg-primary/5 text-primary border border-primary/10",
+                "font-bold text-[9px] sm:text-[10px] uppercase tracking-wider",
+                "hover:bg-primary/10 transition-colors duration-200",
+              )}
+            >
+              <span className="opacity-60">Dari:</span>{" "}
+              {dateRange.start.toLocaleDateString("id-ID")}
               <button
-                onClick={() => onDateRangeChange({ ...dateRange, start: undefined })}
-                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
+                onClick={() =>
+                  onDateRangeChange({ ...dateRange, start: undefined })
+                }
+                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors -mr-0.5"
               >
                 <X className="h-3 w-3" />
               </button>
             </Badge>
           )}
           {dateRange.end && (
-            <Badge variant="secondary" className="gap-2 px-3 py-1.5 rounded-xl bg-primary/5 text-primary border-primary/10 font-bold text-[10px] uppercase tracking-wider">
-              Sampai: {dateRange.end.toLocaleDateString("id-ID")}
+            <Badge
+              variant="secondary"
+              className={cn(
+                "gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg sm:rounded-xl",
+                "bg-primary/5 text-primary border border-primary/10",
+                "font-bold text-[9px] sm:text-[10px] uppercase tracking-wider",
+                "hover:bg-primary/10 transition-colors duration-200",
+              )}
+            >
+              <span className="opacity-60">Sampai:</span>{" "}
+              {dateRange.end.toLocaleDateString("id-ID")}
               <button
-                onClick={() => onDateRangeChange({ ...dateRange, end: undefined })}
-                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors"
+                onClick={() =>
+                  onDateRangeChange({ ...dateRange, end: undefined })
+                }
+                className="hover:bg-primary/10 rounded-full p-0.5 transition-colors -mr-0.5"
               >
                 <X className="h-3 w-3" />
               </button>

@@ -2,7 +2,11 @@
 
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
-import { createPjutsUnitSchema, type CreatePjutsUnitInput, isValidCuid } from "@/lib/validations";
+import {
+  createPjutsUnitSchema,
+  type CreatePjutsUnitInput,
+  isValidCuid,
+} from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { sendUnitNotificationToFieldStaff } from "@/lib/email";
@@ -40,7 +44,7 @@ export interface PjutsUnitData {
  * Create a new PJUTS unit (Admin only)
  */
 export async function createPjutsUnit(
-  input: CreatePjutsUnitInput
+  input: CreatePjutsUnitInput,
 ): Promise<ActionResult<PjutsUnitData>> {
   try {
     const session = await auth();
@@ -65,7 +69,10 @@ export async function createPjutsUnit(
       return {
         success: false,
         error: ERROR_MESSAGES.VALIDATION_FAILED,
-        errors: validationResult.error.flatten().fieldErrors as Record<string, string[]>,
+        errors: validationResult.error.flatten().fieldErrors as Record<
+          string,
+          string[]
+        >,
       };
     }
 
@@ -122,14 +129,14 @@ export async function createPjutsUnit(
       const fieldStaff = await prisma.user.findMany({
         where: {
           role: Role.FIELD_STAFF,
-          isActive: true,  // Only send to active users
+          isActive: true, // Only send to active users
         },
         select: { email: true, name: true },
       });
 
       const recipients = fieldStaff.map((f) => ({
         email: f.email,
-        name: f.name || "Petugas Lapangan"
+        name: f.name || "Petugas Lapangan",
       }));
 
       if (recipients.length > 0) {
@@ -141,7 +148,10 @@ export async function createPjutsUnit(
         });
 
         if (!emailResult.success) {
-          console.error("Failed to send unit notification email:", emailResult.error);
+          console.error(
+            "Failed to send unit notification email:",
+            emailResult.error,
+          );
         }
       }
     } catch (emailError) {
@@ -170,16 +180,19 @@ interface GetUnitsOptions {
   page?: number;
   limit?: number;
   province?: string;
+  regency?: string;
   status?: UnitStatus;
   search?: string;
 }
 
-export async function getPjutsUnits(options: GetUnitsOptions = {}): Promise<ActionResult<{
-  units: PjutsUnitData[];
-  total: number;
-  page: number;
-  totalPages: number;
-}>> {
+export async function getPjutsUnits(options: GetUnitsOptions = {}): Promise<
+  ActionResult<{
+    units: PjutsUnitData[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>
+> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -189,7 +202,7 @@ export async function getPjutsUnits(options: GetUnitsOptions = {}): Promise<Acti
       };
     }
 
-    const { page = 1, limit = 20, province, status, search } = options;
+    const { page = 1, limit = 20, province, regency, status, search } = options;
     const skip = (page - 1) * limit;
 
     // Build where clause
@@ -197,6 +210,10 @@ export async function getPjutsUnits(options: GetUnitsOptions = {}): Promise<Acti
 
     if (province) {
       where.province = province;
+    }
+
+    if (regency) {
+      where.regency = regency;
     }
 
     if (status) {
@@ -262,7 +279,7 @@ interface UpdateUnitInput {
 
 export async function updatePjutsUnit(
   unitId: string,
-  input: UpdateUnitInput
+  input: UpdateUnitInput,
 ): Promise<ActionResult<PjutsUnitData>> {
   try {
     const session = await auth();
@@ -385,7 +402,9 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
 
     // Warn if unit has reports (cascade will delete them)
     if (existing._count.reports > 0) {
-      console.warn(`Deleting unit ${unitId} with ${existing._count.reports} associated reports`);
+      console.warn(
+        `Deleting unit ${unitId} with ${existing._count.reports} associated reports`,
+      );
     }
 
     // Delete the unit (cascade will handle reports)
@@ -448,3 +467,35 @@ export async function getProvinces(): Promise<ActionResult<string[]>> {
   }
 }
 
+// ============================================
+// GET REGENCIES LIST
+// ============================================
+
+export async function getRegencies(): Promise<ActionResult<string[]>> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: ERROR_MESSAGES.AUTH_REQUIRED,
+      };
+    }
+
+    const regencies = await prisma.pjutsUnit.findMany({
+      select: { regency: true },
+      distinct: ["regency"],
+      orderBy: { regency: "asc" },
+    });
+
+    return {
+      success: true,
+      data: regencies.map((r) => r.regency),
+    };
+  } catch (error) {
+    console.error("Get regencies error:", error);
+    return {
+      success: false,
+      error: "Gagal mengambil daftar kabupaten/kota",
+    };
+  }
+}

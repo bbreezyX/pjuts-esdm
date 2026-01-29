@@ -1,12 +1,12 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { getPjutsUnits, getProvinces } from "@/app/actions/units";
+import { getPjutsUnits, getRegencies } from "@/app/actions/units";
 import { AppShell } from "@/components/layout";
 import { UnitsPageClient } from "./units-client";
 
 interface SearchParams {
   page?: string;
-  province?: string;
+  regency?: string;
   status?: string;
   search?: string;
 }
@@ -24,7 +24,7 @@ export default async function UnitsPage({
 
   const params = await searchParams;
   const page = parseInt(params.page || "1", 10);
-  const province = params.province;
+  const regency = params.regency;
   const status = params.status as
     | "OPERATIONAL"
     | "MAINTENANCE_NEEDED"
@@ -33,15 +33,15 @@ export default async function UnitsPage({
     | undefined;
   const search = params.search;
 
-  const [unitsResult, provincesResult] = await Promise.all([
-    getPjutsUnits({ page, province, status, search }),
-    getProvinces(),
+  const [unitsResult, regenciesResult] = await Promise.all([
+    getPjutsUnits({ page, regency, status, search }),
+    getRegencies(),
   ]);
 
   const units = unitsResult.data?.units || [];
   const total = unitsResult.data?.total || 0;
   const totalPages = unitsResult.data?.totalPages || 1;
-  const provinces = provincesResult.data || [];
+  const regencies = regenciesResult.data || [];
 
   return (
     <AppShell
@@ -56,8 +56,8 @@ export default async function UnitsPage({
         total={total}
         page={page}
         totalPages={totalPages}
-        provinces={provinces}
-        initialProvince={province}
+        regencies={regencies}
+        initialRegency={regency}
         initialStatus={status}
         initialSearch={search}
         isAdmin={session.user.role === "ADMIN"}
@@ -65,5 +65,3 @@ export default async function UnitsPage({
     </AppShell>
   );
 }
-
-

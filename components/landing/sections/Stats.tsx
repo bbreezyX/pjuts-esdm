@@ -6,6 +6,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useLanguage } from "@/lib/language-context";
 
 export const Stats = () => {
@@ -85,10 +86,12 @@ export const Stats = () => {
 
                 {/* Illustration with Overlay */}
                 <div className="mt-10 aspect-square rounded-[40px] border border-border/60 relative overflow-hidden group-hover:border-primary/30 transition-all duration-500 shadow-inner bg-transparent">
-                  <img
+                  <Image
                     src={stat.image}
-                    className="w-full h-full object-contain p-4 transition-all duration-700 group-hover:scale-110 mix-blend-multiply"
+                    fill
+                    className="object-contain p-4 transition-all duration-700 group-hover:scale-110 mix-blend-multiply"
                     alt={t(stat.labelKey)}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>

@@ -1,76 +1,109 @@
-"use strict";
 "use client";
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Loader2 } from "lucide-react";
+import { Loader2, FileSpreadsheet } from "lucide-react";
 import { getReports } from "@/app/actions/reports";
 import { utils, writeFile } from "xlsx";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
+import { cn } from "@/lib/utils";
 
 interface ExportReportsButtonProps {
-    province?: string;
-    startDate?: Date;
-    endDate?: Date;
+  regency?: string;
+  startDate?: Date;
+  endDate?: Date;
 }
 
 export function ExportReportsButton({
-    province,
-    startDate,
-    endDate,
+  regency,
+  startDate,
+  endDate,
 }: ExportReportsButtonProps) {
-    const [loading, setLoading] = useState(false);
-    const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
-    const handleExport = async () => {
-        try {
-            setLoading(true);
-            const result = await getReports({
-                page: 1,
-                limit: 10000,
-                province,
-                startDate,
-                endDate,
-            });
+  const handleExport = async () => {
+    try {
+      setLoading(true);
+      const result = await getReports({
+        page: 1,
+        limit: 10000,
+        regency,
+        startDate,
+        endDate,
+      });
 
-            if (!result.success || !result.data) throw new Error(result.error || "Failed to fetch");
-            const reports = result.data.reports;
-            if (reports.length === 0) {
-                toast({ title: "Tidak ada data", description: "Tidak ada laporan yang sesuai.", variant: "destructive" });
-                return;
-            }
+      if (!result.success || !result.data)
+        throw new Error(result.error || "Failed to fetch");
+      const reports = result.data.reports;
 
-            const dataToExport = reports.map((report) => ({
-                "ID Laporan": report.id,
-                "Tanggal": format(new Date(report.createdAt), "dd/MM/yyyy HH:mm"),
-                "ID Unit": report.unit.serialNumber,
-                "Provinsi": report.unit.province,
-                "Kabupaten/Kota": report.unit.regency,
-                "Status Baterai (V)": report.batteryVoltage,
-                "Latitude": report.latitude,
-                "Longitude": report.longitude,
-                "Catatan": report.notes || "-",
-                "Pelapor": report.user.name,
-                "Email Pelapor": report.user.email,
-            }));
+      if (reports.length === 0) {
+        toast({
+          title: "Tidak ada data",
+          description: "Tidak ada laporan yang sesuai dengan kriteria filter.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-            const wb = utils.book_new();
-            const ws = utils.json_to_sheet(dataToExport);
-            utils.book_append_sheet(wb, ws, "Laporan");
-            writeFile(wb, `Laporan_PJUTS_${format(new Date(), "yyyyMMdd_HHmmss")}.xlsx`);
-            toast({ title: "Berhasil", description: "Ekspor selesai.", variant: "success" });
-        } catch {
-            toast({ title: "Gagal", description: "Coba lagi nanti.", variant: "destructive" });
-        } finally {
-            setLoading(false);
-        }
-    };
+      const dataToExport = reports.map((report) => ({
+        "ID Laporan": report.id,
+        Tanggal: format(new Date(report.createdAt), "dd/MM/yyyy HH:mm"),
+        "ID Unit": report.unit.serialNumber,
+        Provinsi: report.unit.province,
+        "Kabupaten/Kota": report.unit.regency,
+        "Status Baterai (V)": report.batteryVoltage,
+        Latitude: report.latitude,
+        Longitude: report.longitude,
+        Catatan: report.notes || "-",
+        Pelapor: report.user.name,
+        "Email Pelapor": report.user.email,
+      }));
 
-    return (
-        <Button variant="outline" size="sm" onClick={handleExport} disabled={loading} className="rounded-xl">
-            {loading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Download className="h-4 w-4 mr-2" />}
-            Export Excel
-        </Button>
-    );
+      const wb = utils.book_new();
+      const ws = utils.json_to_sheet(dataToExport);
+      utils.book_append_sheet(wb, ws, "Laporan");
+      writeFile(
+        wb,
+        `Laporan_PJUTS_${format(new Date(), "yyyyMMdd_HHmmss")}.xlsx`,
+      );
+
+      toast({
+        title: "Berhasil",
+        description: `${reports.length} laporan berhasil diekspor ke Excel.`,
+        variant: "success",
+      });
+    } catch {
+      toast({
+        title: "Gagal Ekspor",
+        description: "Terjadi kesalahan. Silakan coba lagi.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Button
+      variant="outline"
+      size="sm"
+      onClick={handleExport}
+      disabled={loading}
+      className={cn(
+        "rounded-xl sm:rounded-2xl font-bold h-10 sm:h-11 px-4 sm:px-5",
+        "border-border/60 hover:bg-muted transition-all duration-200",
+        "text-xs sm:text-sm",
+      )}
+    >
+      {loading ? (
+        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+      ) : (
+        <FileSpreadsheet className="h-4 w-4 mr-2 text-emerald-600" />
+      )}
+      <span className="hidden sm:inline">Export Excel</span>
+      <span className="sm:hidden">Export</span>
+    </Button>
+  );
 }

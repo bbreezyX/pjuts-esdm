@@ -31,8 +31,13 @@ import {
 } from "@/components/ui/select";
 import { useToast } from "@/components/ui/use-toast";
 import { createPjutsUnitSchema } from "@/lib/validations";
-import { createPjutsUnit, updatePjutsUnit, PjutsUnitData } from "@/app/actions/units";
+import {
+  createPjutsUnit,
+  updatePjutsUnit,
+  PjutsUnitData,
+} from "@/app/actions/units";
 import { UnitStatus } from "@prisma/client";
+import { JAMBI_PROVINCE, JAMBI_REGENCIES } from "@/lib/jambi-data";
 
 // Extended schema for the form (including optional fields for UI handling if needed)
 // We'll use the create schema as base.
@@ -58,7 +63,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
       serialNumber: "",
       latitude: undefined,
       longitude: undefined,
-      province: "",
+      province: JAMBI_PROVINCE,
       regency: "",
       district: "",
       village: "",
@@ -86,7 +91,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
         serialNumber: "",
         latitude: undefined,
         longitude: undefined,
-        province: "",
+        province: JAMBI_PROVINCE,
         regency: "",
         district: "",
         village: "",
@@ -174,14 +179,19 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5 py-2">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-5 py-2"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="serialNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">Serial Number</FormLabel>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Serial Number
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="PJUTS-XXX-000"
@@ -201,7 +211,9 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                   name="lastStatus"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-sm font-medium text-slate-700">Status</FormLabel>
+                      <FormLabel className="text-sm font-medium text-slate-700">
+                        Status
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
@@ -213,10 +225,30 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent className="bg-white border-slate-200">
-                          <SelectItem value="OPERATIONAL" className="text-slate-900 focus:bg-slate-100 cursor-pointer">Operasional</SelectItem>
-                          <SelectItem value="MAINTENANCE_NEEDED" className="text-slate-900 focus:bg-slate-100 cursor-pointer">Perlu Perawatan</SelectItem>
-                          <SelectItem value="OFFLINE" className="text-slate-900 focus:bg-slate-100 cursor-pointer">Offline</SelectItem>
-                          <SelectItem value="UNVERIFIED" className="text-slate-900 focus:bg-slate-100 cursor-pointer">Belum Verifikasi</SelectItem>
+                          <SelectItem
+                            value="OPERATIONAL"
+                            className="text-slate-900 focus:bg-slate-100 cursor-pointer"
+                          >
+                            Operasional
+                          </SelectItem>
+                          <SelectItem
+                            value="MAINTENANCE_NEEDED"
+                            className="text-slate-900 focus:bg-slate-100 cursor-pointer"
+                          >
+                            Perlu Perawatan
+                          </SelectItem>
+                          <SelectItem
+                            value="OFFLINE"
+                            className="text-slate-900 focus:bg-slate-100 cursor-pointer"
+                          >
+                            Offline
+                          </SelectItem>
+                          <SelectItem
+                            value="UNVERIFIED"
+                            className="text-slate-900 focus:bg-slate-100 cursor-pointer"
+                          >
+                            Belum Verifikasi
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -226,17 +258,22 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
               )}
             </div>
 
-
-
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <FormField
                 control={form.control}
                 name="province"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">Provinsi</FormLabel>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Provinsi
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Jawa Barat" {...field} disabled={isSubmitting} className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400" />
+                      <Input
+                        {...field}
+                        value={JAMBI_PROVINCE}
+                        disabled={true}
+                        className="bg-slate-50 text-slate-900 border-slate-300 cursor-not-allowed"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -248,10 +285,31 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                 name="regency"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">Kabupaten/Kota</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Bandung" {...field} disabled={isSubmitting} className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400" />
-                    </FormControl>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Kabupaten/Kota
+                    </FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={isSubmitting}
+                    >
+                      <FormControl>
+                        <SelectTrigger className="bg-white text-slate-900 border-slate-300 focus:ring-primary-500">
+                          <SelectValue placeholder="Pilih Kabupaten/Kota" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="bg-white border-slate-200 max-h-[200px]">
+                        {JAMBI_REGENCIES.map((regency) => (
+                          <SelectItem
+                            key={regency}
+                            value={regency}
+                            className="text-slate-900 focus:bg-slate-100 cursor-pointer"
+                          >
+                            {regency}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -264,9 +322,17 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                 name="district"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">Kecamatan</FormLabel>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Kecamatan
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Cicendo" {...field} value={field.value || ""} disabled={isSubmitting} className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400" />
+                      <Input
+                        placeholder="Telanaipura"
+                        {...field}
+                        value={field.value || ""}
+                        disabled={isSubmitting}
+                        className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -278,9 +344,17 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                 name="village"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-sm font-medium text-slate-700">Desa/Kelurahan</FormLabel>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Desa/Kelurahan
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="Arjuna" {...field} value={field.value || ""} disabled={isSubmitting} className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400" />
+                      <Input
+                        placeholder="Simpang IV Sipin"
+                        {...field}
+                        value={field.value || ""}
+                        disabled={isSubmitting}
+                        className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -293,9 +367,17 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
               name="address"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-sm font-medium text-slate-700">Alamat Lengkap</FormLabel>
+                  <FormLabel className="text-sm font-medium text-slate-700">
+                    Alamat Lengkap
+                  </FormLabel>
                   <FormControl>
-                    <Input placeholder="Jl. Raya No. 123" {...field} value={field.value || ""} disabled={isSubmitting} className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400" />
+                    <Input
+                      placeholder="Jl. Arif Rahman Hakim No. 30"
+                      {...field}
+                      value={field.value || ""}
+                      disabled={isSubmitting}
+                      className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -317,7 +399,11 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                 disabled={isSubmitting}
                 className="bg-primary-600 hover:bg-primary-700 text-white shadow-sm"
               >
-                {isSubmitting ? "Menyimpan..." : (isEdit ? "Simpan Perubahan" : "Tambah Unit")}
+                {isSubmitting
+                  ? "Menyimpan..."
+                  : isEdit
+                    ? "Simpan Perubahan"
+                    : "Tambah Unit"}
               </Button>
             </DialogFooter>
           </form>
@@ -326,4 +412,3 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
     </Dialog>
   );
 }
-

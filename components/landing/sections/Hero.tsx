@@ -8,6 +8,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Zap, MapPin, Database, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useLanguage } from "@/lib/language-context";
 
 export const Hero = () => {
@@ -86,10 +87,13 @@ export const Hero = () => {
           transition={{ delay: 0.4, duration: 0.8 }}
           className="relative max-w-6xl mx-auto aspect-[16/10] md:aspect-[16/8] rounded-[32px] md:rounded-[48px] overflow-hidden shadow-2xl group border border-white/10 bg-white"
         >
-          <img
+          <Image
             src="/illustrations/hero-command.png"
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-1000 mix-blend-multiply"
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-1000 mix-blend-multiply"
             alt="ESDM National Monitoring Hub Illustration"
+            priority
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 1200px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent pointer-events-none" />
 
