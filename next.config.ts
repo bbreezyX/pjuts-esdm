@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
   // Enable React Strict Mode
   reactStrictMode: true,
 
+  // Explicitly set empty turbopack config to acknowledge webpack config usage
+  // This silences the Next.js 16 warning about having webpack config without turbopack config
+  turbopack: {},
+
   // Development-specific optimizations
   ...(isDev && {
     // Longer page retention for faster navigation during dev
