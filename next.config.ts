@@ -51,6 +51,10 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
+        hostname: "assets.esdm.cloud",
+      },
+      {
+        protocol: "https",
         hostname: "esdm.cloud",
       },
       {
@@ -89,7 +93,7 @@ const nextConfig: NextConfig = {
   async rewrites() {
     const r2BucketUrl = process.env.R2_BUCKET_URL;
     if (!r2BucketUrl) return [];
-    
+
     return [
       {
         source: "/reports/:path*",
@@ -106,8 +110,8 @@ const nextConfig: NextConfig = {
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: blob: https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
-          "connect-src 'self' ws: wss: https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
+          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
+          "connect-src 'self' ws: wss: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
           "frame-ancestors 'none'",
         ].join("; ")
       : [
@@ -115,8 +119,8 @@ const nextConfig: NextConfig = {
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: blob: https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
-          "connect-src 'self' https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
+          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
+          "connect-src 'self' https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
           "frame-ancestors 'none'",
         ].join("; ");
 
@@ -127,9 +131,19 @@ const nextConfig: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(self)" },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(self), microphone=(), geolocation=(self)",
+          },
           { key: "X-XSS-Protection", value: "1; mode=block" },
-          ...(!isDev ? [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }] : []),
+          ...(!isDev
+            ? [
+                {
+                  key: "Strict-Transport-Security",
+                  value: "max-age=31536000; includeSubDomains",
+                },
+              ]
+            : []),
           { key: "Content-Security-Policy", value: cspValue },
         ],
       },
@@ -138,15 +152,30 @@ const nextConfig: NextConfig = {
         ? [
             {
               source: "/static/(.*)",
-              headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+              headers: [
+                {
+                  key: "Cache-Control",
+                  value: "public, max-age=31536000, immutable",
+                },
+              ],
             },
             {
               source: "/_next/image(.*)",
-              headers: [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }],
+              headers: [
+                {
+                  key: "Cache-Control",
+                  value: "public, max-age=86400, stale-while-revalidate=604800",
+                },
+              ],
             },
             {
               source: "/_next/static/(.*)",
-              headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+              headers: [
+                {
+                  key: "Cache-Control",
+                  value: "public, max-age=31536000, immutable",
+                },
+              ],
             },
           ]
         : []),
