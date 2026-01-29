@@ -46,7 +46,7 @@ export function MobileNav() {
       </div>
       
       {/* Main nav container */}
-      <div className="bg-card/95 backdrop-blur-2xl border border-border/60 shadow-2xl shadow-black/10 rounded-[1.5rem]">
+      <div className="bg-card/95 backdrop-blur-2xl border border-border/60 rounded-[1.5rem]">
         <div className="flex items-center justify-around px-2 py-2.5">
           {navItems.map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
