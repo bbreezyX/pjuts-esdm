@@ -171,7 +171,7 @@ export function UsersClient({ users }: UsersClientProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in">
-      <div className="flex flex-col gap-4 sm:gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
         <div>
           <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
             <div className="w-1 sm:w-1.5 h-3 sm:h-4 bg-primary rounded-full" />
@@ -188,7 +188,7 @@ export function UsersClient({ users }: UsersClientProps) {
           }}
         >
           <DialogTrigger asChild>
-            <Button size="lg" className="bg-foreground text-background hover:opacity-90 rounded-xl sm:rounded-2xl px-4 sm:px-8 h-10 sm:h-12 font-bold transition-all shadow-lg shadow-foreground/5 hover:scale-105 active:scale-95 text-xs sm:text-sm w-full sm:w-auto">
+            <Button size="lg" className="bg-foreground text-background hover:opacity-90 rounded-xl sm:rounded-2xl px-4 sm:px-8 h-10 sm:h-12 font-bold transition-all shadow-lg shadow-foreground/5 hover:scale-105 active:scale-95 text-xs sm:text-sm w-fit sm:w-auto">
               <Plus className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               Tambah Pengguna
             </Button>
