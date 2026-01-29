@@ -17,7 +17,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -171,15 +170,15 @@ export function UsersClient({ users }: UsersClientProps) {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 animate-fade-in">
+      <div className="flex flex-col gap-4 sm:gap-6">
         <div>
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-4 bg-primary rounded-full" />
-            <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Administrasi Sistem</h3>
+          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+            <div className="w-1 sm:w-1.5 h-3 sm:h-4 bg-primary rounded-full" />
+            <h3 className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.3em]">Administrasi Sistem</h3>
           </div>
-          <h2 className="text-4xl font-bold tracking-tight text-foreground">Manajemen Pengguna</h2>
-          <p className="text-muted-foreground text-sm font-medium mt-1">Kelola hak akses dan akun personil operasional PJUTS.</p>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">Manajemen Pengguna</h2>
+          <p className="text-muted-foreground text-xs sm:text-sm font-medium mt-1">Kelola hak akses dan akun personil operasional PJUTS.</p>
         </div>
         <Dialog
           open={isDialogOpen}
@@ -189,37 +188,37 @@ export function UsersClient({ users }: UsersClientProps) {
           }}
         >
           <DialogTrigger asChild>
-            <Button size="lg" className="bg-foreground text-background hover:opacity-90 rounded-2xl px-8 h-12 font-bold transition-all shadow-lg shadow-foreground/5 hover:scale-105 active:scale-95">
-              <Plus className="mr-2 h-5 w-5" />
+            <Button size="lg" className="bg-foreground text-background hover:opacity-90 rounded-xl sm:rounded-2xl px-4 sm:px-8 h-10 sm:h-12 font-bold transition-all shadow-lg shadow-foreground/5 hover:scale-105 active:scale-95 text-xs sm:text-sm w-full sm:w-auto">
+              <Plus className="mr-1.5 sm:mr-2 h-4 w-4 sm:h-5 sm:w-5" />
               Tambah Pengguna
             </Button>
           </DialogTrigger>
-          <DialogContent className="w-[95vw] max-w-[450px] bg-card/95 backdrop-blur-xl border-border shadow-2xl rounded-[2.5rem] p-8">
+          <DialogContent className="w-[95vw] max-w-[450px] bg-card/95 backdrop-blur-xl border-border shadow-2xl rounded-2xl sm:rounded-[2.5rem] p-4 sm:p-8">
             <DialogHeader>
-              <DialogTitle className="text-2xl font-black text-foreground tracking-tight">
+              <DialogTitle className="text-xl sm:text-2xl font-black text-foreground tracking-tight">
                 {editingUser ? "Edit Profil" : "Pengguna Baru"}
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground font-medium">
+              <DialogDescription className="text-muted-foreground font-medium text-xs sm:text-sm">
                 {editingUser ? "Perbarui informasi akun dan hak akses pengguna." : "Daftarkan personil baru ke dalam sistem monitoring."}
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleSubmit} className="space-y-6 mt-4">
-              <div className="space-y-2">
-                <Label htmlFor="name" className="text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">Nama Lengkap</Label>
-                <Input id="name" name="name" defaultValue={editingUser?.name} required minLength={3} className="h-12 rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium" placeholder="Nama lengkap personil" />
+            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 mt-3 sm:mt-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="name" className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">Nama Lengkap</Label>
+                <Input id="name" name="name" defaultValue={editingUser?.name} required minLength={3} className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm" placeholder="Nama lengkap personil" />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">Alamat Email</Label>
-                <Input id="email" name="email" type="email" defaultValue={editingUser?.email} required className="h-12 rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium" placeholder="personil@esdm.go.id" />
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="email" className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">Alamat Email</Label>
+                <Input id="email" name="email" type="email" defaultValue={editingUser?.email} required className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm" placeholder="personil@esdm.go.id" />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">{editingUser ? "Password Baru" : "Password"}</Label>
-                <Input id="password" name="password" type="password" required={!editingUser} minLength={6} className="h-12 rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium" placeholder={editingUser ? "Biarkan kosong jika tidak berubah" : "Minimal 6 karakter unik"} />
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="password" className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">{editingUser ? "Password Baru" : "Password"}</Label>
+                <Input id="password" name="password" type="password" required={!editingUser} minLength={6} className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm" placeholder={editingUser ? "Biarkan kosong jika tidak berubah" : "Minimal 6 karakter unik"} />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="role" className="text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">Hak Akses (Role)</Label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="role" className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-wider ml-1">Hak Akses (Role)</Label>
                 <Select name="role" defaultValue={editingUser?.role || "FIELD_STAFF"}>
-                  <SelectTrigger className="h-12 rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 font-bold">
+                  <SelectTrigger className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 font-bold text-sm">
                     <SelectValue placeholder="Pilih hak akses" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-border shadow-2xl">
@@ -248,15 +247,117 @@ export function UsersClient({ users }: UsersClientProps) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex justify-end gap-3 pt-4">
-                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-xl font-bold">Batal</Button>
-                <Button type="submit" disabled={isLoading} className="rounded-xl font-bold px-8 shadow-lg shadow-primary/20">{isLoading ? "Memproses..." : editingUser ? "Simpan Perubahan" : "Daftarkan Pengguna"}</Button>
+              <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3 pt-3 sm:pt-4">
+                <Button type="button" variant="ghost" onClick={() => setIsDialogOpen(false)} className="rounded-lg sm:rounded-xl font-bold h-10 sm:h-auto">Batal</Button>
+                <Button type="submit" disabled={isLoading} className="rounded-lg sm:rounded-xl font-bold px-6 sm:px-8 shadow-lg shadow-primary/20 h-10 sm:h-auto text-sm">{isLoading ? "Memproses..." : editingUser ? "Simpan Perubahan" : "Daftarkan"}</Button>
               </div>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
+      {/* Mobile Cards */}
+      <div className="lg:hidden space-y-3">
+        {users.length === 0 ? (
+          <Card className="p-6 text-center text-slate-500 text-sm">
+            Tidak ada pengguna ditemukan
+          </Card>
+        ) : (
+          users.map((user, index) => (
+            <Card
+              key={user.id}
+              className={cn(
+                "p-3 sm:p-4 animate-fade-in border-border/50",
+                !user.isActive && "opacity-60 grayscale-[0.5]"
+              )}
+              style={{ animationDelay: `${index * 0.05}s` }}
+            >
+              <div className="flex items-start gap-3">
+                <div className={cn(
+                  "w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0",
+                  user.isActive ? "bg-gradient-to-br from-primary/10 to-primary/5 text-primary" : "bg-muted text-muted-foreground"
+                )}>
+                  <span className="text-sm sm:text-base font-black">{user.name.charAt(0).toUpperCase()}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="font-bold text-sm sm:text-base text-foreground truncate">{user.name}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                    <Badge 
+                      variant={user.role === "ADMIN" ? "default" : "secondary"} 
+                      className={cn(
+                        "shrink-0 text-[9px] sm:text-[10px] h-5 sm:h-6 rounded-lg px-2",
+                        user.role === "ADMIN" ? "bg-amber-500/10 text-amber-600" : "bg-primary/5 text-primary"
+                      )}
+                    >
+                      {user.role === "ADMIN" ? <ShieldCheck className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" /> : <User className="w-2.5 h-2.5 sm:w-3 sm:h-3 mr-1" />}
+                      {user.role === "ADMIN" ? "Admin" : "Petugas"}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 mt-2">
+                    <div className="flex items-center gap-1.5">
+                      {user.isActive ? (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                          <span className="text-[9px] sm:text-[10px] font-bold text-emerald-600 uppercase">Aktif</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                          <span className="text-[9px] sm:text-[10px] font-bold text-red-500 uppercase">Nonaktif</span>
+                        </>
+                      )}
+                    </div>
+                    <span className="text-muted-foreground">•</span>
+                    <span className="text-[9px] sm:text-[10px] text-muted-foreground">
+                      {new Date(user.createdAt).toLocaleDateString("id-ID", { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 px-3 rounded-lg text-[10px] sm:text-xs font-bold flex-1"
+                      onClick={() => { setEditingUser(user); setIsDialogOpen(true); }}
+                    >
+                      <Pencil className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
+                      Edit
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "h-8 px-3 rounded-lg text-[10px] sm:text-xs font-bold flex-1",
+                        user.isActive ? "text-orange-600" : "text-emerald-600"
+                      )}
+                      onClick={() => handleToggleStatus(user)}
+                      disabled={togglingUserId === user.id}
+                    >
+                      {user.isActive ? (
+                        <><UserMinus className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" /> Nonaktifkan</>
+                      ) : (
+                        <><UserCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" /> Aktifkan</>
+                      )}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 rounded-lg text-red-600 hover:bg-red-50"
+                      onClick={() => handleDelete(user.id)}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table */}
       <div className="hidden lg:block overflow-x-auto pb-4">
         <table className="w-full text-left border-separate border-spacing-y-4">
           <thead>
@@ -285,7 +386,7 @@ export function UsersClient({ users }: UsersClientProps) {
                       "w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm transition-transform duration-300 group-hover:scale-110",
                       user.isActive ? "bg-gradient-to-br from-primary/10 to-primary/5 text-primary" : "bg-muted text-muted-foreground"
                     )}>
-                      <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`} alt="avatar" className="w-full h-full object-cover rounded-2xl" />
+                      <span className="text-lg font-black">{user.name.charAt(0).toUpperCase()}</span>
                     </div>
                     <div>
                       <p className="font-black text-foreground tracking-tight leading-none mb-1.5">{user.name}</p>
@@ -381,28 +482,28 @@ export function UsersClient({ users }: UsersClientProps) {
       </div>
 
       <Dialog open={!!confirmDisableUser} onOpenChange={() => setConfirmDisableUser(null)}>
-        <DialogContent className="w-[95vw] max-w-[425px] bg-card/95 backdrop-blur-xl border-border shadow-2xl rounded-[2rem] p-8">
+        <DialogContent className="w-[95vw] max-w-[425px] bg-card/95 backdrop-blur-xl border-border shadow-2xl rounded-2xl sm:rounded-[2rem] p-4 sm:p-8">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black text-foreground tracking-tight flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-orange-600" />
+            <DialogTitle className="text-xl sm:text-2xl font-black text-foreground tracking-tight flex items-center gap-2 sm:gap-3">
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-orange-500/10 flex items-center justify-center">
+                <AlertTriangle className="w-4 h-4 sm:w-6 sm:h-6 text-orange-600" />
               </div>
               Nonaktifkan?
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground font-medium pt-2">
+            <DialogDescription className="text-muted-foreground font-medium pt-2 text-xs sm:text-sm">
               Pengguna yang dinonaktifkan akan kehilangan akses ke seluruh sistem monitoring secara instan.
             </DialogDescription>
           </DialogHeader>
-          <div className="py-6">
-            <div className="bg-orange-500/5 border border-orange-500/10 rounded-[1.25rem] p-6">
-              <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Akun Terpilih</p>
-              <p className="font-bold text-foreground text-lg tracking-tight leading-snug">{confirmDisableUser?.name}</p>
-              <p className="text-sm text-muted-foreground font-medium">{confirmDisableUser?.email}</p>
+          <div className="py-4 sm:py-6">
+            <div className="bg-orange-500/5 border border-orange-500/10 rounded-xl sm:rounded-[1.25rem] p-4 sm:p-6">
+              <p className="text-[9px] sm:text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">Akun Terpilih</p>
+              <p className="font-bold text-foreground text-base sm:text-lg tracking-tight leading-snug">{confirmDisableUser?.name}</p>
+              <p className="text-xs sm:text-sm text-muted-foreground font-medium">{confirmDisableUser?.email}</p>
             </div>
           </div>
-          <DialogFooter className="flex flex-col sm:flex-row gap-3">
-            <Button type="button" variant="ghost" onClick={() => setConfirmDisableUser(null)} className="rounded-xl font-bold flex-1">Batal</Button>
-            <Button type="button" onClick={() => confirmDisableUser && performToggle(confirmDisableUser.id)} disabled={togglingUserId !== null} className="bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold flex-1 shadow-lg shadow-orange-600/20">
+          <DialogFooter className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
+            <Button type="button" variant="ghost" onClick={() => setConfirmDisableUser(null)} className="rounded-lg sm:rounded-xl font-bold flex-1 h-10 sm:h-auto">Batal</Button>
+            <Button type="button" onClick={() => confirmDisableUser && performToggle(confirmDisableUser.id)} disabled={togglingUserId !== null} className="bg-orange-600 hover:bg-orange-700 text-white rounded-lg sm:rounded-xl font-bold flex-1 shadow-lg shadow-orange-600/20 h-10 sm:h-auto text-sm">
               {togglingUserId ? "Memproses..." : "Ya, Nonaktifkan"}
             </Button>
           </DialogFooter>

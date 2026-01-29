@@ -133,12 +133,31 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     error: "/login",
   },
   callbacks: {
-    async jwt({ token, user, trigger: _trigger }) {
+    async jwt({ token, user, trigger }) {
       // Initial sign in - set user data in token
       if (user) {
         token.id = user.id ?? "";
         token.role = user.role ?? "FIELD_STAFF";
+        token.name = user.name ?? "";
+        token.email = user.email ?? "";
         token.lastActiveCheck = Date.now();
+      }
+
+      // Handle session update (e.g., after profile update)
+      if (trigger === "update" && token.id) {
+        try {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: token.id as string },
+            select: { name: true, email: true, role: true, isActive: true },
+          });
+          if (dbUser && dbUser.isActive) {
+            token.name = dbUser.name;
+            token.email = dbUser.email;
+            token.role = dbUser.role;
+          }
+        } catch (error) {
+          console.error("Error updating token:", error);
+        }
       }
 
       // On subsequent requests, periodically check if user is still active
@@ -183,6 +202,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;
+        session.user.name = (token.name as string) || session.user.name;
+        session.user.email = (token.email as string) || session.user.email;
       }
       return session;
     },
@@ -209,6 +230,8 @@ declare module "@auth/core/jwt" {
   interface JWT {
     id: string;
     role: string;
+    name?: string;
+    email?: string;
     lastActiveCheck?: number;
     isActive?: boolean;
   }

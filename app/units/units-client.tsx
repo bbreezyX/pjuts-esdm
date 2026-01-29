@@ -12,7 +12,6 @@ import {
   FileText,
   ChevronLeft,
   ChevronRight,
-  ExternalLink,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -43,7 +42,6 @@ import {
 import { PjutsUnitData } from "@/app/actions/units";
 import { getStatusLabel, formatDate, cn } from "@/lib/utils";
 import { UnitStatus } from "@prisma/client";
-import { PageHeader } from "@/components/layout";
 import { UnitDialog } from "@/components/units/unit-dialog";
 import { DeleteUnitDialog } from "@/components/units/delete-unit-dialog";
 
@@ -139,62 +137,62 @@ export function UnitsPageClient({
   const hasActiveFilters = selectedProvince || selectedStatus || searchQuery;
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="flex flex-col gap-4 sm:gap-6">
         <div>
-          <h1 className="text-4xl font-bold text-foreground tracking-tight mb-2">Unit PJUTS</h1>
-          <p className="text-muted-foreground text-sm font-medium">Kelola dan pantau seluruh unit penerangan jalan umum tenaga surya secara terpadu.</p>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight mb-1 sm:mb-2">Unit PJUTS</h1>
+          <p className="text-muted-foreground text-xs sm:text-sm font-medium">Kelola dan pantau seluruh unit penerangan jalan umum tenaga surya secara terpadu.</p>
         </div>
         {isAdmin && (
-          <div className="flex items-center gap-3">
-            <Button variant="outline" className="rounded-2xl border-border h-12 px-6 font-bold hover:bg-muted">
-              <Upload className="h-4 w-4 mr-2" />
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+            <Button variant="outline" className="rounded-xl sm:rounded-2xl border-border h-9 sm:h-12 px-3 sm:px-6 font-bold hover:bg-muted text-xs sm:text-sm">
+              <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
               Import
             </Button>
-            <Button variant="outline" className="rounded-2xl border-border h-12 px-6 font-bold hover:bg-muted">
-              <Download className="h-4 w-4 mr-2" />
+            <Button variant="outline" className="rounded-xl sm:rounded-2xl border-border h-9 sm:h-12 px-3 sm:px-6 font-bold hover:bg-muted text-xs sm:text-sm">
+              <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
               Export
             </Button>
-            <Button size="lg" onClick={handleCreate} className="bg-foreground text-background hover:opacity-90 rounded-2xl px-6 h-12 font-bold transition-all shadow-lg shadow-foreground/5 hover:scale-105">
-              <Plus className="h-5 w-5 mr-2" />
+            <Button size="lg" onClick={handleCreate} className="bg-foreground text-background hover:opacity-90 rounded-xl sm:rounded-2xl px-3 sm:px-6 h-9 sm:h-12 font-bold transition-all shadow-lg shadow-foreground/5 hover:scale-105 text-xs sm:text-sm">
+              <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
               Tambah Unit
             </Button>
           </div>
         )}
       </div>
 
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row gap-4">
+      <div className="space-y-4 sm:space-y-6">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
           <div className="relative flex-1 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-slate-600 transition-colors z-10" />
+            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400 group-focus-within:text-slate-600 transition-colors z-10" />
             <input 
               type="text" 
-              placeholder="Cari unit berdasarkan Serial Number atau Wilayah..." 
+              placeholder="Cari unit..." 
               value={searchQuery} 
               onChange={(e) => setSearchQuery(e.target.value)} 
               onKeyDown={(e) => e.key === "Enter" && handleSearch()} 
-              className="relative w-full h-12 pl-12 pr-4 rounded-full border border-slate-200/60 bg-white/80 backdrop-blur-md text-sm font-medium shadow-sm shadow-slate-200/20 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-300 transition-all placeholder:text-slate-400" 
+              className="relative w-full h-10 sm:h-12 pl-10 sm:pl-12 pr-3 sm:pr-4 rounded-xl sm:rounded-full border border-slate-200/60 bg-white/80 backdrop-blur-md text-xs sm:text-sm font-medium shadow-sm shadow-slate-200/20 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-300 transition-all placeholder:text-slate-400" 
             />
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-2 sm:gap-3">
             <Button 
               variant={showFilters ? "default" : "outline"} 
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                "h-12 px-6 rounded-2xl font-bold transition-all shrink-0",
+                "h-10 sm:h-12 px-3 sm:px-6 rounded-xl sm:rounded-2xl font-bold transition-all shrink-0 text-xs sm:text-sm",
                 showFilters ? "bg-primary shadow-lg shadow-primary/20" : "hover:bg-muted"
               )}
             >
-              <Filter className="h-4 w-4 mr-2" />
-              Filter Lanjutan
+              <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
+              <span className="hidden xs:inline">Filter </span>Lanjutan
             </Button>
             {hasActiveFilters && (
               <Button 
                 variant="ghost" 
                 onClick={() => { setSearchQuery(""); setSelectedProvince(undefined); setSelectedStatus(undefined); updateURL({ search: undefined, province: undefined, status: undefined }); }}
-                className="h-12 px-5 rounded-2xl font-bold text-red-500 hover:bg-red-50 shrink-0 transition-all"
+                className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl font-bold text-red-500 hover:bg-red-50 shrink-0 transition-all text-xs sm:text-sm"
               >
-                <X className="h-4 w-4 mr-2" />
+                <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                 Reset
               </Button>
             )}
@@ -202,16 +200,16 @@ export function UnitsPageClient({
         </div>
         
         {showFilters && (
-          <div className="bg-muted/30 backdrop-blur-md rounded-[2rem] p-8 border border-border/50 space-y-6 animate-in slide-in-from-top-4 fade-in duration-500">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-1.5 h-4 bg-primary rounded-full" />
-              <h3 className="text-sm font-black text-foreground uppercase tracking-wider">Kriteria Penyaringan</h3>
+          <div className="bg-muted/30 backdrop-blur-md rounded-2xl sm:rounded-[2rem] p-4 sm:p-8 border border-border/50 space-y-4 sm:space-y-6 animate-in slide-in-from-top-4 fade-in duration-500">
+            <div className="flex items-center gap-2 mb-1 sm:mb-2">
+              <div className="w-1 sm:w-1.5 h-3 sm:h-4 bg-primary rounded-full" />
+              <h3 className="text-xs sm:text-sm font-black text-foreground uppercase tracking-wider">Kriteria Penyaringan</h3>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">Provinsi</label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
+              <div className="space-y-1.5 sm:space-y-2">
+                <label className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">Provinsi</label>
                 <Select value={selectedProvince || "all"} onValueChange={(v) => { const val = v === "all" ? undefined : v; setSelectedProvince(val); updateURL({ province: val }); }}>
-                  <SelectTrigger className="h-12 rounded-xl border-border/60 bg-card/50 font-bold text-sm">
+                  <SelectTrigger className="h-10 sm:h-12 rounded-xl border-border/60 bg-card/50 font-bold text-xs sm:text-sm">
                     <SelectValue placeholder="Semua Provinsi" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-border shadow-2xl">
@@ -220,10 +218,10 @@ export function UnitsPageClient({
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <label className="text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">Status Unit</label>
+              <div className="space-y-1.5 sm:space-y-2">
+                <label className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">Status Unit</label>
                 <Select value={selectedStatus || "all"} onValueChange={(v) => { const val = v === "all" ? undefined : v; setSelectedStatus(val); updateURL({ status: val }); }}>
-                  <SelectTrigger className="h-12 rounded-xl border-border/60 bg-card/50 font-bold text-sm">
+                  <SelectTrigger className="h-10 sm:h-12 rounded-xl border-border/60 bg-card/50 font-bold text-xs sm:text-sm">
                     <SelectValue placeholder="Semua Status" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-border shadow-2xl">
@@ -237,6 +235,91 @@ export function UnitsPageClient({
       </div>
 
       <div className={cn("transition-opacity duration-300", isPending ? "opacity-50 pointer-events-none" : "opacity-100")}>
+        {/* Mobile Cards */}
+        <div className="lg:hidden space-y-3">
+          {initialUnits.length === 0 ? (
+            <Card className="p-6 text-center text-slate-500 text-sm">
+              Tidak ada unit ditemukan
+            </Card>
+          ) : (
+            initialUnits.map((unit, index) => (
+              <Card
+                key={unit.id}
+                className="p-3 sm:p-4 animate-fade-in border-border/50"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
+                    <Lightbulb className="h-5 w-5 sm:h-6 sm:w-6" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm sm:text-base text-foreground truncate">{unit.serialNumber}</p>
+                        <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                          {unit.province}, {unit.regency}
+                        </p>
+                      </div>
+                      <Badge variant={getStatusBadgeVariant(unit.lastStatus)} className="shrink-0 text-[9px] sm:text-[10px] h-5 sm:h-6 rounded-lg">
+                        {getStatusLabel(unit.lastStatus)}
+                      </Badge>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                      <div className="inline-flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold text-muted-foreground">
+                        <FileText size={10} className="text-primary/60" />
+                        {unit._count.reports} Laporan
+                      </div>
+                      <code className="text-[9px] sm:text-[10px] font-medium bg-muted/40 px-1.5 py-0.5 rounded text-primary">
+                        {unit.latitude.toFixed(4)}, {unit.longitude.toFixed(4)}
+                      </code>
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-3 rounded-lg text-[10px] sm:text-xs font-bold flex-1"
+                        onClick={() => window.open(`https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`, "_blank")}
+                      >
+                        <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
+                        Maps
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-3 rounded-lg text-[10px] sm:text-xs font-bold flex-1"
+                        asChild
+                      >
+                        <Link href={`/report/new?unitId=${unit.id}`}>
+                          <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
+                          Lapor
+                        </Link>
+                      </Button>
+                      {isAdmin && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="rounded-xl border-border shadow-xl p-1.5 min-w-[140px]">
+                            <DropdownMenuItem className="rounded-lg py-2 font-bold text-xs cursor-pointer" onClick={() => handleEdit(unit)}>
+                              <Pencil className="h-3.5 w-3.5 mr-2 text-amber-500" /> Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="rounded-lg py-2 font-bold text-xs cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50" onClick={() => handleDelete(unit)}>
+                              <Trash2 className="h-3.5 w-3.5 mr-2" /> Hapus
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))
+          )}
+        </div>
+
+        {/* Desktop Table */}
         <div className="hidden lg:block overflow-x-auto pb-4">
           <table className="w-full text-left border-separate border-spacing-y-4">
             <thead>
@@ -322,6 +405,40 @@ export function UnitsPageClient({
           </table>
         </div>
       </div>
+      {/* Pagination Info */}
+      {initialUnits.length > 0 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
+            Menampilkan <span className="font-bold text-foreground">{initialUnits.length}</span> dari <span className="font-bold text-foreground">{total}</span> unit
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page <= 1}
+              onClick={() => updateURL({ page: String(page - 1) })}
+              className="h-8 sm:h-9 px-3 rounded-lg sm:rounded-xl text-xs font-bold"
+            >
+              <ChevronLeft className="h-3.5 w-3.5 mr-1" />
+              Prev
+            </Button>
+            <span className="text-xs sm:text-sm font-bold text-muted-foreground px-2">
+              {page} / {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={page >= totalPages}
+              onClick={() => updateURL({ page: String(page + 1) })}
+              className="h-8 sm:h-9 px-3 rounded-lg sm:rounded-xl text-xs font-bold"
+            >
+              Next
+              <ChevronRight className="h-3.5 w-3.5 ml-1" />
+            </Button>
+          </div>
+        </div>
+      )}
+
       <UnitDialog open={isUnitDialogOpen} onOpenChange={setIsUnitDialogOpen} unit={selectedUnit} />
       <DeleteUnitDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen} unit={unitToDelete} />
     </div>

@@ -11,7 +11,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "next-auth/react";
-import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 interface UserNavProps {
     user: {
@@ -68,13 +68,11 @@ export function UserNav({ user }: UserNavProps) {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-border/50" />
                 <div className="p-1 space-y-1">
-                    <DropdownMenuItem className="p-3 rounded-xl focus:bg-muted cursor-pointer font-bold text-xs gap-3">
-                        <UserCircle className="h-4 w-4 text-primary" />
-                        Profil Saya
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="p-3 rounded-xl focus:bg-muted cursor-pointer font-bold text-xs gap-3">
-                        <ShieldCheck className="h-4 w-4 text-primary" />
-                        Pengaturan Akun
+                    <DropdownMenuItem asChild className="p-3 rounded-xl focus:bg-muted cursor-pointer font-bold text-xs gap-3">
+                        <Link href="/profile">
+                            <UserCircle className="h-4 w-4 text-primary" />
+                            Profil Saya
+                        </Link>
                     </DropdownMenuItem>
                 </div>
                 <DropdownMenuSeparator className="bg-border/50" />
