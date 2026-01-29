@@ -8,13 +8,13 @@ const withPWA = withPWAInit({
   dest: "public",
   disable: isDev, // Completely disable in development
   register: true,
-  skipWaiting: true,
-  cacheOnFrontEndNav: !isDev,
   fallbacks: {
     document: "/~offline",
   },
-  // Prevent PWA from running any code in development
-  buildExcludes: isDev ? [/./] : [],
+  workboxOptions: {
+    skipWaiting: true,
+    clientsClaim: true,
+  },
 });
 
 const nextConfig: NextConfig = {
