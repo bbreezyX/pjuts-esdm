@@ -17,7 +17,6 @@ import {
   User,
   Bell,
   Search,
-  Plus
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";

@@ -2,7 +2,6 @@
 
 import { MapPin, Clock, FileText, PlusCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { UnitStatus } from "@prisma/client";
 import { getRelativeTime, getStatusLabel, cn } from "@/lib/utils";
 
@@ -18,10 +17,10 @@ interface Activity {
 
 interface ActivityFeedProps {
   activities: Activity[];
-  maxHeight?: string;
+  _maxHeight?: string;
 }
 
-export function ActivityFeed({ activities, maxHeight = "400px" }: ActivityFeedProps) {
+export function ActivityFeed({ activities, _maxHeight = "400px" }: ActivityFeedProps) {
   const getActivityIcon = (type: Activity["type"]) => {
     switch (type) {
       case "report":

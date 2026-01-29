@@ -10,7 +10,6 @@ import {
     Tooltip,
     ResponsiveContainer,
 } from "recharts";
-import { cn } from "@/lib/utils";
 
 interface ProvinceData {
     province: string;
