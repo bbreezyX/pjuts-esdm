@@ -27,7 +27,7 @@ export function PageHeader({
           </div>
 
           {/* Main Title */}
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight leading-tight">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
             {title}
           </h1>
 

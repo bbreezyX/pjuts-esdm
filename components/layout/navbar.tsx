@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 import {
   LayoutGrid,
@@ -17,37 +17,42 @@ import {
   User,
   Bell,
   Search,
+  Loader2,
+  ArrowRight,
+  MapPin,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { getPjutsUnits, type PjutsUnitData } from "@/app/actions/units";
 
 const Notifications = dynamic(
   () => import("./notifications").then((mod) => mod.Notifications),
   {
     ssr: false,
     loading: () => (
-      <Button variant="ghost" size="icon" className="relative text-muted-foreground h-10 w-10 rounded-xl">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="relative text-muted-foreground h-10 w-10 rounded-xl"
+      >
         <Bell className="h-5 w-5" />
       </Button>
     ),
-  }
+  },
 );
 
-const UserNav = dynamic(
-  () => import("./user-nav").then((mod) => mod.UserNav),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center gap-2 px-2">
-        <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-        <div className="hidden lg:block space-y-1">
-          <div className="w-20 h-4 bg-muted rounded animate-pulse" />
-        </div>
+const UserNav = dynamic(() => import("./user-nav").then((mod) => mod.UserNav), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center gap-2 px-2">
+      <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+      <div className="hidden lg:block space-y-1">
+        <div className="w-20 h-4 bg-muted rounded animate-pulse" />
       </div>
-    ),
-  }
-);
+    </div>
+  ),
+});
 
 interface NavbarProps {
   user: {
@@ -68,8 +73,48 @@ const navItems = [
 
 export function Navbar({ user }: NavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<PjutsUnitData[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // Search Logic with Debounce
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearching(true);
+      try {
+        const result = await getPjutsUnits({ search: searchQuery, limit: 6 });
+        if (result.success && result.data) {
+          setSearchResults(result.data.units);
+        }
+      } catch (error) {
+        console.error("Search failed:", error);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -97,7 +142,7 @@ export function Navbar({ user }: NavbarProps) {
                 </div>
                 <div className="hidden sm:block">
                   <h1 className="text-lg font-black text-foreground tracking-tighter leading-none">
-                    PJUTS <span className="text-primary/70">ESDM</span>
+                    PJUTS <span className="text-primary">ESDM</span>
                   </h1>
                   <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] mt-1">
                     Cloud System
@@ -111,7 +156,9 @@ export function Navbar({ user }: NavbarProps) {
               {navItems.map((item) => {
                 if (item.adminOnly && user.role !== "ADMIN") return null;
 
-                const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                const isActive =
+                  pathname === item.href ||
+                  pathname.startsWith(`${item.href}/`);
                 const Icon = item.icon;
                 return (
                   <Link
@@ -121,10 +168,15 @@ export function Navbar({ user }: NavbarProps) {
                       "flex items-center gap-2.5 px-5 py-2.5 rounded-xl text-xs font-bold transition-all duration-300",
                       isActive
                         ? "bg-card text-foreground shadow-lg shadow-primary/5 ring-1 ring-border/50 translate-y-[-1px]"
-                        : "text-muted-foreground hover:text-foreground hover:bg-card/40"
+                        : "text-muted-foreground hover:text-foreground hover:bg-card/40",
                     )}
                   >
-                    <Icon className={cn("w-4 h-4 transition-colors duration-300", isActive ? "text-primary" : "text-muted-foreground")} />
+                    <Icon
+                      className={cn(
+                        "w-4 h-4 transition-colors duration-300",
+                        isActive ? "text-primary" : "text-muted-foreground",
+                      )}
+                    />
                     {item.label}
                   </Link>
                 );
@@ -134,13 +186,20 @@ export function Navbar({ user }: NavbarProps) {
             {/* Right Section */}
             <div className="flex items-center gap-3">
               {/* Search Bar (Premium Bento) */}
-              <div 
+              <div
                 className="hidden lg:flex items-center gap-4 bg-muted/40 px-5 py-2.5 rounded-2xl border border-border/40 w-72 group hover:bg-muted/60 hover:border-border/80 transition-all duration-300 cursor-pointer mr-3"
                 onClick={() => setSearchOpen(true)}
               >
-                <Search size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
-                <span className="text-xs font-bold text-muted-foreground group-hover:text-foreground/80">Cari unit PJUTS...</span>
-                <kbd className="ml-auto text-[10px] bg-card/80 px-2 py-1 rounded-lg border border-border/60 font-black text-muted-foreground shadow-sm">⌘K</kbd>
+                <Search
+                  size={18}
+                  className="text-muted-foreground group-hover:text-primary transition-colors"
+                />
+                <span className="text-xs font-bold text-muted-foreground group-hover:text-foreground/80">
+                  Cari unit PJUTS...
+                </span>
+                <kbd className="ml-auto text-[10px] bg-card/80 px-2 py-1 rounded-lg border border-border/60 font-black text-muted-foreground shadow-sm">
+                  ⌘K
+                </kbd>
               </div>
 
               {/* Action Buttons */}
@@ -188,8 +247,8 @@ export function Navbar({ user }: NavbarProps) {
           <div className="relative w-full max-w-sm ml-auto bg-card shadow-2xl rounded-3xl border border-border overflow-hidden animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between p-6 border-b border-border">
               <div className="flex items-center gap-3">
-                 <Image src="/logo-esdm.png" alt="Logo" width={32} height={32} />
-                 <span className="font-bold text-foreground">Menu Navigasi</span>
+                <Image src="/logo-esdm.png" alt="Logo" width={32} height={32} />
+                <span className="font-bold text-foreground">Menu Navigasi</span>
               </div>
               <Button
                 variant="ghost"
@@ -200,7 +259,7 @@ export function Navbar({ user }: NavbarProps) {
                 <X className="h-5 w-5" />
               </Button>
             </div>
-            
+
             <nav className="p-4 grid gap-2">
               {navItems.map((item) => {
                 if (item.adminOnly && user.role !== "ADMIN") return null;
@@ -215,7 +274,7 @@ export function Navbar({ user }: NavbarProps) {
                       "flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold transition-all",
                       isActive
                         ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                        : "text-muted-foreground hover:bg-muted"
+                        : "text-muted-foreground hover:bg-muted",
                     )}
                   >
                     <Icon className="w-5 h-5" />
@@ -243,27 +302,128 @@ export function Navbar({ user }: NavbarProps) {
         <div className="fixed inset-0 z-50 p-4 flex items-start justify-center pt-20">
           <div
             className="fixed inset-0 bg-background/60 backdrop-blur-md"
-            onClick={() => setSearchOpen(false)}
+            onClick={() => {
+              setSearchOpen(false);
+              setSearchQuery("");
+            }}
           />
           <div className="relative w-full max-w-2xl bg-card rounded-3xl shadow-2xl border border-border overflow-hidden animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-4 p-6 border-b border-border bg-muted/30">
-              <Search className="w-6 h-6 text-primary" />
+              {isSearching ? (
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
+              ) : (
+                <Search className="w-6 h-6 text-primary" />
+              )}
               <input
                 type="text"
-                placeholder="Cari unit berdasarkan Pole ID atau Wilayah..."
-                className="flex-1 bg-transparent outline-none text-lg font-medium text-foreground placeholder:text-muted-foreground"
+                placeholder="Cari Pole ID, Wilayah, atau ID Unit..."
+                className="flex-1 bg-transparent outline-none text-lg font-bold text-foreground placeholder:text-muted-foreground"
                 autoFocus
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <kbd className="hidden sm:flex items-center gap-1 bg-card px-2 py-1 rounded-lg border border-border font-mono text-[10px] font-bold text-muted-foreground shadow-sm">
                 ESC
               </kbd>
             </div>
-            <div className="p-12 text-center">
-              <div className="w-16 h-16 rounded-3xl bg-muted flex items-center justify-center mx-auto mb-4">
-                 <LayoutGrid size={32} className="text-muted-foreground/40" />
+
+            <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
+              {searchQuery ? (
+                <div className="p-4 space-y-2">
+                  {searchResults.length > 0 ? (
+                    searchResults.map((unit) => (
+                      <button
+                        key={unit.id}
+                        onClick={() => {
+                          setSearchOpen(false);
+                          setSearchQuery("");
+                          router.push(`/units?search=${unit.serialNumber}`);
+                        }}
+                        className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-muted transition-all group"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                            <Lightbulb className="w-6 h-6 text-primary" />
+                          </div>
+                          <div className="text-left">
+                            <p className="font-black text-foreground tracking-tight">
+                              {unit.serialNumber}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <MapPin size={12} className="text-emerald-500" />
+                              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                {unit.regency}, {unit.province}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-5 h-5 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                      </button>
+                    ))
+                  ) : !isSearching ? (
+                    <div className="py-20 text-center">
+                      <div className="w-16 h-16 rounded-3xl bg-muted flex items-center justify-center mx-auto mb-4">
+                        <Search
+                          size={32}
+                          className="text-muted-foreground/40"
+                        />
+                      </div>
+                      <p className="text-sm font-bold text-foreground uppercase tracking-wider">
+                        Hasil tidak ditemukan
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Coba gunakan kata kunci atau ID unit yang berbeda.
+                      </p>
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="p-12 text-center">
+                  <div className="w-16 h-16 rounded-3xl bg-muted flex items-center justify-center mx-auto mb-4">
+                    <LayoutGrid
+                      size={32}
+                      className="text-muted-foreground/40"
+                    />
+                  </div>
+                  <p className="text-sm font-bold text-foreground">
+                    Pencarian Terpadu PJUTS
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1 px-10">
+                    Cari unit secara cepat berdasarkan serial number, wilayah
+                    regency, district, atau alamat spesifik.
+                  </p>
+
+                  <div className="mt-8 flex flex-wrap justify-center gap-2">
+                    {["POLE-", "JAMBI", "BATANGHARI"].map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => setSearchQuery(tag)}
+                        className="px-3 py-1.5 rounded-lg bg-muted text-[10px] font-black uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all"
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="p-4 border-t border-border bg-muted/20 flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-8">
+              <div className="flex gap-4">
+                <span className="flex items-center gap-1.5">
+                  <span className="bg-card px-1.5 py-0.5 rounded border border-border shadow-sm">
+                    ↵
+                  </span>{" "}
+                  Pilih
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="bg-card px-1.5 py-0.5 rounded border border-border shadow-sm">
+                    ↑↓
+                  </span>{" "}
+                  Navigasi
+                </span>
               </div>
-              <p className="text-sm font-bold text-foreground">Pencarian Terpadu</p>
-              <p className="text-xs text-muted-foreground mt-1">Ketikkan Pole ID untuk menemukan unit PJUTS secara spesifik.</p>
+              <span>System Cloud Monitor v1.0</span>
             </div>
           </div>
         </div>

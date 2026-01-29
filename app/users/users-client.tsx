@@ -200,7 +200,7 @@ export function UsersClient({ users }: UsersClientProps) {
               Administrasi Sistem
             </h3>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-foreground">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
             Manajemen Pengguna
           </h2>
           <p className="text-muted-foreground text-xs sm:text-sm font-medium mt-1">

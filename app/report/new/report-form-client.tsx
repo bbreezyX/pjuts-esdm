@@ -17,19 +17,15 @@ import {
   MapPin,
   ClipboardCheck,
   Smartphone,
+  Search,
+  CheckCircle2,
+  Navigation,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PjutsUnitData } from "@/app/actions/units";
 import { submitReport } from "@/app/actions/reports";
 import { cn } from "@/lib/utils";
@@ -152,6 +148,24 @@ const addGeotagOverlay = async (
   });
 };
 
+function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+interface UnitWithDistance extends PjutsUnitData {
+  distance: number;
+}
+
 interface ReportFormClientProps {
   units: PjutsUnitData[];
   preselectedUnitId?: string;
@@ -196,6 +210,8 @@ export function ReportFormClient({
     batteryVoltage: "",
     notes: "",
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [nearestUnits, setNearestUnits] = useState<UnitWithDistance[]>([]);
 
   const paginate = (newStep: Step) => {
     setStep([newStep, newStep > step ? 1 : -1]);
@@ -248,20 +264,32 @@ export function ReportFormClient({
     setGeoLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        const { latitude, longitude } = pos.coords;
         setFormData((p) => ({
           ...p,
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
+          latitude,
+          longitude,
         }));
+
+        // Find nearest units
+        const sorted = [...units]
+          .map((u) => ({
+            ...u,
+            distance: getDistance(latitude, longitude, u.latitude, u.longitude),
+          }))
+          .sort((a, b) => a.distance - b.distance)
+          .slice(0, 3);
+        setNearestUnits(sorted);
+
         setGeoLoading(false);
       },
       () => setGeoLoading(false),
       { enableHighAccuracy: true, timeout: 10000 },
     );
-  }, []);
+  }, [units]);
 
   useEffect(() => {
-    if (step === 2 && !formData.latitude) getLocation();
+    if (step === 1 && !formData.latitude) getLocation();
   }, [step, formData.latitude, getLocation]);
 
   const handleImageCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -437,60 +465,148 @@ export function ReportFormClient({
                     Identifikasi Unit
                   </h2>
                   <p className="text-sm text-slate-500 font-medium">
-                    Pilih aset yang akan dilakukan pengecekan malam ini.
+                    Pilih aset yang akan dilakukan pengecekan.
                   </p>
                 </div>
 
-                <div className="grid gap-4">
-                  <div className="bg-emerald-600/5 border border-emerald-600/10 p-4 rounded-3xl flex items-start gap-4">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-600 flex items-center justify-center flex-shrink-0 text-white shadow-lg shadow-emerald-100">
-                      <Smartphone className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900 text-sm">
-                        Aset Aktif Jambi
-                      </h3>
-                      <p className="text-xs text-slate-500 font-medium leading-relaxed">
-                        Data unit telah disinkronkan untuk penggunaan offline di
-                        lapangan.
-                      </p>
-                    </div>
-                  </div>
-
-                  <Card className="p-6 border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-3xl">
+                <div className="grid gap-6">
+                  {/* Proximity Suggestion */}
+                  {nearestUnits.length > 0 && (
                     <div className="space-y-4">
-                      <label className="text-xs font-black uppercase text-slate-400 tracking-widest ml-1">
-                        Pilih Serial Number
-                      </label>
-                      <Select
-                        value={formData.unitId}
-                        onValueChange={(v) =>
-                          setFormData((p) => ({ ...p, unitId: v }))
-                        }
-                      >
-                        <SelectTrigger className="h-16 rounded-2xl border-slate-200 bg-slate-50/50 text-base font-bold text-slate-800 transition-all focus:ring-emerald-500/20 active:scale-[0.99] hover:bg-slate-50">
-                          <SelectValue placeholder="Pilih unit PJUTS..." />
-                        </SelectTrigger>
-                        <SelectContent className="max-h-72 rounded-2xl border-slate-200 shadow-2xl p-2">
-                          {units.map((u) => (
-                            <SelectItem
-                              key={u.id}
-                              value={u.id}
-                              className="py-3.5 rounded-xl cursor-pointer focus:bg-emerald-50 focus:text-emerald-900 mb-1"
-                            >
-                              <div className="flex flex-col">
-                                <span className="text-sm font-bold tracking-tight">
-                                  {u.serialNumber}
-                                </span>
-                                <div className="flex items-center gap-1.5 text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">
-                                  <MapPin className="h-2.5 w-2.5" />
-                                  {u.regency.toLowerCase()}, Jambi
-                                </div>
+                      <div className="flex items-center justify-between px-1">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
+                          Unit Terdekat (GPS)
+                        </label>
+                        <Badge
+                          variant="secondary"
+                          className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[10px] rounded-full"
+                        >
+                          Auto-Detected
+                        </Badge>
+                      </div>
+                      <div className="grid gap-3">
+                        {nearestUnits.map((u) => (
+                          <motion.button
+                            whileTap={{ scale: 0.98 }}
+                            key={u.id}
+                            onClick={() =>
+                              setFormData((p) => ({ ...p, unitId: u.id }))
+                            }
+                            className={cn(
+                              "w-full text-left p-4 rounded-3xl border-2 transition-all flex items-center justify-between group",
+                              formData.unitId === u.id
+                                ? "bg-emerald-600 border-emerald-600 text-white shadow-xl shadow-emerald-200"
+                                : "bg-white border-slate-100 hover:border-emerald-200 shadow-sm",
+                            )}
+                          >
+                            <div className="flex items-center gap-4">
+                              <div
+                                className={cn(
+                                  "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
+                                  formData.unitId === u.id
+                                    ? "bg-white/20"
+                                    : "bg-emerald-50 text-emerald-600",
+                                )}
+                              >
+                                {formData.unitId === u.id ? (
+                                  <CheckCircle2 className="h-6 w-6" />
+                                ) : (
+                                  <Navigation className="h-5 w-5" />
+                                )}
                               </div>
-                            </SelectItem>
+                              <div>
+                                <h4 className="font-black text-sm tracking-tight leading-none mb-1">
+                                  {u.serialNumber}
+                                </h4>
+                                <p
+                                  className={cn(
+                                    "text-[10px] font-bold uppercase tracking-wider",
+                                    formData.unitId === u.id
+                                      ? "text-emerald-100"
+                                      : "text-slate-400",
+                                  )}
+                                >
+                                  {u.village || u.regency} •{" "}
+                                  {u.distance.toFixed(2)} km
+                                </p>
+                              </div>
+                            </div>
+                            {formData.unitId !== u.id && (
+                              <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-400 transition-colors" />
+                            )}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <Card className="p-6 border-slate-200/60 shadow-xl shadow-slate-200/20 rounded-[32px] overflow-hidden">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[10px] font-black uppercase text-slate-400 tracking-[0.2em] ml-1">
+                          Cari Semua Unit
+                        </label>
+                      </div>
+
+                      <div className="relative group">
+                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+                        <Input
+                          placeholder="Ketik Serial Number..."
+                          className="h-16 pl-14 pr-12 rounded-2xl border-2 border-transparent bg-slate-50/50 text-base font-bold text-slate-800 transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white"
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                        />
+                        {searchQuery && (
+                          <button
+                            onClick={() => setSearchQuery("")}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 rounded-xl hover:bg-slate-200/50 text-slate-400"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="grid gap-2 max-h-64 overflow-y-auto pr-1 -mr-1 custom-scrollbar">
+                        {units
+                          .filter(
+                            (u) =>
+                              u.serialNumber
+                                .toLowerCase()
+                                .includes(searchQuery.toLowerCase()) ||
+                              u.regency
+                                .toLowerCase()
+                                .includes(searchQuery.toLowerCase()),
+                          )
+                          .slice(0, searchQuery ? 10 : 5)
+                          .map((u) => (
+                            <button
+                              key={u.id}
+                              onClick={() =>
+                                setFormData((p) => ({ ...p, unitId: u.id }))
+                              }
+                              className={cn(
+                                "w-full text-left px-4 py-3.5 rounded-2xl transition-all border border-transparent",
+                                formData.unitId === u.id
+                                  ? "bg-emerald-50 border-emerald-100 text-emerald-900"
+                                  : "hover:bg-slate-50 text-slate-700",
+                              )}
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex flex-col">
+                                  <span className="text-sm font-black">
+                                    {u.serialNumber}
+                                  </span>
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                                    {u.regency.toLowerCase()}
+                                  </span>
+                                </div>
+                                {formData.unitId === u.id && (
+                                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                )}
+                              </div>
+                            </button>
                           ))}
-                        </SelectContent>
-                      </Select>
+                      </div>
                     </div>
                   </Card>
                 </div>
@@ -668,13 +784,13 @@ export function ReportFormClient({
                         </Badge>
                       </div>
                       <div className="relative group">
-                        <div className="absolute left-5 top-1/2 -translate-y-1/2 p-2 bg-slate-100 rounded-xl transition-colors group-focus-within:bg-emerald-600 group-focus-within:text-white">
+                        <div className="absolute left-5 top-1/2 -translate-y-1/2 p-2 bg-slate-100 rounded-xl transition-colors group-focus-within:bg-primary group-focus-within:text-white">
                           <Zap className="h-4 w-4" />
                         </div>
                         <Input
                           type="number"
                           placeholder="00.0"
-                          className="h-20 pl-16 pr-20 rounded-2xl text-2xl font-black border-slate-100 bg-slate-50/50 transition-all focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white"
+                          className="h-20 pl-16 pr-20 rounded-2xl text-2xl font-black border-2 border-transparent bg-slate-50/50 transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white"
                           value={formData.batteryVoltage}
                           onChange={(e) =>
                             setFormData((p) => ({
@@ -695,7 +811,7 @@ export function ReportFormClient({
                       </label>
                       <Textarea
                         placeholder="Tuliskan detail temuan atau kerusakan (jika ada)..."
-                        className="min-h-[160px] rounded-2xl border-slate-100 bg-slate-50/50 p-6 text-base font-medium transition-all focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white resize-none"
+                        className="min-h-[160px] rounded-2xl border-2 border-transparent bg-slate-50/50 p-6 text-base font-medium transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white resize-none"
                         value={formData.notes}
                         onChange={(e) =>
                           setFormData((p) => ({ ...p, notes: e.target.value }))

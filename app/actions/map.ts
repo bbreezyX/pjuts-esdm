@@ -38,6 +38,11 @@ export interface MapPoint {
  */
 async function fetchAllMapPoints(): Promise<MapPoint[]> {
   const units = await prisma.pjutsUnit.findMany({
+    where: {
+      NOT: {
+        AND: [{ latitude: 0 }, { longitude: 0 }],
+      },
+    },
     select: {
       id: true,
       serialNumber: true,
@@ -53,7 +58,7 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
           id: true,
           images: {
             take: 1,
-            select: { url: true }
+            select: { url: true },
           },
           batteryVoltage: true,
           createdAt: true,
@@ -75,12 +80,12 @@ async function fetchAllMapPoints(): Promise<MapPoint[]> {
     lastStatus: unit.lastStatus,
     lastReport: unit.reports[0]
       ? {
-        id: unit.reports[0].id,
-        imageUrl: unit.reports[0].images[0]?.url || "",
-        batteryVoltage: unit.reports[0].batteryVoltage,
-        createdAt: unit.reports[0].createdAt,
-        user: unit.reports[0].user.name,
-      }
+          id: unit.reports[0].id,
+          imageUrl: unit.reports[0].images[0]?.url || "",
+          batteryVoltage: unit.reports[0].batteryVoltage,
+          createdAt: unit.reports[0].createdAt,
+          user: unit.reports[0].user.name,
+        }
       : undefined,
   }));
 }
@@ -92,7 +97,7 @@ const getCachedMapPoints = unstable_cache(
   {
     revalidate: CacheDurations.MEDIUM,
     tags: [CacheTags.MAP_POINTS],
-  }
+  },
 );
 
 /**
@@ -147,10 +152,12 @@ export async function getMapPointsFresh(): Promise<ActionResult<MapPoint[]>> {
 
 /**
  * Get all PJUTS units as map points with optional bounds filtering
- * 
+ *
  * @param bounds - Optional map bounds to filter visible units
  */
-export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<MapPoint[]>> {
+export async function getMapPoints(
+  bounds?: MapBounds,
+): Promise<ActionResult<MapPoint[]>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -187,6 +194,9 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
       gte: west,
       lte: east,
     };
+    where.NOT = {
+      AND: [{ latitude: 0 }, { longitude: 0 }],
+    };
 
     // Fetch units with their latest report
     const units = await prisma.pjutsUnit.findMany({
@@ -206,7 +216,7 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
             id: true,
             images: {
               take: 1,
-              select: { url: true }
+              select: { url: true },
             },
             batteryVoltage: true,
             createdAt: true,
@@ -229,12 +239,12 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
       lastStatus: unit.lastStatus,
       lastReport: unit.reports[0]
         ? {
-          id: unit.reports[0].id,
-          imageUrl: unit.reports[0].images[0]?.url || "",
-          batteryVoltage: unit.reports[0].batteryVoltage,
-          createdAt: unit.reports[0].createdAt,
-          user: unit.reports[0].user.name,
-        }
+            id: unit.reports[0].id,
+            imageUrl: unit.reports[0].images[0]?.url || "",
+            batteryVoltage: unit.reports[0].batteryVoltage,
+            createdAt: unit.reports[0].createdAt,
+            user: unit.reports[0].user.name,
+          }
         : undefined,
     }));
 
@@ -258,7 +268,9 @@ export async function getMapPoints(bounds?: MapBounds): Promise<ActionResult<Map
 /**
  * Get map points filtered by status
  */
-export async function getMapPointsByStatus(status: UnitStatus): Promise<ActionResult<MapPoint[]>> {
+export async function getMapPointsByStatus(
+  status: UnitStatus,
+): Promise<ActionResult<MapPoint[]>> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -269,7 +281,12 @@ export async function getMapPointsByStatus(status: UnitStatus): Promise<ActionRe
     }
 
     const units = await prisma.pjutsUnit.findMany({
-      where: { lastStatus: status },
+      where: {
+        lastStatus: status,
+        NOT: {
+          AND: [{ latitude: 0 }, { longitude: 0 }],
+        },
+      },
       select: {
         id: true,
         serialNumber: true,
@@ -285,7 +302,7 @@ export async function getMapPointsByStatus(status: UnitStatus): Promise<ActionRe
             id: true,
             images: {
               take: 1,
-              select: { url: true }
+              select: { url: true },
             },
             batteryVoltage: true,
             createdAt: true,
@@ -307,12 +324,12 @@ export async function getMapPointsByStatus(status: UnitStatus): Promise<ActionRe
       lastStatus: unit.lastStatus,
       lastReport: unit.reports[0]
         ? {
-          id: unit.reports[0].id,
-          imageUrl: unit.reports[0].images[0]?.url || "",
-          batteryVoltage: unit.reports[0].batteryVoltage,
-          createdAt: unit.reports[0].createdAt,
-          user: unit.reports[0].user.name,
-        }
+            id: unit.reports[0].id,
+            imageUrl: unit.reports[0].images[0]?.url || "",
+            batteryVoltage: unit.reports[0].batteryVoltage,
+            createdAt: unit.reports[0].createdAt,
+            user: unit.reports[0].user.name,
+          }
         : undefined,
     }));
 
@@ -336,32 +353,34 @@ export async function getMapPointsByStatus(status: UnitStatus): Promise<ActionRe
 /**
  * Get detailed information about a specific unit for the map popup
  */
-export async function getUnitDetail(unitId: string): Promise<ActionResult<{
-  unit: {
-    id: string;
-    serialNumber: string;
-    latitude: number;
-    longitude: number;
-    province: string;
-    regency: string;
-    district: string | null;
-    village: string | null;
-    address: string | null;
-    lastStatus: UnitStatus;
-    installDate: Date | null;
-  };
-  recentReports: Array<{
-    id: string;
-    imageUrl: string;
-    batteryVoltage: number;
-    latitude: number;
-    longitude: number;
-    notes: string | null;
-    createdAt: Date;
-    user: string;
-  }>;
-  reportCount: number;
-}>> {
+export async function getUnitDetail(unitId: string): Promise<
+  ActionResult<{
+    unit: {
+      id: string;
+      serialNumber: string;
+      latitude: number;
+      longitude: number;
+      province: string;
+      regency: string;
+      district: string | null;
+      village: string | null;
+      address: string | null;
+      lastStatus: UnitStatus;
+      installDate: Date | null;
+    };
+    recentReports: Array<{
+      id: string;
+      imageUrl: string;
+      batteryVoltage: number;
+      latitude: number;
+      longitude: number;
+      notes: string | null;
+      createdAt: Date;
+      user: string;
+    }>;
+    reportCount: number;
+  }>
+> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -380,7 +399,7 @@ export async function getUnitDetail(unitId: string): Promise<ActionResult<{
           include: {
             images: {
               take: 1,
-              select: { url: true }
+              select: { url: true },
             },
             user: {
               select: { name: true },
@@ -445,20 +464,22 @@ export async function getUnitDetail(unitId: string): Promise<ActionResult<{
 /**
  * Get clustered data for large scale map views
  */
-export async function getClusterData(): Promise<ActionResult<{
-  clusters: Array<{
-    province: string;
-    latitude: number;
-    longitude: number;
-    count: number;
-    statusBreakdown: {
-      operational: number;
-      maintenanceNeeded: number;
-      offline: number;
-      unverified: number;
-    };
-  }>;
-}>> {
+export async function getClusterData(): Promise<
+  ActionResult<{
+    clusters: Array<{
+      province: string;
+      latitude: number;
+      longitude: number;
+      count: number;
+      statusBreakdown: {
+        operational: number;
+        maintenanceNeeded: number;
+        offline: number;
+        unverified: number;
+      };
+    }>;
+  }>
+> {
   try {
     const session = await auth();
     if (!session?.user?.id) {
@@ -471,6 +492,11 @@ export async function getClusterData(): Promise<ActionResult<{
     // Get aggregated data by province
     const provinceData = await prisma.pjutsUnit.groupBy({
       by: ["province", "lastStatus"],
+      where: {
+        NOT: {
+          AND: [{ latitude: 0 }, { longitude: 0 }],
+        },
+      },
       _count: { id: true },
       _avg: {
         latitude: true,
@@ -529,13 +555,15 @@ export async function getClusterData(): Promise<ActionResult<{
       provinceMap.set(row.province, existing);
     }
 
-    const clusters = Array.from(provinceMap.entries()).map(([province, data]) => ({
-      province,
-      latitude: data.latSum / data.count,
-      longitude: data.lngSum / data.count,
-      count: data.count,
-      statusBreakdown: data.statusBreakdown,
-    }));
+    const clusters = Array.from(provinceMap.entries()).map(
+      ([province, data]) => ({
+        province,
+        latitude: data.latSum / data.count,
+        longitude: data.lngSum / data.count,
+        count: data.count,
+        statusBreakdown: data.statusBreakdown,
+      }),
+    );
 
     return {
       success: true,
@@ -549,4 +577,3 @@ export async function getClusterData(): Promise<ActionResult<{
     };
   }
 }
-

@@ -499,3 +499,121 @@ export async function getRegencies(): Promise<ActionResult<string[]>> {
     };
   }
 }
+// ============================================
+// BULK CREATE PJUTS UNITS
+// ============================================
+
+export async function bulkCreateUnits(units: CreatePjutsUnitInput[]): Promise<
+  ActionResult<{
+    created: number;
+    skipped: number;
+    errors: {
+      serialNumber?: string;
+      error: string;
+      details?: Record<string, string[] | undefined>;
+    }[];
+  }>
+> {
+  try {
+    const session = await auth();
+    if (!session?.user?.id || session.user.role !== "ADMIN") {
+      return {
+        success: false,
+        error: ERROR_MESSAGES.UNIT_ADMIN_ONLY,
+      };
+    }
+
+    let createdCount = 0;
+    let skippedCount = 0;
+    const errors: {
+      serialNumber?: string;
+      error: string;
+      details?: Record<string, string[] | undefined>;
+    }[] = [];
+
+    // Process units in batches to avoid overwhelming the DB
+    const BATCH_SIZE = 50;
+    for (let i = 0; i < units.length; i += BATCH_SIZE) {
+      const batch = units.slice(i, i + BATCH_SIZE);
+
+      await Promise.all(
+        batch.map(async (unitData) => {
+          try {
+            // Validate individual unit
+            const validation = createPjutsUnitSchema.safeParse(unitData);
+            if (!validation.success) {
+              errors.push({
+                serialNumber: unitData.serialNumber,
+                error: "Validation failed",
+                details: validation.error.flatten().fieldErrors,
+              });
+              skippedCount++;
+              return;
+            }
+
+            // Check if serial number already exists
+            const existing = await prisma.pjutsUnit.findUnique({
+              where: { serialNumber: unitData.serialNumber },
+            });
+
+            if (existing) {
+              skippedCount++;
+              return;
+            }
+
+            // Create unit
+            await prisma.pjutsUnit.create({
+              data: {
+                serialNumber: unitData.serialNumber,
+                latitude: unitData.latitude ?? 0,
+                longitude: unitData.longitude ?? 0,
+                province: unitData.province,
+                regency: unitData.regency,
+                district: unitData.district,
+                village: unitData.village,
+                address: unitData.address,
+                lastStatus: UnitStatus.UNVERIFIED,
+              },
+            });
+            createdCount++;
+          } catch (err: unknown) {
+            const errorMessage =
+              err instanceof Error ? err.message : "Unknown error";
+            errors.push({
+              serialNumber: unitData.serialNumber,
+              error: errorMessage,
+            });
+            skippedCount++;
+          }
+        }),
+      );
+    }
+
+    if (createdCount > 0) {
+      revalidatePath("/dashboard");
+      revalidatePath("/units");
+      revalidatePath("/map");
+
+      // Log audit
+      await logUnitAudit("BULK_CREATE_UNIT", "BULK", session.user.id, {
+        count: createdCount,
+        skipped: skippedCount,
+      });
+    }
+
+    return {
+      success: true,
+      data: {
+        created: createdCount,
+        skipped: skippedCount,
+        errors,
+      },
+    };
+  } catch (error) {
+    console.error("Bulk create units error:", error);
+    return {
+      success: false,
+      error: "Gagal memproses impor unit",
+    };
+  }
+}

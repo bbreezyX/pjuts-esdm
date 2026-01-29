@@ -22,7 +22,10 @@ import {
   Plus,
   Download,
   Upload,
+  Zap,
+  Loader2,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
@@ -44,6 +47,10 @@ import { getStatusLabel, formatDate, cn } from "@/lib/utils";
 import { UnitStatus } from "@prisma/client";
 import { UnitDialog } from "@/components/units/unit-dialog";
 import { DeleteUnitDialog } from "@/components/units/delete-unit-dialog";
+import { ImportUnitDialog } from "@/components/units/import-unit-dialog";
+import { utils, writeFile } from "xlsx";
+import { toast } from "@/components/ui/use-toast";
+import { getPjutsUnits } from "@/app/actions/units";
 
 interface UnitsPageClientProps {
   initialUnits: PjutsUnitData[];
@@ -103,6 +110,8 @@ export function UnitsPageClient({
   );
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [unitToDelete, setUnitToDelete] = useState<PjutsUnitData | null>(null);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   const updateURL = (updates: Record<string, string | undefined>) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -156,42 +165,123 @@ export function UnitsPageClient({
     setIsUnitDialogOpen(true);
   };
 
+  const handleExport = async () => {
+    try {
+      setIsExporting(true);
+      const result = await getPjutsUnits({
+        limit: 10000,
+        regency: selectedRegency,
+        status: selectedStatus as UnitStatus | undefined,
+        search: searchQuery,
+      });
+
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Gagal mengambil data unit");
+      }
+
+      const units = result.data.units;
+      if (units.length === 0) {
+        toast({
+          title: "Tidak ada data",
+          description: "Tidak ada unit yang sesuai dengan filter saat ini.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      const dataToExport = units.map((u) => ({
+        "Serial Number": u.serialNumber,
+        Status: getStatusLabel(u.lastStatus),
+        Kabupaten: u.regency,
+        Provinsi: u.province,
+        Kecamatan: u.district || "-",
+        "Kelurahan/Desa": u.village || "-",
+        Alamat: u.address || "-",
+        Latitude: u.latitude,
+        Longitude: u.longitude,
+        "Jumlah Laporan": u._count.reports,
+        "Tanggal Install": u.installDate ? formatDate(u.installDate) : "-",
+      }));
+
+      const wb = utils.book_new();
+      const ws = utils.json_to_sheet(dataToExport);
+      utils.book_append_sheet(wb, ws, "Units");
+      writeFile(
+        wb,
+        `Data_Unit_PJUTS_${formatDate(new Date()).replace(/\//g, "-")}.xlsx`,
+      );
+
+      toast({
+        title: "Export Berhasil",
+        description: `${units.length} unit telah diekspor ke Excel.`,
+        variant: "success",
+      });
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Terjadi kesalahan saat mengekspor data.";
+      toast({
+        title: "Export Gagal",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const hasActiveFilters = selectedRegency || selectedStatus || searchQuery;
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
-      <div className="flex flex-col gap-4 sm:gap-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground tracking-tight mb-1 sm:mb-2">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 mb-1">
+            <div className="w-1.5 h-4 bg-primary rounded-full" />
+            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+              Asset Management
+            </span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
             Unit PJUTS
           </h1>
-          <p className="text-muted-foreground text-xs sm:text-sm font-medium">
+          <p className="text-slate-500 text-sm font-medium max-w-md">
             Kelola dan pantau seluruh unit penerangan jalan umum tenaga surya
-            secara terpadu.
+            Provinsi Jambi secara terpadu.
           </p>
         </div>
         {isAdmin && (
-          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <Button
-              variant="outline"
-              className="rounded-xl sm:rounded-2xl border-border h-9 sm:h-12 px-3 sm:px-6 font-bold hover:bg-muted text-xs sm:text-sm"
-            >
-              <Upload className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-              Import
-            </Button>
-            <Button
-              variant="outline"
-              className="rounded-xl sm:rounded-2xl border-border h-9 sm:h-12 px-3 sm:px-6 font-bold hover:bg-muted text-xs sm:text-sm"
-            >
-              <Download className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-              Export
-            </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex p-1 bg-slate-100/50 backdrop-blur-md rounded-2xl border border-slate-200/40">
+              <Button
+                variant="ghost"
+                onClick={() => setIsImportDialogOpen(true)}
+                className="rounded-xl h-10 px-4 font-black text-[10px] uppercase tracking-wider hover:bg-white hover:text-emerald-600 transition-all"
+              >
+                <Upload className="h-3.5 w-3.5 mr-2" />
+                Import
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={handleExport}
+                disabled={isExporting}
+                className="rounded-xl h-10 px-4 font-black text-[10px] uppercase tracking-wider hover:bg-white hover:text-emerald-600 transition-all"
+              >
+                {isExporting ? (
+                  <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
+                ) : (
+                  <Download className="h-3.5 w-3.5 mr-2" />
+                )}
+                Export
+              </Button>
+            </div>
             <Button
               size="lg"
               onClick={handleCreate}
-              className="bg-foreground text-background hover:opacity-90 rounded-xl sm:rounded-2xl px-3 sm:px-6 h-9 sm:h-12 font-bold transition-all shadow-lg shadow-foreground/5 hover:scale-105 text-xs sm:text-sm"
+              className="bg-slate-900 text-white hover:bg-slate-800 rounded-2xl px-6 h-12 font-black transition-all shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-95 text-[10px] uppercase tracking-[0.1em]"
             >
-              <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-1.5 sm:mr-2" />
+              <Plus className="h-4 w-4 mr-2" />
               Tambah Unit
             </Button>
           </div>
@@ -199,31 +289,42 @@ export function UnitsPageClient({
       </div>
 
       <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+        <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1 group">
-            <Search className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 h-4 w-4 sm:h-5 sm:w-5 text-slate-400 group-focus-within:text-slate-600 transition-colors z-10" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors z-10" />
             <input
               type="text"
-              placeholder="Cari unit..."
+              placeholder="Cari Serial Number atau Lokasi..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              className="relative w-full h-10 sm:h-12 pl-10 sm:pl-12 pr-3 sm:pr-4 rounded-xl sm:rounded-full border border-slate-200/60 bg-white/80 backdrop-blur-md text-xs sm:text-sm font-medium shadow-sm shadow-slate-200/20 focus:outline-none focus:ring-4 focus:ring-slate-900/5 focus:border-slate-300 transition-all placeholder:text-slate-400"
+              className="relative w-full h-14 pl-14 pr-12 rounded-[2rem] border-2 border-transparent bg-white/60 backdrop-blur-xl text-base font-bold shadow-xl shadow-slate-200/10 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white transition-all placeholder:text-slate-400"
             />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery("");
+                  updateURL({ search: undefined });
+                }}
+                className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors bg-slate-100 rounded-full p-1 z-10"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
-          <div className="flex gap-2 sm:gap-3">
+          <div className="flex gap-3">
             <Button
-              variant={showFilters ? "default" : "outline"}
+              variant="outline"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                "h-10 sm:h-12 px-3 sm:px-6 rounded-xl sm:rounded-2xl font-bold transition-all shrink-0 text-xs sm:text-sm",
+                "h-14 px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shrink-0 border-2",
                 showFilters
-                  ? "bg-primary shadow-lg shadow-primary/20"
-                  : "hover:bg-muted",
+                  ? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-200"
+                  : "bg-white border-slate-100 hover:border-primary text-slate-600 shadow-sm shadow-slate-200/5",
               )}
             >
-              <Filter className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2" />
-              <span className="hidden xs:inline">Filter </span>Lanjutan
+              <Filter className="h-4 w-4 mr-2" />
+              Filter Lanjutan
             </Button>
             {hasActiveFilters && (
               <Button
@@ -238,88 +339,116 @@ export function UnitsPageClient({
                     status: undefined,
                   });
                 }}
-                className="h-10 sm:h-12 px-3 sm:px-5 rounded-xl sm:rounded-2xl font-bold text-red-500 hover:bg-red-50 shrink-0 transition-all text-xs sm:text-sm"
+                className="h-14 px-6 rounded-2xl font-black text-[10px] uppercase tracking-widest text-red-500 hover:bg-red-50 shrink-0 transition-all border-2 border-transparent hover:border-red-100"
               >
-                <X className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                <X className="h-4 w-4 mr-2" />
                 Reset
               </Button>
             )}
           </div>
         </div>
 
-        {showFilters && (
-          <div className="bg-muted/30 backdrop-blur-md rounded-2xl sm:rounded-[2rem] p-4 sm:p-8 border border-border/50 space-y-4 sm:space-y-6 animate-in slide-in-from-top-4 fade-in duration-500">
-            <div className="flex items-center gap-2 mb-1 sm:mb-2">
-              <div className="w-1 sm:w-1.5 h-3 sm:h-4 bg-primary rounded-full" />
-              <h3 className="text-xs sm:text-sm font-black text-foreground uppercase tracking-wider">
-                Kriteria Penyaringan
-              </h3>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-8">
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
-                  Kabupaten/Kota
-                </label>
-                <Select
-                  value={selectedRegency || "all"}
-                  onValueChange={(v) => {
-                    const val = v === "all" ? undefined : v;
-                    setSelectedRegency(val);
-                    updateURL({ regency: val });
-                  }}
-                >
-                  <SelectTrigger className="h-10 sm:h-12 rounded-xl border-border/60 bg-card/50 font-bold text-xs sm:text-sm">
-                    <SelectValue placeholder="Semua Kabupaten/Kota" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-border shadow-2xl max-h-[200px]">
-                    <SelectItem value="all" className="font-bold">
-                      Semua Kabupaten/Kota
-                    </SelectItem>
-                    {regencies.map((reg) => (
-                      <SelectItem key={reg} value={reg} className="font-medium">
-                        {reg}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+        <AnimatePresence>
+          {showFilters && (
+            <motion.div
+              initial={{ opacity: 0, height: 0, y: -20 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -20 }}
+              className="overflow-hidden"
+            >
+              <div className="bg-white rounded-[2.5rem] p-8 border-2 border-slate-50 shadow-2xl shadow-slate-200/40 space-y-8">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-2xl bg-primary/5 flex items-center justify-center text-primary">
+                      <Zap className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider leading-none mb-1">
+                        Penyaringan Aset
+                      </h3>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                        Sesuaikan tampilan data unit
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                      Wilayah Kabupaten
+                    </label>
+                    <Select
+                      value={selectedRegency || "all"}
+                      onValueChange={(v) => {
+                        const val = v === "all" ? undefined : v;
+                        setSelectedRegency(val);
+                        updateURL({ regency: val });
+                      }}
+                    >
+                      <SelectTrigger className="h-14 rounded-2xl border-2 border-transparent bg-slate-50/50 font-bold text-slate-800 transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white">
+                        <SelectValue placeholder="Pilih Kabupaten" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-3xl border-slate-100 shadow-2xl">
+                        <SelectItem
+                          value="all"
+                          className="font-black text-[10px] uppercase"
+                        >
+                          Semua Kabupaten
+                        </SelectItem>
+                        {regencies.map((reg) => (
+                          <SelectItem
+                            key={reg}
+                            value={reg}
+                            className="font-bold"
+                          >
+                            {reg}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] ml-1">
+                      Status Operasional
+                    </label>
+                    <Select
+                      value={selectedStatus || "all"}
+                      onValueChange={(v) => {
+                        const val = v === "all" ? undefined : v;
+                        setSelectedStatus(val);
+                        updateURL({ status: val });
+                      }}
+                    >
+                      <SelectTrigger className="h-14 rounded-2xl border-2 border-transparent bg-slate-50/50 font-bold text-slate-800 transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white">
+                        <SelectValue placeholder="Pilih Status" />
+                      </SelectTrigger>
+                      <SelectContent className="rounded-3xl border-slate-100 shadow-2xl">
+                        <SelectItem
+                          value="all"
+                          className="font-black text-[10px] uppercase"
+                        >
+                          Semua Status
+                        </SelectItem>
+                        {statusOptions.map((opt) => (
+                          <SelectItem
+                            key={opt.value}
+                            value={opt.value}
+                            className="font-bold"
+                          >
+                            <div className="flex items-center gap-3">
+                              <opt.icon className={cn("h-4 w-4", opt.color)} />
+                              {opt.label}
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-1.5 sm:space-y-2">
-                <label className="text-[10px] sm:text-[11px] font-black text-muted-foreground uppercase tracking-[0.1em] ml-1">
-                  Status Unit
-                </label>
-                <Select
-                  value={selectedStatus || "all"}
-                  onValueChange={(v) => {
-                    const val = v === "all" ? undefined : v;
-                    setSelectedStatus(val);
-                    updateURL({ status: val });
-                  }}
-                >
-                  <SelectTrigger className="h-10 sm:h-12 rounded-xl border-border/60 bg-card/50 font-bold text-xs sm:text-sm">
-                    <SelectValue placeholder="Semua Status" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-border shadow-2xl">
-                    <SelectItem value="all" className="font-bold">
-                      Semua Status
-                    </SelectItem>
-                    {statusOptions.map((opt) => (
-                      <SelectItem
-                        key={opt.value}
-                        value={opt.value}
-                        className="font-medium"
-                      >
-                        <div className="flex items-center gap-2">
-                          <opt.icon className={`h-4 w-4 ${opt.color}`} />
-                          {opt.label}
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <div
@@ -338,44 +467,52 @@ export function UnitsPageClient({
             initialUnits.map((unit, index) => (
               <Card
                 key={unit.id}
-                className="p-3 sm:p-4 animate-fade-in border-border/50"
+                className="p-5 animate-fade-in border-2 border-slate-50 shadow-xl shadow-slate-200/20 rounded-[2rem] bg-white group"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-primary/5 flex items-center justify-center text-primary shrink-0">
-                    <Lightbulb className="h-5 w-5 sm:h-6 sm:w-6" />
+                <div className="flex items-start gap-4">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600 shrink-0 shadow-inner group-hover:scale-110 transition-transform">
+                    <Lightbulb className="h-7 w-7" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
-                        <p className="font-bold text-sm sm:text-base text-foreground truncate">
+                        <p className="font-black text-lg text-slate-900 tracking-tight leading-none mb-1">
                           {unit.serialNumber}
                         </p>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                          {unit.province}, {unit.regency}
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                          {unit.regency}
                         </p>
                       </div>
                       <Badge
                         variant={getStatusBadgeVariant(unit.lastStatus)}
-                        className="shrink-0 text-[9px] sm:text-[10px] h-5 sm:h-6 rounded-lg"
+                        className="shrink-0 text-[10px] font-black uppercase tracking-wider h-6 rounded-lg px-2"
                       >
                         {getStatusLabel(unit.lastStatus)}
                       </Badge>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 mt-2">
-                      <div className="inline-flex items-center gap-1 bg-muted/50 px-2 py-1 rounded-lg text-[9px] sm:text-[10px] font-bold text-muted-foreground">
-                        <FileText size={10} className="text-primary/60" />
+                    <div className="flex flex-wrap items-center gap-3 mt-3">
+                      <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-100 px-3 py-1.5 rounded-xl text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                        <FileText size={12} className="text-emerald-500/60" />
                         {unit._count.reports} Laporan
                       </div>
-                      <code className="text-[9px] sm:text-[10px] font-medium bg-muted/40 px-1.5 py-0.5 rounded text-primary">
-                        {unit.latitude.toFixed(4)}, {unit.longitude.toFixed(4)}
-                      </code>
+                      {unit.latitude === 0 && unit.longitude === 0 ? (
+                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">
+                          Lokasi Belum Tersedia
+                        </span>
+                      ) : (
+                        <code className="text-[10px] font-black bg-emerald-50/50 px-2 py-1 rounded-lg text-emerald-600 tracking-tight">
+                          {unit.latitude.toFixed(4)},{" "}
+                          {unit.longitude.toFixed(4)}
+                        </code>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border/50">
+                    <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-50">
                       <Button
-                        variant="ghost"
+                        variant="secondary"
                         size="sm"
-                        className="h-8 px-3 rounded-lg text-[10px] sm:text-xs font-bold flex-1"
+                        disabled={unit.latitude === 0 && unit.longitude === 0}
+                        className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-100 hover:bg-slate-200 transition-all disabled:opacity-30"
                         onClick={() =>
                           window.open(
                             `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
@@ -383,52 +520,56 @@ export function UnitsPageClient({
                           )
                         }
                       >
-                        <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
+                        <MapPin className="h-3.5 w-3.5 mr-2" />
                         Maps
                       </Button>
                       <Button
-                        variant="ghost"
+                        variant="secondary"
                         size="sm"
-                        className="h-8 px-3 rounded-lg text-[10px] sm:text-xs font-bold flex-1"
+                        className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-700 transition-all border-none"
                         asChild
                       >
                         <Link href={`/report/new?unitId=${unit.id}`}>
-                          <FileText className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />
+                          <FileText className="h-3.5 w-3.5 mr-2" />
                           Lapor
                         </Link>
                       </Button>
-                      {isAdmin && (
+                    </div>
+                    {isAdmin && (
+                      <div className="mt-2 text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 rounded-lg"
+                              size="sm"
+                              className="h-8 w-full rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400"
                             >
-                              <MoreHorizontal className="h-4 w-4" />
+                              <MoreHorizontal className="h-4 w-4 mr-2" /> Kelola
+                              Unit
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent
                             align="end"
-                            className="rounded-xl border-border shadow-xl p-1.5 min-w-[140px]"
+                            className="rounded-2xl border-slate-100 shadow-2xl p-2 min-w-[160px]"
                           >
                             <DropdownMenuItem
-                              className="rounded-lg py-2 font-bold text-xs cursor-pointer"
+                              className="rounded-xl py-3 font-black text-[10px] uppercase tracking-wider cursor-pointer"
                               onClick={() => handleEdit(unit)}
                             >
-                              <Pencil className="h-3.5 w-3.5 mr-2 text-amber-500" />{" "}
-                              Edit
+                              <Pencil className="h-3.5 w-3.5 mr-3 text-amber-500" />
+                              Edit Unit
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="rounded-lg py-2 font-bold text-xs cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                              className="rounded-xl py-3 font-black text-[10px] uppercase tracking-wider cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
                               onClick={() => handleDelete(unit)}
                             >
-                              <Trash2 className="h-3.5 w-3.5 mr-2" /> Hapus
+                              <Trash2 className="h-3.5 w-3.5 mr-3" />
+                              Hapus Unit
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
@@ -456,68 +597,80 @@ export function UnitsPageClient({
                   className="group animate-in fade-in slide-in-from-bottom-2 duration-500"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
-                  <td className="px-8 py-6 bg-card group-hover:bg-muted/30 rounded-l-[2.5rem] border-y border-l border-border/50 transition-all duration-300">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-primary/5 flex items-center justify-center text-primary shadow-sm group-hover:scale-110 transition-transform duration-300">
-                        <Lightbulb className="h-6 w-6" />
+                  <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 rounded-l-[2.5rem] border-y-2 border-l-2 border-slate-50 transition-all duration-300">
+                    <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 rounded-[1.25rem] bg-emerald-50 flex items-center justify-center text-emerald-600 shadow-inner group-hover:scale-110 transition-transform duration-300">
+                        <Lightbulb className="h-7 w-7" />
                       </div>
                       <div>
-                        <p className="font-black text-foreground tracking-tight leading-none mb-1.5">
+                        <p className="font-black text-slate-900 text-lg tracking-tight leading-none mb-2">
                           {unit.serialNumber}
                         </p>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {unit.installDate
-                            ? formatDate(unit.installDate)
-                            : "Menunggu Verifikasi"}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 px-2 py-0.5 rounded-md">
+                            Asset ID
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                            {unit.installDate
+                              ? formatDate(unit.installDate)
+                              : "PENDING VERIF"}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-8 py-6 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300">
-                    <p className="text-sm font-bold text-foreground tracking-tight mb-1">
-                      {unit.province}
-                    </p>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                      <span className="w-1 h-1 rounded-full bg-primary/40" />
+                  <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 border-y-2 border-slate-50 transition-all duration-300">
+                    <p className="text-sm font-black text-slate-900 tracking-tight mb-1 uppercase">
                       {unit.regency}
                     </p>
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1.5 leading-none">
+                      <MapPin className="h-3 w-3 text-emerald-500" />
+                      {unit.province}
+                    </p>
                   </td>
-                  <td className="px-8 py-6 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300 text-center">
+                  <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 border-y-2 border-slate-50 transition-all duration-300 text-center">
                     <Badge
                       variant={getStatusBadgeVariant(unit.lastStatus)}
-                      className="rounded-xl px-3 py-1 text-[10px] font-black border-none shadow-sm uppercase tracking-wider"
+                      className="rounded-xl px-4 py-2 text-[10px] font-black border-none shadow-sm uppercase tracking-[0.1em]"
                     >
                       {getStatusLabel(unit.lastStatus)}
                     </Badge>
                   </td>
-                  <td className="px-8 py-6 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300 text-center">
-                    <div className="inline-flex items-center gap-2 bg-muted px-3 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-wider text-muted-foreground border border-border/30">
-                      <FileText size={12} className="text-primary/60" />
-                      {unit._count.reports} LAPORAN
+                  <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 border-y-2 border-slate-50 transition-all duration-300 text-center">
+                    <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-100 px-4 py-2 rounded-2xl font-black text-[10px] uppercase tracking-[0.1em] text-slate-500">
+                      <FileText size={14} className="text-emerald-500/60" />
+                      {unit._count.reports} REPORTS
                     </div>
                   </td>
-                  <td className="px-8 py-6 bg-card group-hover:bg-muted/30 border-y border-border/50 transition-all duration-300">
-                    <code className="text-[11px] font-black bg-muted/40 px-2.5 py-1 rounded-lg text-primary tracking-tight">
-                      {unit.latitude.toFixed(6)}, {unit.longitude.toFixed(6)}
-                    </code>
+                  <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 border-y-2 border-slate-50 transition-all duration-300">
+                    {unit.latitude === 0 && unit.longitude === 0 ? (
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">
+                        Belum Tersedia
+                      </span>
+                    ) : (
+                      <code className="text-[11px] font-black bg-slate-100/80 px-3 py-1.5 rounded-xl text-emerald-700 tracking-tight shadow-sm">
+                        {unit.latitude.toFixed(6)}, {unit.longitude.toFixed(6)}
+                      </code>
+                    )}
                   </td>
-                  <td className="px-8 py-6 bg-card group-hover:bg-muted/30 rounded-r-[2.5rem] border-y border-r border-border/50 transition-all duration-300 text-center">
+                  <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 rounded-r-[2.5rem] border-y-2 border-r-2 border-slate-50 transition-all duration-300 text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-10 w-10 rounded-xl bg-muted/30 hover:bg-card transition-all"
+                          className="h-12 w-12 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-xl transition-all"
                         >
-                          <MoreHorizontal className="h-5 w-5" />
+                          <MoreHorizontal className="h-6 w-6 text-slate-400" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         align="end"
-                        className="rounded-2xl border-border shadow-2xl p-2 min-w-[180px]"
+                        className="rounded-[2rem] border-slate-100 shadow-2xl p-3 min-w-[200px]"
                       >
                         <DropdownMenuItem
-                          className="rounded-xl py-3 font-bold text-xs cursor-pointer"
+                          className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
+                          disabled={unit.latitude === 0 && unit.longitude === 0}
                           onClick={() =>
                             window.open(
                               `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
@@ -525,33 +678,34 @@ export function UnitsPageClient({
                             )
                           }
                         >
-                          <MapPin className="h-4 w-4 mr-3 text-primary" /> Lihat
-                          di Maps
+                          <MapPin className="h-4 w-4 mr-3 text-emerald-500" />
+                          Buka di Google Maps
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           asChild
-                          className="rounded-xl py-3 font-bold text-xs cursor-pointer"
+                          className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
                         >
                           <Link href={`/report/new?unitId=${unit.id}`}>
-                            <FileText className="h-4 w-4 mr-3 text-emerald-500" />{" "}
-                            Buat Laporan
+                            <Zap className="h-4 w-4 mr-3 text-amber-500" />
+                            Buat Laporan Baru
                           </Link>
                         </DropdownMenuItem>
                         {isAdmin && (
                           <>
-                            <div className="h-px bg-border my-2 mx-1" />
+                            <div className="h-px bg-slate-100 my-2 mx-2" />
                             <DropdownMenuItem
-                              className="rounded-xl py-3 font-bold text-xs cursor-pointer"
+                              className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
                               onClick={() => handleEdit(unit)}
                             >
-                              <Pencil className="h-4 w-4 mr-3 text-amber-500" />{" "}
-                              Edit Unit
+                              <Pencil className="h-4 w-4 mr-3 text-slate-400" />
+                              Edit Informasi Unit
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              className="rounded-xl py-3 font-bold text-xs cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                              className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
                               onClick={() => handleDelete(unit)}
                             >
-                              <Trash2 className="h-4 w-4 mr-3" /> Hapus Unit
+                              <Trash2 className="h-4 w-4 mr-3" />
+                              Hapus dari Sistem
                             </DropdownMenuItem>
                           </>
                         )}
@@ -566,37 +720,35 @@ export function UnitsPageClient({
       </div>
       {/* Pagination Info */}
       {initialUnits.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
-          <p className="text-xs sm:text-sm text-muted-foreground font-medium">
-            Menampilkan{" "}
-            <span className="font-bold text-foreground">
-              {initialUnits.length}
-            </span>{" "}
-            dari <span className="font-bold text-foreground">{total}</span> unit
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mt-12 py-6 border-t border-slate-100">
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+            Showing{" "}
+            <span className="text-slate-900">{initialUnits.length}</span> of{" "}
+            <span className="text-slate-900">{total}</span> assets
           </p>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Button
               variant="outline"
               size="sm"
               disabled={page <= 1}
               onClick={() => updateURL({ page: String(page - 1) })}
-              className="h-8 sm:h-9 px-3 rounded-lg sm:rounded-xl text-xs font-bold"
+              className="h-12 px-6 rounded-2xl border-2 border-slate-100 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 disabled:opacity-30 transition-all"
             >
-              <ChevronLeft className="h-3.5 w-3.5 mr-1" />
-              Prev
+              <ChevronLeft className="h-4 w-4 mr-2" />
+              Previous
             </Button>
-            <span className="text-xs sm:text-sm font-bold text-muted-foreground px-2">
+            <div className="bg-slate-100 px-4 py-3 rounded-xl font-black text-xs text-slate-600">
               {page} / {totalPages}
-            </span>
+            </div>
             <Button
               variant="outline"
               size="sm"
               disabled={page >= totalPages}
               onClick={() => updateURL({ page: String(page + 1) })}
-              className="h-8 sm:h-9 px-3 rounded-lg sm:rounded-xl text-xs font-bold"
+              className="h-12 px-6 rounded-2xl border-2 border-slate-100 font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 disabled:opacity-30 transition-all"
             >
               Next
-              <ChevronRight className="h-3.5 w-3.5 ml-1" />
+              <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           </div>
         </div>
@@ -611,6 +763,10 @@ export function UnitsPageClient({
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
         unit={unitToDelete}
+      />
+      <ImportUnitDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
       />
     </div>
   );

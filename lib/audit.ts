@@ -1,11 +1,11 @@
 /**
  * Audit Logging System
- * 
+ *
  * Provides tracking for administrative actions including:
  * - User management (create, update, delete, status changes)
  * - Unit management (create, update, delete)
  * - Report management (delete)
- * 
+ *
  * All admin actions are logged for security and compliance purposes.
  */
 
@@ -26,6 +26,7 @@ export type AuditAction =
   | "CREATE_UNIT"
   | "UPDATE_UNIT"
   | "DELETE_UNIT"
+  | "BULK_CREATE_UNIT"
   // Report actions
   | "DELETE_REPORT";
 
@@ -45,10 +46,10 @@ export interface AuditLogParams {
 
 /**
  * Log an audit event to the database
- * 
+ *
  * @param params - The audit event parameters
  * @returns The created audit log entry, or null if logging fails
- * 
+ *
  * @example
  * await logAuditEvent({
  *   action: "CREATE_USER",
@@ -90,7 +91,7 @@ export async function logUserAudit(
   action: "CREATE_USER" | "UPDATE_USER" | "DELETE_USER" | "TOGGLE_USER_STATUS",
   userId: string,
   performedBy: string,
-  metadata?: Prisma.InputJsonValue
+  metadata?: Prisma.InputJsonValue,
 ) {
   return logAuditEvent({
     action,
@@ -105,10 +106,10 @@ export async function logUserAudit(
  * Log a unit-related audit event
  */
 export async function logUnitAudit(
-  action: "CREATE_UNIT" | "UPDATE_UNIT" | "DELETE_UNIT",
+  action: "CREATE_UNIT" | "UPDATE_UNIT" | "DELETE_UNIT" | "BULK_CREATE_UNIT",
   unitId: string,
   performedBy: string,
-  metadata?: Prisma.InputJsonValue
+  metadata?: Prisma.InputJsonValue,
 ) {
   return logAuditEvent({
     action,
@@ -126,7 +127,7 @@ export async function logReportAudit(
   action: "DELETE_REPORT",
   reportId: string,
   performedBy: string,
-  metadata?: Prisma.InputJsonValue
+  metadata?: Prisma.InputJsonValue,
 ) {
   return logAuditEvent({
     action,

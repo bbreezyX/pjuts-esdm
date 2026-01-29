@@ -20,7 +20,10 @@ interface ActivityFeedProps {
   _maxHeight?: string;
 }
 
-export function ActivityFeed({ activities, _maxHeight = "400px" }: ActivityFeedProps) {
+export function ActivityFeed({
+  activities,
+  _maxHeight = "400px",
+}: ActivityFeedProps) {
   const getActivityIcon = (type: Activity["type"]) => {
     switch (type) {
       case "report":
@@ -35,7 +38,7 @@ export function ActivityFeed({ activities, _maxHeight = "400px" }: ActivityFeedP
   const getActivityColor = (type: Activity["type"]) => {
     switch (type) {
       case "report":
-        return "bg-blue-500/10 text-blue-600 ring-blue-500/20";
+        return "bg-primary/10 text-primary ring-primary/20";
       case "unit_added":
         return "bg-emerald-500/10 text-emerald-600 ring-emerald-500/20";
       default:
@@ -51,25 +54,38 @@ export function ActivityFeed({ activities, _maxHeight = "400px" }: ActivityFeedP
             <Clock className="w-8 h-8 text-muted-foreground/30" />
           </div>
           <div className="space-y-1">
-            <p className="text-sm font-bold text-foreground">Belum ada aktivitas</p>
-            <p className="text-xs text-muted-foreground">Aktivitas terbaru akan muncul di sini</p>
+            <p className="text-sm font-bold text-foreground">
+              Belum ada aktivitas
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Aktivitas terbaru akan muncul di sini
+            </p>
           </div>
         </div>
       ) : (
-        <div className="relative space-y-8 before:absolute before:inset-0 before:ml-4 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-border before:via-border/50 before:to-transparent">
+        <div className="relative space-y-8">
           {activities.map((activity, index) => (
             <div
               key={activity.id}
               className="relative flex gap-6 animate-in slide-in-from-bottom-2 fade-in duration-500"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
+              {/* Connector Line Spine */}
+              {index !== activities.length - 1 && (
+                <div className="absolute left-4 top-4 bottom-[-48px] w-px bg-border/60 -translate-x-1/2" />
+              )}
+
               <div
                 className={cn(
-                  "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ring-4 ring-card z-10 shadow-sm transition-transform hover:scale-110",
-                  getActivityColor(activity.type)
+                  "relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl ring-4 ring-card z-10 shadow-sm transition-transform hover:scale-110 border border-transparent",
+                  getActivityColor(activity.type),
                 )}
               >
                 {getActivityIcon(activity.type)}
+                {/* Tactical Dot Center */}
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+                  <div className="w-4 h-4 rounded-full border border-current" />
+                </div>
               </div>
               <div className="flex-1 min-w-0 group">
                 <div className="flex items-start justify-between gap-4 mb-2">
@@ -80,15 +96,17 @@ export function ActivityFeed({ activities, _maxHeight = "400px" }: ActivityFeedP
 
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold text-foreground border border-border shadow-sm">
+                    <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-[9px] font-black text-white shadow-[0_2px_10px_rgba(var(--primary),0.3)] transition-transform group-hover:scale-110">
                       {activity.user.charAt(0).toUpperCase()}
                     </div>
-                    <span>{activity.user}</span>
+                    <span className="group-hover:text-foreground transition-colors hover:underline decoration-primary/30 decoration-2 underline-offset-4">
+                      {activity.user}
+                    </span>
                   </div>
 
                   {activity.province && (
-                    <div className="flex items-center gap-1.5">
-                      <MapPin className="w-3 h-3 text-primary/60" />
+                    <div className="flex items-center gap-1.5 bg-muted/50 px-2.5 py-0.5 rounded-full border border-border/40 group-hover:border-primary/20 transition-colors">
+                      <MapPin className="w-2.5 h-2.5 text-primary/60" />
                       <span>{activity.province}</span>
                     </div>
                   )}
@@ -111,7 +129,7 @@ export function ActivityFeed({ activities, _maxHeight = "400px" }: ActivityFeedP
                             ? "bg-amber-500/10 text-amber-600"
                             : activity.status === "OFFLINE"
                               ? "bg-red-500/10 text-red-600"
-                              : "bg-muted text-muted-foreground"
+                              : "bg-muted text-muted-foreground",
                       )}
                     >
                       {getStatusLabel(activity.status)}
@@ -147,7 +165,9 @@ export function ActivityTicker({ items }: { items: TickerItemProps[] }) {
               <span className="mx-3 opacity-30">|</span>
               <span className="opacity-80">{item.province}</span>
               <span className="mx-3 opacity-30">|</span>
-              <span className="opacity-60 font-medium lowercase">{getRelativeTime(item.timestamp)}</span>
+              <span className="opacity-60 font-medium lowercase">
+                {getRelativeTime(item.timestamp)}
+              </span>
             </span>
           </div>
         ))}

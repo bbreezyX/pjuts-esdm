@@ -10,6 +10,7 @@ import {
   Plus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutGrid },
@@ -23,89 +24,156 @@ export function MobileNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-3 px-3">
-      {/* Floating center button - positioned outside the card */}
-      <div className="absolute left-1/2 -translate-x-1/2 bottom-[calc(100%-2.25rem)] z-10">
-        <Link
-          href="/report/new"
-          className="relative flex flex-col items-center justify-center group active:scale-90 transition-all duration-200"
-        >
-          {/* Glow effect */}
-          <div className="absolute inset-0 bg-primary/30 rounded-full blur-xl scale-150 opacity-0 group-hover:opacity-100 transition-opacity" />
-          
-          {/* Button */}
-          <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary/80 shadow-xl shadow-primary/40 flex items-center justify-center group-hover:shadow-primary/50 group-active:shadow-primary/20 transition-all border-4 border-card">
-            <Plus className="w-7 h-7 text-primary-foreground transition-transform group-hover:scale-110 group-hover:rotate-90 group-active:scale-95 duration-300" />
-          </div>
-          
-          {/* Label */}
-          <span className="text-[8px] font-black uppercase tracking-wider text-primary mt-1">
-            Lapor
-          </span>
-        </Link>
-      </div>
-      
-      {/* Main nav container */}
-      <div className="bg-card/95 backdrop-blur-2xl border border-border/60 rounded-[1.5rem]">
-        <div className="flex items-center justify-around px-2 py-2.5">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
-            const Icon = item.icon;
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-4 px-4 bg-gradient-to-t from-background via-background/90 to-transparent pt-12 pointer-events-none">
+      <div className="relative pointer-events-auto max-w-md mx-auto">
+        {/* Floating center button - Tactical Action Button */}
+        <div className="absolute left-1/2 -translate-x-1/2 -top-12 z-50">
+          <Link
+            href="/report/new"
+            className="relative flex flex-col items-center group active:scale-95 transition-transform duration-200"
+          >
+            {/* Outer Glow & Pulse - Using Primary Blue */}
+            <motion.div
+              animate={{
+                scale: [1, 1.15, 1],
+                opacity: [0.2, 0.4, 0.2],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute inset-0 bg-primary/30 rounded-full blur-2xl"
+            />
 
-            // Skip the main button as it's rendered separately above
-            if (item.isMain) {
-              return (
-                <div key={item.href} className="w-16 flex-shrink-0" />
-              );
-            }
+            {/* Tactical Button Frame */}
+            <div className="relative">
+              {/* Spinning border effect on hover - Using Accent Gold */}
+              <div className="absolute -inset-1.5 bg-gradient-to-tr from-accent via-accent/20 to-accent rounded-[1.4rem] opacity-0 group-hover:opacity-100 blur-[2px] transition-opacity duration-500" />
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "relative flex flex-col items-center justify-center gap-0.5 py-2 px-2 rounded-xl transition-all duration-300 group flex-1 min-w-0",
-                  isActive 
-                    ? "text-primary" 
-                    : "text-muted-foreground active:text-foreground"
-                )}
-              >
-                {/* Active background indicator */}
-                <div className={cn(
-                  "absolute inset-1 rounded-lg transition-all duration-300",
-                  isActive 
-                    ? "bg-primary/10 scale-100 opacity-100" 
-                    : "bg-transparent scale-90 opacity-0 group-active:bg-muted group-active:scale-100 group-active:opacity-100"
-                )} />
-                
-                {/* Active dot indicator */}
-                <div className={cn(
-                  "absolute -top-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary transition-all duration-300",
-                  isActive ? "opacity-100 scale-100" : "opacity-0 scale-0"
-                )} />
-                
-                {/* Icon */}
-                <div className="relative z-10">
-                  <Icon className={cn(
-                    "w-5 h-5 transition-all duration-300",
-                    isActive ? "scale-110" : "group-active:scale-90"
-                  )} />
+              <div className="relative w-16 h-16 rounded-[1.25rem] bg-primary flex items-center justify-center overflow-hidden border-2 border-white shadow-xl shadow-primary/20 group-hover:border-accent transition-colors">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white via-transparent to-transparent" />
+                <div className="absolute inset-0 opacity-[0.05] bg-[grid-size:8px_8px] bg-[radial-gradient(circle_at_center,_#fff_1px,transparent_0)]" />
+
+                {/* Gradient Fill */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+
+                {/* Gradient Fill */}
+                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent" />
+
+                {/* Icon Wrapper */}
+                <motion.div
+                  whileHover={{ rotate: 90, scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                  className="relative z-10"
+                >
+                  <Plus className="w-8 h-8 text-white drop-shadow-sm" />
+                </motion.div>
+
+                {/* Tactical Scanners - Gold */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <motion.div
+                    animate={{ translateY: ["-100%", "100%"] }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "linear",
+                    }}
+                    className="h-[2px] w-full bg-accent/30 blur-[1px]"
+                  />
                 </div>
-                
-                {/* Label */}
-                <span className={cn(
-                  "relative z-10 text-[9px] font-bold uppercase tracking-wide transition-all duration-300 truncate",
-                  isActive ? "text-primary" : "text-muted-foreground/70"
-                )}>
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
+              </div>
+            </div>
+
+            {/* Label with brand styling */}
+            <div className="mt-1 flex flex-col items-center">
+              <span className="text-[10px] font-black uppercase tracking-[0.15em] text-primary">
+                Lapor
+              </span>
+            </div>
+          </Link>
         </div>
-        
-        {/* Safe area spacer for devices with home indicator */}
-        <div className="h-safe-area-inset-bottom" />
+
+        {/* Main Nav Glass Container - Light Theme Compatible */}
+        <div className="bg-white/80 backdrop-blur-xl border border-primary/10 rounded-[2.25rem] shadow-[0_8px_32px_rgba(0,0,0,0.08)] overflow-hidden">
+          <div className="relative flex items-center justify-around px-3 py-3">
+            {navItems.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/dashboard" &&
+                  pathname.startsWith(`${item.href}`));
+              const Icon = item.icon;
+
+              if (item.isMain) {
+                return <div key={item.href} className="w-20 flex-shrink-0" />;
+              }
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "relative flex flex-col items-center justify-center gap-1.5 py-2.5 px-1 rounded-2xl transition-all duration-500 group flex-1 min-w-0 z-10",
+                    isActive
+                      ? "text-primary"
+                      : "text-slate-400 hover:text-slate-600",
+                  )}
+                >
+                  {/* Shared Layout Active Indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="nav-glow"
+                      className="absolute inset-0 bg-primary/5 rounded-2xl"
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.6,
+                      }}
+                    >
+                      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 w-6 h-[2.5px] rounded-full bg-primary/40 blur-[0.5px]" />
+                    </motion.div>
+                  )}
+
+                  {/* Icon with motion */}
+                  <div className="relative">
+                    <motion.div
+                      animate={
+                        isActive ? { scale: [1, 1.15, 1], y: [0, -1, 0] } : {}
+                      }
+                      transition={{ duration: 0.4 }}
+                    >
+                      <Icon
+                        className={cn(
+                          "w-5 h-5 transition-colors duration-300",
+                          isActive
+                            ? "text-primary stroke-[2.5px]"
+                            : "group-hover:text-primary/70 stroke-[2px]",
+                        )}
+                      />
+                    </motion.div>
+                  </div>
+
+                  {/* Label */}
+                  <span
+                    className={cn(
+                      "text-[9px] font-bold uppercase tracking-wider transition-all duration-300 truncate max-w-full",
+                      isActive
+                        ? "text-primary scale-105"
+                        : "text-slate-500 font-medium",
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Safe area spacer for devices with home indicator */}
+          <div className="h-safe-area-inset-bottom" />
+        </div>
       </div>
     </nav>
   );
