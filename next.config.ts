@@ -53,6 +53,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "esdm.cloud",
       },
+      {
+        protocol: "https",
+        hostname: "www.esdm.cloud",
+      },
     ],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
     imageSizes: [16, 32, 48, 64, 96, 128, 256],
@@ -82,6 +86,18 @@ const nextConfig: NextConfig = {
   },
 
   // Security headers (apply to all environments)
+  async rewrites() {
+    const r2BucketUrl = process.env.R2_BUCKET_URL;
+    if (!r2BucketUrl) return [];
+    
+    return [
+      {
+        source: "/reports/:path*",
+        destination: `${r2BucketUrl.replace(/\/$/, "")}/reports/:path*`,
+      },
+    ];
+  },
+
   async headers() {
     // In development, use relaxed CSP for HMR/websockets
     const cspValue = isDev

@@ -19,10 +19,12 @@ const FROM_EMAIL =
   process.env.EMAIL_FROM || "PJUTS ESDM <onboarding@resend.dev>";
 
 // App URL for links in emails
-const APP_URL =
+const APP_URL = (
   process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
   process.env.AUTH_URL ||
-  "http://localhost:3000";
+  "http://localhost:3000"
+).replace(/\/$/, "");
 
 // ============================================
 // TYPES
