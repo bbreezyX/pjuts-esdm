@@ -82,7 +82,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Visualisasi data real-time untuk memudahkan pengambilan keputusan strategis oleh pimpinan.",
     "system.security": "Keamanan Data",
     "system.security_desc":
-      "Protokol keamanan tingkat tinggi untuk melindungi aset data strategis kementerian.",
+      "Protokol keamanan tingkat tinggi untuk melindungi aset data strategis Dinas ESDM Provinsi Jambi.",
     "system.reporting": "Pelaporan Digital",
     "system.reporting_desc":
       "Otomasi dokumen laporan untuk efisiensi birokrasi dan akuntabilitas kerja.",
@@ -98,10 +98,10 @@ const translations: Record<Language, Record<string, string>> = {
       "Sistem kami memastikan setiap rupiah investasi daerah dalam PJUTS terpantau manfaatnya secara maksimal bagi masyarakat.",
     "solutions.census": "Sensus Data Digital",
     "solutions.census_desc":
-      "Perekaman identitas setiap unit PJUTS menggunakan QR Code dan koordinat GPS yang akurat untuk pemetaan aset nasional.",
+      "Perekaman identitas setiap unit PJUTS menggunakan QR Code dan koordinat GPS yang akurat untuk pemetaan aset Provinsi Jambi.",
     "solutions.iot": "Transmisi IoT",
     "solutions.iot_desc":
-      "Pengiriman data kondisi lampu dan baterai secara berkala melalui jaringan seluler atau satelit ke pusat data Kementerian ESDM.",
+      "Pengiriman data kondisi lampu dan baterai secara berkala melalui jaringan seluler atau satelit ke pusat data Dinas ESDM Provinsi Jambi.",
     "solutions.verification": "Verifikasi & Tindak Lanjut",
     "solutions.verification_desc":
       "Validasi laporan otomatis oleh sistem, diteruskan kepada penyedia jasa untuk perbaikan segera guna menjaga standar pelayanan.",
@@ -120,7 +120,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Foto fisik dengan watermark timestamp & geotag otomatis dari aplikasi.",
     "workflow.step3": "Sinkronisasi",
     "workflow.step3_desc":
-      "Sinkronisasi data otomatis ke server pusat dashboard nasional.",
+      "Sinkronisasi data otomatis ke server pusat dashboard Provinsi Jambi.",
     "workflow.monitor_live": "System Monitor Live",
 
     // Features (FAQ) Section
@@ -139,7 +139,7 @@ const translations: Record<Language, Record<string, string>> = {
       "PJUTS mandiri energi, tidak memerlukan kabel instalasi listrik PLN, dan lebih hemat biaya operasional jangka panjang bagi daerah.",
     "faq.q4": "Dimana saya bisa melihat data sebaran PJUTS?",
     "faq.a4":
-      "Peta sebaran nasional dapat diakses melalui modul GIS di dashboard monitoring untuk transparansi aset negara.",
+      "Peta sebaran Provinsi Jambi dapat diakses melalui modul GIS di dashboard monitoring untuk transparansi aset daerah.",
 
     // CTA Section
     "cta.title_1": "Siap Monitoring",
@@ -331,7 +331,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Real-time data visualization for strategic decision-making by leadership.",
     "system.security": "Data Security",
     "system.security_desc":
-      "High-level security protocols to protect strategic ministry data assets.",
+      "High-level security protocols to protect strategic provincial data assets.",
     "system.reporting": "Digital Reporting",
     "system.reporting_desc":
       "Report document automation for bureaucratic efficiency and work accountability.",
@@ -347,10 +347,10 @@ const translations: Record<Language, Record<string, string>> = {
       "Our system ensures every rupiah of regional investment in PJUTS is maximally monitored for public benefit.",
     "solutions.census": "Digital Data Census",
     "solutions.census_desc":
-      "Recording identity of each PJUTS unit using QR Code and accurate GPS coordinates for national asset mapping.",
+      "Recording identity of each PJUTS unit using QR Code and accurate GPS coordinates for Jambi Province asset mapping.",
     "solutions.iot": "IoT Transmission",
     "solutions.iot_desc":
-      "Periodic transmission of lamp and battery condition data via cellular or satellite network to the Ministry of EMR data center.",
+      "Periodic transmission of lamp and battery condition data via cellular or satellite network to the Jambi Province EMR Office data center.",
     "solutions.verification": "Verification & Follow-up",
     "solutions.verification_desc":
       "Automatic report validation by the system, forwarded to service providers for immediate repair to maintain service standards.",
@@ -369,7 +369,7 @@ const translations: Record<Language, Record<string, string>> = {
       "Physical photos with automatic timestamp watermark & geotag from the app.",
     "workflow.step3": "Synchronization",
     "workflow.step3_desc":
-      "Automatic data synchronization to the national dashboard central server.",
+      "Automatic data synchronization to the provincial dashboard central server.",
     "workflow.monitor_live": "System Monitor Live",
 
     // Features (FAQ) Section
@@ -388,7 +388,7 @@ const translations: Record<Language, Record<string, string>> = {
       "PJUTS is energy independent, does not require PLN electricity installation cables, and is more cost-effective in long-term operations for regions.",
     "faq.q4": "Where can I see PJUTS distribution data?",
     "faq.a4":
-      "The national distribution map can be accessed through the GIS module in the monitoring dashboard for state asset transparency.",
+      "The Jambi Province distribution map can be accessed through the GIS module in the monitoring dashboard for regional asset transparency.",
 
     // CTA Section
     "cta.title_1": "Ready for",

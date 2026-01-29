@@ -1,31 +1,33 @@
-# 🇮🇩 PJUTS Monitoring System
+# 🇮🇩 PJUTS Monitoring System - Provinsi Jambi
 
-**Illuminating the Archipelago, One Solar Light at a Time.**
+**Illuminating Jambi Province, One Solar Light at a Time.**
 
 ---
 
-In the vast expanse of Indonesia, from the bustling streets of Jakarta to the remote islands of the East, thousands of **Solar Public Street Lights (PJUTS)** stand as beacons of renewable energy directly serving the community. But with great scale comes a great challenge: **How do we ensure every single light remains operational?**
+Across the 11 regencies and cities of **Jambi Province**, from the capital city of Jambi to the highland areas of Kerinci, hundreds of **Solar Public Street Lights (PJUTS)** stand as beacons of renewable energy directly serving the community. But with broad geographic coverage comes a real challenge: **How do we ensure every single light remains operational?**
 
-This project is the answer. It is a dedicated digital platform built for the **Ministry of Energy and Mineral Resources (Kementerian ESDM)** to monitor, manage, and maintain the nationwide network of solar street lights.
+This project is the answer. It is a dedicated digital platform built for the **Dinas Energi dan Sumber Daya Mineral (ESDM) Provinsi Jambi** to monitor, manage, and maintain the provincial network of solar street lights.
 
 ## 📖 The Story
 
 Imagine manual reports lost in transit, uncertain maintenance schedules, and the difficulty of verifying repairs in remote locations. The **PJUTS Monitoring System** transforms this logistical nightmare into a streamlined, data-driven operation.
 
-We empower **Field Staff** with a simple, mobile-friendly tool to submit real-time reports—complete with GPS-verified coordinates and high-resolution photos—directly from the installation site. Meanwhile, **Admins** in the control center get a bird's-eye view of the entire country's infrastructure through an interactive dashboard, allowing them to spot outages instantly and deploy resources where they are needed most.
+We empower **Field Staff** with a simple, mobile-friendly tool to submit real-time reports—complete with GPS-verified coordinates and high-resolution photos—directly from the installation site. Meanwhile, **Admins** in the control center get a bird's-eye view of the provincial infrastructure through an interactive dashboard, allowing them to spot outages instantly and deploy resources where they are needed most.
 
-It's not just a database; it is the nervous system of Indonesia's solar lighting infrastructure.
+It's not just a database; it is the nervous system of Jambi Province's solar lighting infrastructure.
 
 ## ✨ Key Features
 
 ### For the Guardians on the Ground (Field Staff)
+
 - **📍 Precision Reporting**: Submit reports tagged with GPS coordinates. The system automatically verifies that you are actually at the unit's location.
 - **📸 Visual Proof**: Upload high-resolution evidence of repairs or issues, optimized automatically for fast transmission even in low-bandwidth areas.
 - **⚡ Battery Health Checks**: Log voltage readings to predict failures before they happen.
 
 ### For the Command Center (Admins)
+
 - **🗺️ Interactive Situation Room**: A geospatial map visualizing the status of every unit in real-time—green for operational, red for critical.
-- **📊 Insightful Dashboards**: Aggregate data by province to identifying regional trends and maintenance hotspots.
+- **📊 Insightful Dashboards**: Aggregate data by regency/city (Kabupaten/Kota) to identify regional trends and maintenance hotspots across Jambi Province.
 - **🛡️ Secure Management**: Robust role-based access control ensures data integrity.
 
 ## 🛠️ Built With
@@ -65,6 +67,7 @@ Create your local environment configuration. Make sure to fill in your specific 
 ```bash
 cp env.example.txt .env
 ```
+
 > **Pro Tip**: Update the `DATABASE_URL` and R2 credentials in your new `.env` file before proceeding.
 
 ### 3. Database Initialization
@@ -100,4 +103,4 @@ We welcome contributions to help keep the lights on! Whether it's optimizing the
 
 ## ⚖️ License
 
-Developed for **Kementerian ESDM Republik Indonesia**. Example proprietary/private license.
+Developed for **Dinas ESDM Provinsi Jambi**. Example proprietary/private license.

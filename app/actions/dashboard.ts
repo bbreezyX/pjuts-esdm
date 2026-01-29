@@ -138,38 +138,40 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
 }
 
 // ============================================
-// OPTIMIZED: GET STATS BY PROVINCE
+// OPTIMIZED: GET STATS BY REGENCY (Kabupaten/Kota)
 // Uses single aggregated query instead of 3 queries
+// Scoped to Jambi Province - aggregates by regency
 // ============================================
 
 /**
- * Internal function to fetch province stats with optimized single query
+ * Internal function to fetch regency stats with optimized single query
+ * Note: Uses ProvinceStats interface for compatibility, but "province" field contains regency names
  */
 async function fetchStatsByProvince(): Promise<ProvinceStats[]> {
-    // Single query with joins instead of 3 separate queries
-    const provinceData = await prisma.$queryRaw<Array<{
-        province: string;
+    // Single query with joins - grouped by regency instead of province
+    const regencyData = await prisma.$queryRaw<Array<{
+        regency: string;
         lastStatus: string;
         unit_count: bigint;
         report_count: bigint;
     }>>`
     SELECT 
-      u."province",
+      u."regency",
       u."lastStatus",
       COUNT(DISTINCT u."id") as unit_count,
       COUNT(r."id") as report_count
     FROM "PjutsUnit" u
     LEFT JOIN "Report" r ON r."unitId" = u."id"
-    GROUP BY u."province", u."lastStatus"
-    ORDER BY u."province"
+    GROUP BY u."regency", u."lastStatus"
+    ORDER BY u."regency"
   `;
 
-    // Efficiently aggregate into province stats
-    const provinceMap = new Map<string, ProvinceStats>();
+    // Efficiently aggregate into regency stats (using province field for compatibility)
+    const regencyMap = new Map<string, ProvinceStats>();
 
-    for (const row of provinceData) {
-        const existing = provinceMap.get(row.province) || {
-            province: row.province,
+    for (const row of regencyData) {
+        const existing = regencyMap.get(row.regency) || {
+            province: row.regency, // Contains regency name for Jambi Province scope
             totalUnits: 0,
             operational: 0,
             maintenanceNeeded: 0,
@@ -196,13 +198,13 @@ async function fetchStatsByProvince(): Promise<ProvinceStats[]> {
                 break;
         }
 
-        // Only count reports once per province-status combo
+        // Only count reports once per regency-status combo
         existing.totalReports += Number(row.report_count);
-        provinceMap.set(row.province, existing);
+        regencyMap.set(row.regency, existing);
     }
 
     // Sort by total units descending
-    return Array.from(provinceMap.values()).sort(
+    return Array.from(regencyMap.values()).sort(
         (a, b) => b.totalUnits - a.totalUnits
     );
 }
@@ -218,7 +220,8 @@ const getCachedStatsByProvince = unstable_cache(
 );
 
 /**
- * Get unit and report counts grouped by province (CACHED & OPTIMIZED)
+ * Get unit and report counts grouped by regency/kabupaten-kota (CACHED & OPTIMIZED)
+ * Returns data scoped to Jambi Province
  */
 export async function getStatsByProvince(): Promise<ActionResult<ProvinceStats[]>> {
     try {

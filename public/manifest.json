@@ -1,7 +1,7 @@
 {
   "name": "PJUTS ESDM - Sistem Monitoring",
   "short_name": "PJUTS ESDM",
-  "description": "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Kementerian ESDM",
+  "description": "Sistem monitoring dan pelaporan PJUTS (Penerangan Jalan Umum Tenaga Surya) Dinas ESDM Provinsi Jambi",
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#003366",

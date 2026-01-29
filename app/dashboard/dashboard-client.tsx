@@ -139,7 +139,7 @@ function DashboardBentoGrid({
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <h3 className="text-xl font-bold text-foreground">Total Unit Terpasang</h3>
-              <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full">Nasional</span>
+              <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full">Provinsi Jambi</span>
             </div>
             <div className="flex items-center gap-2 text-emerald-500 font-bold text-sm">
               <TrendingUp size={14} />
@@ -161,11 +161,11 @@ function DashboardBentoGrid({
             <span className="text-6xl font-bold tracking-tighter text-foreground">
               {totalUnits.toLocaleString('id-ID')}
             </span>
-            <p className="text-xs text-muted-foreground">Pertumbuhan unit baru di 34 provinsi</p>
+            <p className="text-xs text-muted-foreground">Pertumbuhan unit baru di seluruh Kabupaten/Kota</p>
             <div className="flex items-center gap-3 mt-4">
               <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl">
                 <Globe size={14} className="text-muted-foreground" />
-                <span className="text-xs font-medium text-muted-foreground">34 Provinsi</span>
+                <span className="text-xs font-medium text-muted-foreground">{safeProvinces.length} Kabupaten/Kota</span>
               </div>
               <Link href="/units" className="flex items-center gap-1 text-xs font-bold text-primary hover:text-primary/80 transition-colors">
                 Lihat Semua Unit <ArrowRight size={14} />
@@ -298,13 +298,13 @@ function DashboardBentoGrid({
       <BentoCard className="col-span-12 lg:col-span-8">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
           <div>
-             <h3 className="text-xl font-bold mb-1 text-foreground">Sebaran Provinsi</h3>
-             <p className="text-xs text-muted-foreground">Top 8 provinsi dengan unit PJUTS terbanyak</p>
+             <h3 className="text-xl font-bold mb-1 text-foreground">Sebaran Kabupaten/Kota</h3>
+             <p className="text-xs text-muted-foreground">Distribusi unit PJUTS per wilayah di Provinsi Jambi</p>
           </div>
           <div className="flex items-center gap-2">
              <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl text-[10px] font-bold text-muted-foreground">
                <Globe size={12} />
-               <span>{safeProvinces.length} Provinsi</span>
+               <span>{safeProvinces.length} Kabupaten/Kota</span>
              </div>
              <Link href="/map">
                <Button variant="outline" size="sm" className="rounded-xl text-xs font-bold h-8">
@@ -341,7 +341,7 @@ function DashboardBentoGrid({
            <div className="flex justify-between items-center mb-6">
               <div className="flex flex-col gap-1">
                  <span className="px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold rounded-full w-fit">Data Wilayah</span>
-                 <h3 className="text-2xl font-bold text-foreground">Detail Performa Provinsi</h3>
+                 <h3 className="text-2xl font-bold text-foreground">Detail Performa Kabupaten/Kota</h3>
               </div>
               <Link href="/analytics">
                 <Button variant="outline" className="rounded-2xl border-border hover:bg-muted text-xs font-bold">
@@ -355,7 +355,7 @@ function DashboardBentoGrid({
           <table className="w-full text-left border-separate border-spacing-y-3">
             <thead>
               <tr className="text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
-                <th className="px-4 py-2">Provinsi</th>
+                <th className="px-4 py-2">Kabupaten/Kota</th>
                 <th className="px-4 py-2">Total Unit</th>
                 <th className="px-4 py-2">Status</th>
                 <th className="px-4 py-2 text-right">Performa</th>

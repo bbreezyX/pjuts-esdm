@@ -271,11 +271,11 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
       <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h3 className="text-xl font-bold text-slate-900">Unit per Provinsi (Top 10)</h3>
-            <p className="text-slate-500 mt-1">Performa unit per wilayah</p>
+            <h3 className="text-xl font-bold text-slate-900">Unit per Kabupaten/Kota</h3>
+            <p className="text-slate-500 mt-1">Performa unit per wilayah di Provinsi Jambi</p>
           </div>
           <Badge variant="secondary" className="bg-slate-100 text-slate-600 hover:bg-slate-200">
-            {provinces.length} Provinsi
+            {provinces.length} Kabupaten/Kota
           </Badge>
         </div>
         <div className="h-[400px]">
@@ -340,17 +340,17 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
         </div>
       </div>
 
-      {/* Province Table */}
+      {/* Regency Table */}
       <div className="bg-white rounded-[2rem] p-8 shadow-sm border border-slate-200/60">
         <div className="mb-8">
-           <h3 className="text-xl font-bold text-slate-900">Detail Statistik Provinsi</h3>
-           <p className="text-slate-500 mt-1">Data lengkap per wilayah</p>
+           <h3 className="text-xl font-bold text-slate-900">Detail Statistik Kabupaten/Kota</h3>
+           <p className="text-slate-500 mt-1">Data lengkap per wilayah di Provinsi Jambi</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left border-separate border-spacing-y-2">
             <thead>
               <tr className="text-slate-400 text-sm font-medium">
-                <th className="px-4 py-2 font-medium">Provinsi</th>
+                <th className="px-4 py-2 font-medium">Kabupaten/Kota</th>
                 <th className="px-4 py-2 text-center font-medium">Total</th>
                 <th className="px-4 py-2 text-center font-medium text-emerald-600">Operasional</th>
                 <th className="px-4 py-2 text-center font-medium text-amber-600">Perawatan</th>

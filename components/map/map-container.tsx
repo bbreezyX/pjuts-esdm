@@ -80,12 +80,16 @@ declare global {
   }
 }
 
+// Default values for Jambi Province
+const DEFAULT_CENTER: [number, number] = [-1.6, 103.6];
+const DEFAULT_ZOOM = 8;
+
 function MapContainerComponent({
   points,
   onPointClick,
   selectedStatus,
-  center = [-2.5, 118],
-  zoom = 5,
+  center = DEFAULT_CENTER,
+  zoom = DEFAULT_ZOOM,
 }: MapContainerProps) {
   const mapRef = useRef<LeafletMap | null>(null);
   const markersRef = useRef<LeafletLayerGroup | null>(null);
@@ -94,6 +98,11 @@ function MapContainerComponent({
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const leafletRef = useRef<LeafletLibrary | null>(null);
+  const initializedRef = useRef(false);
+  
+  // Store initial center and zoom in refs to avoid re-initialization
+  const initialCenterRef = useRef(center);
+  const initialZoomRef = useRef(zoom);
 
   // Filtered points
   const filteredPoints = useMemo(() => {
@@ -166,18 +175,20 @@ function MapContainerComponent({
     };
   }, []);
 
-  // Initialize map
+  // Initialize map - only runs once when Leaflet is loaded
   useEffect(() => {
-    if (!isLoaded || !containerRef.current || mapRef.current) return;
+    if (!isLoaded || !containerRef.current || initializedRef.current) return;
 
     const L = leafletRef.current;
     if (!L) return;
 
     try {
-      // Create map
+      initializedRef.current = true;
+      
+      // Create map with initial values from refs
       const map = L.map(containerRef.current, {
-        center,
-        zoom,
+        center: initialCenterRef.current,
+        zoom: initialZoomRef.current,
         zoomControl: false,
         preferCanvas: true,
       });
@@ -198,7 +209,7 @@ function MapContainerComponent({
 
       // Force resize after a short delay
       setTimeout(() => {
-        if (mapRef.current === map) {
+        if (mapRef.current === map && initializedRef.current) {
           map.invalidateSize();
           setIsReady(true);
         }
@@ -206,32 +217,41 @@ function MapContainerComponent({
     } catch (err) {
       console.error("Map init error:", err);
       setError("Gagal menginisialisasi peta");
+      initializedRef.current = false;
     }
 
     return () => {
       if (mapRef.current) {
+        setIsReady(false);
         mapRef.current.remove();
         mapRef.current = null;
         markersRef.current = null;
+        initializedRef.current = false;
       }
     };
-  }, [isLoaded, center, zoom]);
+  }, [isLoaded]); // Only depend on isLoaded - center/zoom are read from refs
 
   // Update markers
   useEffect(() => {
-    if (!isReady || !markersRef.current || !leafletRef.current) return;
+    if (!isReady || !markersRef.current || !leafletRef.current || !initializedRef.current) return;
 
     const L = leafletRef.current;
-    markersRef.current.clearLayers();
+    const markers = markersRef.current;
+    
+    try {
+      markers.clearLayers();
 
-    filteredPoints.forEach((point) => {
-      const icon = createIcon(point.lastStatus);
-      if (!icon) return;
+      filteredPoints.forEach((point) => {
+        const icon = createIcon(point.lastStatus);
+        if (!icon) return;
 
-      const marker = L.marker([point.latitude, point.longitude], { icon });
-      marker.on("click", () => onPointClick?.(point));
-      markersRef.current?.addLayer(marker);
-    });
+        const marker = L.marker([point.latitude, point.longitude], { icon });
+        marker.on("click", () => onPointClick?.(point));
+        markers.addLayer(marker);
+      });
+    } catch (err) {
+      console.error("Error updating markers:", err);
+    }
   }, [filteredPoints, isReady, createIcon, onPointClick]);
 
   // Fit bounds
@@ -240,15 +260,21 @@ function MapContainerComponent({
       !isReady ||
       !mapRef.current ||
       !leafletRef.current ||
+      !initializedRef.current ||
       filteredPoints.length === 0
     )
       return;
 
-    const L = leafletRef.current;
-    const bounds = L.latLngBounds(
-      filteredPoints.map((p) => [p.latitude, p.longitude])
-    );
-    mapRef.current.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+    try {
+      const L = leafletRef.current;
+      const map = mapRef.current;
+      const bounds = L.latLngBounds(
+        filteredPoints.map((p) => [p.latitude, p.longitude])
+      );
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+    } catch (err) {
+      console.error("Error fitting bounds:", err);
+    }
   }, [filteredPoints, isReady]);
 
   // Error state

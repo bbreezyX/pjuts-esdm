@@ -33,7 +33,7 @@ export default async function AnalyticsPage() {
     >
       <PageHeader
         title="Analitik"
-        description="Visualisasi data dan tren PJUTS di Indonesia"
+        description="Visualisasi data dan tren PJUTS di Provinsi Jambi"
       >
         <Button variant="outline" size="sm" className="rounded-xl font-bold">
           <Download className="h-4 w-4 mr-2" />
