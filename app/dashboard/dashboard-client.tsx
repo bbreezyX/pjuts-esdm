@@ -497,7 +497,6 @@ function DashboardBentoGrid({
                   ...a,
                   timestamp: new Date(a.timestamp),
                 }))}
-                maxHeight="100%"
               />
            </div>
            <div className="bg-muted/30 rounded-2xl sm:rounded-[2rem] p-5 sm:p-6 border border-border/50 flex flex-col justify-center items-center text-center">
