@@ -467,7 +467,8 @@ export function UnitsPageClient({
             initialUnits.map((unit, index) => (
               <Card
                 key={unit.id}
-                className="p-5 animate-fade-in border-2 border-slate-50 shadow-xl shadow-slate-200/20 rounded-[2rem] bg-white group"
+                onClick={() => router.push(`/map?unitId=${unit.id}`)}
+                className="p-5 animate-fade-in border-2 border-slate-50 shadow-xl shadow-slate-200/20 rounded-[2rem] bg-white group cursor-pointer hover:border-primary/50 transition-all"
                 style={{ animationDelay: `${index * 0.05}s` }}
               >
                 <div className="flex items-start gap-4">
@@ -513,12 +514,13 @@ export function UnitsPageClient({
                         size="sm"
                         disabled={unit.latitude === 0 && unit.longitude === 0}
                         className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest bg-slate-100 hover:bg-slate-200 transition-all disabled:opacity-30"
-                        onClick={() =>
+                        onClick={(e) => {
+                          e.stopPropagation();
                           window.open(
                             `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
                             "_blank",
-                          )
-                        }
+                          );
+                        }}
                       >
                         <MapPin className="h-3.5 w-3.5 mr-2" />
                         Maps
@@ -528,6 +530,7 @@ export function UnitsPageClient({
                         size="sm"
                         className="h-10 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-600 text-white hover:bg-emerald-700 transition-all border-none"
                         asChild
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Link href={`/report/new?unitId=${unit.id}`}>
                           <FileText className="h-3.5 w-3.5 mr-2" />
@@ -543,6 +546,7 @@ export function UnitsPageClient({
                               variant="ghost"
                               size="sm"
                               className="h-8 w-full rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-400"
+                              onClick={(e) => e.stopPropagation()}
                             >
                               <MoreHorizontal className="h-4 w-4 mr-2" /> Kelola
                               Unit
@@ -554,14 +558,20 @@ export function UnitsPageClient({
                           >
                             <DropdownMenuItem
                               className="rounded-xl py-3 font-black text-[10px] uppercase tracking-wider cursor-pointer"
-                              onClick={() => handleEdit(unit)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(unit);
+                              }}
                             >
                               <Pencil className="h-3.5 w-3.5 mr-3 text-amber-500" />
                               Edit Unit
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               className="rounded-xl py-3 font-black text-[10px] uppercase tracking-wider cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
-                              onClick={() => handleDelete(unit)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(unit);
+                              }}
                             >
                               <Trash2 className="h-3.5 w-3.5 mr-3" />
                               Hapus Unit
@@ -594,7 +604,8 @@ export function UnitsPageClient({
               {initialUnits.map((unit, index) => (
                 <tr
                   key={unit.id}
-                  className="group animate-in fade-in slide-in-from-bottom-2 duration-500"
+                  onClick={() => router.push(`/map?unitId=${unit.id}`)}
+                  className="group animate-in fade-in slide-in-from-bottom-2 duration-500 cursor-pointer"
                   style={{ animationDelay: `${index * 0.05}s` }}
                 >
                   <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 rounded-l-[2.5rem] border-y-2 border-l-2 border-slate-50 transition-all duration-300">
@@ -654,63 +665,67 @@ export function UnitsPageClient({
                     )}
                   </td>
                   <td className="px-8 py-6 bg-white group-hover:bg-slate-50/50 rounded-r-[2.5rem] border-y-2 border-r-2 border-slate-50 transition-all duration-300 text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-12 w-12 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-xl transition-all"
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-12 w-12 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-xl transition-all"
+                          >
+                            <MoreHorizontal className="h-6 w-6 text-slate-400" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="rounded-[2rem] border-slate-100 shadow-2xl p-3 min-w-[200px]"
                         >
-                          <MoreHorizontal className="h-6 w-6 text-slate-400" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="rounded-[2rem] border-slate-100 shadow-2xl p-3 min-w-[200px]"
-                      >
-                        <DropdownMenuItem
-                          className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
-                          disabled={unit.latitude === 0 && unit.longitude === 0}
-                          onClick={() =>
-                            window.open(
-                              `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
-                              "_blank",
-                            )
-                          }
-                        >
-                          <MapPin className="h-4 w-4 mr-3 text-emerald-500" />
-                          Buka di Google Maps
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          asChild
-                          className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
-                        >
-                          <Link href={`/report/new?unitId=${unit.id}`}>
-                            <Zap className="h-4 w-4 mr-3 text-amber-500" />
-                            Buat Laporan Baru
-                          </Link>
-                        </DropdownMenuItem>
-                        {isAdmin && (
-                          <>
-                            <div className="h-px bg-slate-100 my-2 mx-2" />
-                            <DropdownMenuItem
-                              className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
-                              onClick={() => handleEdit(unit)}
-                            >
-                              <Pencil className="h-4 w-4 mr-3 text-slate-400" />
-                              Edit Informasi Unit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
-                              onClick={() => handleDelete(unit)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-3" />
-                              Hapus dari Sistem
-                            </DropdownMenuItem>
-                          </>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          <DropdownMenuItem
+                            className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
+                            disabled={
+                              unit.latitude === 0 && unit.longitude === 0
+                            }
+                            onClick={() =>
+                              window.open(
+                                `https://www.google.com/maps?q=${unit.latitude},${unit.longitude}`,
+                                "_blank",
+                              )
+                            }
+                          >
+                            <MapPin className="h-4 w-4 mr-3 text-emerald-500" />
+                            Buka di Google Maps
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            asChild
+                            className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
+                          >
+                            <Link href={`/report/new?unitId=${unit.id}`}>
+                              <Zap className="h-4 w-4 mr-3 text-amber-500" />
+                              Buat Laporan Baru
+                            </Link>
+                          </DropdownMenuItem>
+                          {isAdmin && (
+                            <>
+                              <div className="h-px bg-slate-100 my-2 mx-2" />
+                              <DropdownMenuItem
+                                className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer"
+                                onClick={() => handleEdit(unit)}
+                              >
+                                <Pencil className="h-4 w-4 mr-3 text-slate-400" />
+                                Edit Informasi Unit
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="rounded-xl py-4 px-4 font-black text-[10px] uppercase tracking-wider cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"
+                                onClick={() => handleDelete(unit)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-3" />
+                                Hapus dari Sistem
+                              </DropdownMenuItem>
+                            </>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </td>
                 </tr>
               ))}

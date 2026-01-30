@@ -18,6 +18,7 @@ interface MapContainerProps {
   zoom?: number;
   activeLayer?: BaseLayerType;
   activeOverlays?: OverlayType[];
+  selectedUnitId?: string | null;
   bufferConfig?: {
     center: [number, number];
     radiusKm: number;
@@ -43,6 +44,7 @@ interface LeafletDivIcon {
 
 interface LeafletMarker {
   on: (event: string, handler: () => void) => void;
+  setZIndexOffset: (offset: number) => void;
 }
 
 interface LeafletLayerGroup {
@@ -71,11 +73,18 @@ interface LeafletMap {
     bounds: LeafletLatLngBounds,
     options?: { padding?: [number, number]; maxZoom?: number },
   ) => void;
+  flyTo: (
+    latlng: [number, number],
+    zoom?: number,
+    options?: { animate?: boolean; duration?: number },
+  ) => void;
   removeLayer: (layer: LeafletTileLayer | LeafletCircle) => void;
   addLayer: (layer: LeafletTileLayer) => void;
 }
 
-type LeafletLatLngBounds = unknown;
+type LeafletLatLngBounds = {
+  isValid: () => boolean;
+};
 
 interface LeafletLibrary {
   map: (
@@ -128,6 +137,7 @@ function MapContainerComponent({
   points,
   onPointClick,
   selectedStatus,
+  selectedUnitId,
   center = DEFAULT_CENTER,
   zoom = DEFAULT_ZOOM,
   activeLayer = "openstreetmap",
@@ -156,33 +166,66 @@ function MapContainerComponent({
   }, [points, selectedStatus]);
 
   // Create marker icon
-  const createIcon = useCallback((status: string) => {
+  const createIcon = useCallback((status: string, isSelected: boolean) => {
     if (!leafletRef.current) return null;
     const L = leafletRef.current;
-    const color =
+
+    // If selected, use a distinct color or just making it bigger/glowy
+    // Let's use blue or purple for selection if we want to override status color?
+    // Or keep status color but make it pulsate heavily.
+    const baseColor =
       STATUS_COLORS[status as keyof typeof STATUS_COLORS] ||
       STATUS_COLORS.UNVERIFIED;
 
+    // If selected, maybe use a "target" color or just brighter version?
+    // Let's stick to status color but enhance the visual.
+
+    const size = isSelected ? 60 : 40;
+    const iconSize = isSelected ? 48 : 40; // Inner SVG size
+    const pulseAnimation = isSelected
+      ? `
+        @keyframes pulse-ring {
+          0% { transform: scale(0.33); opacity: 1; }
+          80%, 100% { transform: scale(1); opacity: 0; }
+        }
+        .pulse-ring-${status} {
+          animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+      `
+      : "";
+
     return L.divIcon({
-      className: "custom-marker",
+      className: `custom-marker ${isSelected ? "selected-marker" : ""}`,
       html: `
-        <div style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
-          <svg viewBox="0 0 24 24" width="40" height="40">
+        <style>
+          ${pulseAnimation}
+        </style>
+        <div style="width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;position:relative;filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+          ${
+            isSelected
+              ? `
+          <div class="pulse-ring-${status}" style="position:absolute; inset:0; border-radius:50%; background:${baseColor}; opacity:0.4;"></div>
+          <div class="pulse-ring-${status}" style="position:absolute; inset:-10px; border-radius:50%; border: 4px solid ${baseColor}; opacity:0.4; animation-delay: 0.5s;"></div>
+          `
+              : ""
+          }
+          <svg viewBox="0 0 24 24" width="${iconSize}" height="${iconSize}" style="transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); ${isSelected ? "transform: scale(1.2);" : ""}">
             <defs>
-              <linearGradient id="grad-${status}" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" style="stop-color:${color};stop-opacity:1" />
-                <stop offset="100%" style="stop-color:${color};stop-opacity:0.8" />
+              <linearGradient id="grad-${status}-${isSelected}" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:${baseColor};stop-opacity:1" />
+                <stop offset="100%" style="stop-color:${baseColor};stop-opacity:0.8" />
               </linearGradient>
             </defs>
-            <path fill="url(#grad-${status})" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-            <circle cx="12" cy="9" r="3.5" fill="white"/>
+            <path fill="url(#grad-${status}-${isSelected})" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="${isSelected ? 4.5 : 3.5}" fill="white"/>
+            ${isSelected ? `<circle cx="12" cy="9" r="2" fill="${baseColor}"/>` : ""}
           </svg>
-          <div style="position:absolute;bottom:0px;left:50%;transform:translateX(-50%);width:10px;height:10px;background:${color};border-radius:50%;border:2px solid white;box-shadow:0 0 10px ${color};"></div>
+          ${!isSelected ? `<div style="position:absolute;bottom:0px;left:50%;transform:translateX(-50%);width:10px;height:10px;background:${baseColor};border-radius:50%;border:2px solid white;box-shadow:0 0 10px ${baseColor};"></div>` : ""}
         </div>
       `,
-      iconSize: [40, 40],
-      iconAnchor: [20, 40],
-      popupAnchor: [0, -40],
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size], // Center bottom anchor roughly
+      popupAnchor: [0, -size],
     });
   }, []);
 
@@ -378,7 +421,7 @@ function MapContainerComponent({
     }
   }, [activeOverlays, isReady]);
 
-  // Update markers
+  // Update markers and handle flyTo
   useEffect(() => {
     if (
       !isReady ||
@@ -390,57 +433,79 @@ function MapContainerComponent({
 
     const L = leafletRef.current;
     const markers = markersRef.current;
+    const map = mapRef.current;
 
     try {
       markers.clearLayers();
 
       filteredPoints.forEach((point) => {
-        const icon = createIcon(point.lastStatus);
+        const isSelected = point.id === selectedUnitId;
+        const icon = createIcon(point.lastStatus, isSelected);
         if (!icon) return;
 
         const marker = L.marker([point.latitude, point.longitude], { icon });
+
+        if (isSelected) {
+          marker.setZIndexOffset(1000);
+        }
+
         marker.on("click", () => onPointClick?.(point));
         markers.addLayer(marker);
+
+        if (isSelected && map) {
+          map.flyTo([point.latitude, point.longitude], 15, {
+            animate: true,
+            duration: 1.5,
+          });
+        }
       });
     } catch (err) {
       console.error("Error updating markers:", err);
     }
-  }, [filteredPoints, isReady, createIcon, onPointClick]);
+  }, [filteredPoints, isReady, createIcon, onPointClick, selectedUnitId]);
 
-  // Fit bounds
+  // Fit bounds (only on initial load or if no specific selection)
   useEffect(() => {
     if (
       !isReady ||
       !mapRef.current ||
       !leafletRef.current ||
       !initializedRef.current ||
-      filteredPoints.length === 0
+      filteredPoints.length === 0 ||
+      selectedUnitId // Skip auto-fit if a specific unit is selected to avoid conflict with flyTo
     )
       return;
 
     try {
       const L = leafletRef.current;
       const map = mapRef.current;
-      
+
       // Filter out points with invalid coordinates
       const validPoints = filteredPoints.filter(
-        (p) => 
-          typeof p.latitude === 'number' && 
-          typeof p.longitude === 'number' &&
-          !isNaN(p.latitude) && 
+        (p) =>
+          typeof p.latitude === "number" &&
+          typeof p.longitude === "number" &&
+          !isNaN(p.latitude) &&
           !isNaN(p.longitude) &&
-          p.latitude >= -90 && p.latitude <= 90 &&
-          p.longitude >= -180 && p.longitude <= 180
+          p.latitude >= -90 &&
+          p.latitude <= 90 &&
+          p.longitude >= -180 &&
+          p.longitude <= 180,
       );
-      
+
       if (validPoints.length === 0) return;
-      
+
       const bounds = L.latLngBounds(
         validPoints.map((p) => [p.latitude, p.longitude] as [number, number]),
       ) as L.LatLngBounds;
-      
+
       // Check if bounds are valid before fitting
-      if (bounds && bounds.isValid()) {
+      if (
+        bounds &&
+        bounds &&
+        typeof bounds.isValid === "function" &&
+        bounds.isValid()
+      ) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
       }
     } catch (err) {

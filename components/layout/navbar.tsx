@@ -248,7 +248,13 @@ export function Navbar({ user }: NavbarProps) {
           <div className="relative w-full max-w-sm ml-auto bg-card shadow-2xl rounded-3xl border border-border overflow-hidden animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between p-6 border-b border-border">
               <div className="flex items-center gap-3">
-                <Image src="/logo-esdm.png" alt="Logo" width={32} height={32} priority />
+                <Image
+                  src="/logo-esdm.png"
+                  alt="Logo"
+                  width={32}
+                  height={32}
+                  priority
+                />
                 <span className="font-bold text-foreground">Menu Navigasi</span>
               </div>
               <Button
@@ -338,7 +344,7 @@ export function Navbar({ user }: NavbarProps) {
                         onClick={() => {
                           setSearchOpen(false);
                           setSearchQuery("");
-                          router.push(`/units?search=${unit.serialNumber}`);
+                          router.push(`/map?unitId=${unit.id}`);
                         }}
                         className="w-full flex items-center justify-between p-4 rounded-2xl hover:bg-muted transition-all group"
                       >

@@ -8,6 +8,7 @@ import {
   useMemo,
   useCallback,
 } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout";
 import { MapFilters, MapLegend, UnitDetailDrawer } from "@/components/map";
@@ -71,24 +72,28 @@ function FiltersSkeleton() {
 function EnhancedMapContent({
   pointsPromise,
   selectedStatus,
+  selectedUnitId,
   onPointClick,
 }: {
   pointsPromise: PointsPromise;
   selectedStatus: string | null;
+  selectedUnitId: string | null;
   onPointClick: (point: MapPoint) => void;
 }) {
   const [activeLayer, setActiveLayer] =
     useState<BaseLayerType>("openstreetmap");
   const [activeOverlays, setActiveOverlays] = useState<OverlayType[]>([]);
   const [bufferConfig, setBufferConfig] = useState<BufferConfig | null>(null);
-  const [selectedPoint, setSelectedPoint] = useState<MapPoint | null>(null);
 
   const { data: points } = use(pointsPromise);
   const safePoints = useMemo(() => points || [], [points]);
 
+  const selectedPoint = useMemo(() => {
+    return safePoints.find((p) => p.id === selectedUnitId) || null;
+  }, [safePoints, selectedUnitId]);
+
   const handlePointClick = useCallback(
     (point: MapPoint) => {
-      setSelectedPoint(point);
       onPointClick(point);
     },
     [onPointClick],
@@ -122,6 +127,7 @@ function EnhancedMapContent({
       <MapContainer
         points={safePoints}
         selectedStatus={selectedStatus}
+        selectedUnitId={selectedUnitId}
         onPointClick={handlePointClick}
         activeLayer={activeLayer}
         activeOverlays={activeOverlays}
@@ -173,12 +179,29 @@ function FiltersSection({
   );
 }
 
+// URL Syncer component to handle search params without de-optimizing the main component
+function MapUrlSyncer({ onUnitId }: { onUnitId: (id: string) => void }) {
+  const searchParams = useSearchParams();
+
+  // Handle unitId from URL
+  useEffect(() => {
+    const unitId = searchParams.get("unitId");
+    if (unitId) {
+      onUnitId(unitId);
+    }
+  }, [searchParams, onUnitId]);
+
+  return null;
+}
+
 export function MapPageClient({
   pointsPromise,
   statsPromise,
 }: MapPageClientProps) {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   // Listen for map point clicks from popup buttons
   useEffect(() => {
@@ -199,8 +222,17 @@ export function MapPageClient({
     };
   }, []);
 
+  const handleCloseDrawer = useCallback(() => {
+    setSelectedUnitId(null);
+    router.replace(pathname);
+  }, [router, pathname]);
+
   return (
     <>
+      <Suspense fallback={null}>
+        <MapUrlSyncer onUnitId={setSelectedUnitId} />
+      </Suspense>
+
       <PageHeader
         title="Peta PJUTS"
         description="Visualisasi lokasi unit penerangan jalan umum tenaga surya dengan fitur analisis GIS"
@@ -234,6 +266,7 @@ export function MapPageClient({
             <EnhancedMapContent
               pointsPromise={pointsPromise}
               selectedStatus={selectedStatus}
+              selectedUnitId={selectedUnitId}
               onPointClick={(point) => setSelectedUnitId(point.id)}
             />
           </Suspense>
@@ -242,10 +275,7 @@ export function MapPageClient({
       </Card>
 
       {/* Unit Detail Drawer */}
-      <UnitDetailDrawer
-        unitId={selectedUnitId}
-        onClose={() => setSelectedUnitId(null)}
-      />
+      <UnitDetailDrawer unitId={selectedUnitId} onClose={handleCloseDrawer} />
     </>
   );
 }
