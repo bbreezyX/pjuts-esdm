@@ -107,7 +107,7 @@ const nextConfig: NextConfig = {
     const cspValue = isDev
       ? [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://static.cloudflareinsights.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
           // Map tile providers: OSM, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
@@ -117,7 +117,7 @@ const nextConfig: NextConfig = {
         ].join("; ")
       : [
           "default-src 'self'",
-          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com",
+          "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://static.cloudflareinsights.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
           // Map tile providers: OSM, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
