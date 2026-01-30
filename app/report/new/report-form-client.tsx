@@ -138,8 +138,12 @@ const addGeotagOverlay = async (
             img.height - h + padding + i * fontSize * 1.5 + fontSize,
           ),
         );
+        const newFileName = file.name.replace(/\.[^/.]+$/, "") + ".jpg";
         canvas.toBlob(
-          (b) => (b ? resolve(new File([b], file.name)) : reject()),
+          (b) =>
+            b
+              ? resolve(new File([b], newFileName, { type: "image/jpeg" }))
+              : reject(),
           "image/jpeg",
           0.9,
         );
@@ -552,7 +556,7 @@ export function ReportFormClient({
                         <Search className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 group-focus-within:text-primary transition-colors" />
                         <Input
                           placeholder="Ketik Serial Number..."
-                          className="h-16 pl-14 pr-12 rounded-2xl border-2 border-transparent bg-slate-50/50 text-base font-bold text-slate-800 transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white"
+                          className="h-16 pl-14 pr-12 rounded-2xl border-2 border-transparent bg-slate-50/50 text-base font-bold text-slate-800 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white"
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
                         />
@@ -749,7 +753,7 @@ export function ReportFormClient({
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
+                  accept="image/*,.heic,.heif"
                   capture="environment"
                   onChange={handleImageCapture}
                   className="hidden"
@@ -790,7 +794,7 @@ export function ReportFormClient({
                         <Input
                           type="number"
                           placeholder="00.0"
-                          className="h-20 pl-16 pr-20 rounded-2xl text-2xl font-black border-2 border-transparent bg-slate-50/50 transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white"
+                          className="h-20 pl-16 pr-20 rounded-2xl text-2xl font-black border-2 border-transparent bg-slate-50/50 transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white"
                           value={formData.batteryVoltage}
                           onChange={(e) =>
                             setFormData((p) => ({
@@ -811,7 +815,7 @@ export function ReportFormClient({
                       </label>
                       <Textarea
                         placeholder="Tuliskan detail temuan atau kerusakan (jika ada)..."
-                        className="min-h-[160px] rounded-2xl border-2 border-transparent bg-slate-50/50 p-6 text-base font-medium transition-all focus:ring-4 focus:ring-primary/10 focus:border-primary focus:bg-white resize-none"
+                        className="min-h-[160px] rounded-2xl !border-2 border-transparent bg-slate-50/50 p-6 text-base font-medium transition-all focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-4 focus:ring-primary/10 focus:!border-primary focus:bg-white resize-none"
                         value={formData.notes}
                         onChange={(e) =>
                           setFormData((p) => ({ ...p, notes: e.target.value }))

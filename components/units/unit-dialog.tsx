@@ -197,7 +197,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                         placeholder="PJUTS-XXX-000"
                         {...field}
                         disabled={isEdit || isSubmitting}
-                        className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                        className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                       />
                     </FormControl>
                     <FormMessage />
@@ -220,7 +220,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                         disabled={isSubmitting}
                       >
                         <FormControl>
-                          <SelectTrigger className="bg-white text-slate-900 border-slate-300 focus:ring-primary-500">
+                          <SelectTrigger className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-primary-500">
                             <SelectValue placeholder="Pilih status" />
                           </SelectTrigger>
                         </FormControl>
@@ -272,7 +272,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                         {...field}
                         value={JAMBI_PROVINCE}
                         disabled={true}
-                        className="bg-slate-50 text-slate-900 border-slate-300 cursor-not-allowed"
+                        className="bg-slate-50 text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 cursor-not-allowed"
                       />
                     </FormControl>
                     <FormMessage />
@@ -294,7 +294,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                       disabled={isSubmitting}
                     >
                       <FormControl>
-                        <SelectTrigger className="bg-white text-slate-900 border-slate-300 focus:ring-primary-500">
+                        <SelectTrigger className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:ring-primary-500">
                           <SelectValue placeholder="Pilih Kabupaten/Kota" />
                         </SelectTrigger>
                       </FormControl>
@@ -331,7 +331,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                         {...field}
                         value={field.value || ""}
                         disabled={isSubmitting}
-                        className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                        className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                       />
                     </FormControl>
                     <FormMessage />
@@ -353,7 +353,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                         {...field}
                         value={field.value || ""}
                         disabled={isSubmitting}
-                        className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                        className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                       />
                     </FormControl>
                     <FormMessage />
@@ -376,7 +376,7 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                       {...field}
                       value={field.value || ""}
                       disabled={isSubmitting}
-                      className="bg-white text-slate-900 border-slate-300 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                      className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                     />
                   </FormControl>
                   <FormMessage />

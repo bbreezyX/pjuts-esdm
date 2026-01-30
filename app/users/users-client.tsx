@@ -251,7 +251,7 @@ export function UsersClient({ users }: UsersClientProps) {
                   defaultValue={editingUser?.name}
                   required
                   minLength={3}
-                  className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm"
+                  className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm"
                   placeholder="Nama lengkap personil"
                 />
               </div>
@@ -268,7 +268,7 @@ export function UsersClient({ users }: UsersClientProps) {
                   type="email"
                   defaultValue={editingUser?.email}
                   required
-                  className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm"
+                  className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm"
                   placeholder="personil@esdm.go.id"
                 />
               </div>
@@ -285,7 +285,7 @@ export function UsersClient({ users }: UsersClientProps) {
                   type="password"
                   required={!editingUser}
                   minLength={6}
-                  className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm"
+                  className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary/30 focus:ring-primary/10 font-medium text-sm"
                   placeholder={
                     editingUser
                       ? "Biarkan kosong jika tidak berubah"
@@ -304,7 +304,7 @@ export function UsersClient({ users }: UsersClientProps) {
                   name="role"
                   defaultValue={editingUser?.role || "FIELD_STAFF"}
                 >
-                  <SelectTrigger className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus:border-primary/30 font-bold text-sm">
+                  <SelectTrigger className="h-10 sm:h-12 rounded-lg sm:rounded-xl bg-muted/50 border-border/50 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary/30 font-bold text-sm">
                     <SelectValue placeholder="Pilih hak akses" />
                   </SelectTrigger>
                   <SelectContent className="rounded-2xl border-border shadow-2xl">
