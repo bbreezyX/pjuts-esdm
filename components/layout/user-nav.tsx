@@ -34,27 +34,29 @@ export function UserNav({ user }: UserNavProps) {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="ghost"
-                    className="flex items-center gap-3 px-2 h-12 rounded-xl hover:bg-muted/50 transition-all border border-transparent hover:border-border active:scale-95 group"
+                    className="flex items-center gap-2 h-8 sm:h-9 lg:h-10 px-1.5 sm:px-2 lg:px-3 rounded-full bg-muted/30 hover:bg-muted/50 border border-border/30 hover:border-border/60 transition-all active:scale-95 group overflow-hidden"
                 >
-                    <div className="relative">
-                        <div className="w-9 h-9 rounded-xl bg-foreground text-background flex items-center justify-center shadow-lg transition-transform group-hover:scale-105">
-                            <span className="text-sm font-black uppercase">
+                    <div className="relative flex-shrink-0">
+                        <div className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 rounded-full bg-foreground text-background flex items-center justify-center shadow-sm transition-transform group-hover:scale-105">
+                            <span className="text-[9px] sm:text-[10px] lg:text-xs font-black uppercase">
                                 {user.name.charAt(0)}
                             </span>
                         </div>
                         {isAdmin && (
-                            <div className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-primary text-primary-foreground flex items-center justify-center border-2 border-card">
-                                <ShieldCheck size={10} />
+                            <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-2.5 sm:h-2.5 lg:w-3 lg:h-3 rounded-full bg-primary text-primary-foreground flex items-center justify-center border-[1.5px] border-card">
+                                <ShieldCheck className="w-[5px] h-[5px] sm:w-[6px] sm:h-[6px] lg:w-[8px] lg:h-[8px]" />
                             </div>
                         )}
                     </div>
-                    <div className="hidden lg:block text-left mr-1">
-                        <p className="text-xs font-black text-foreground leading-none mb-1">{user.name}</p>
-                        <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest leading-none">
-                            {isAdmin ? "System Admin" : "Field Officer"}
+                    <div className="hidden lg:block text-left min-w-0 max-w-[60px] xl:max-w-[80px] transition-all duration-300">
+                        <p className="text-[10px] xl:text-[11px] font-bold text-foreground leading-tight truncate">
+                            {user.name}
+                        </p>
+                        <p className="text-[8px] xl:text-[9px] font-semibold text-muted-foreground uppercase tracking-wide leading-none">
+                            {isAdmin ? "Admin" : "Officer"}
                         </p>
                     </div>
-                    <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+                    <ChevronDown className="h-3 w-3 lg:h-3.5 lg:w-3.5 text-muted-foreground transition-transform group-data-[state=open]:rotate-180 flex-shrink-0 lg:ml-0.5" />
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-64 p-2 rounded-2xl shadow-2xl border-border bg-card">

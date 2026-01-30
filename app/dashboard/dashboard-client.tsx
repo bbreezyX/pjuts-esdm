@@ -243,7 +243,7 @@ function UserAvatarWithPopover({ user }: { user: DashboardUser }) {
       <PopoverTrigger asChild>
         <div
           className={cn(
-            "w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 rounded-xl lg:rounded-2xl border-[3px] lg:border-[4px] border-background shadow-xl shadow-primary/5 transition-transform hover:scale-110 hover:z-10 cursor-pointer flex items-center justify-center text-white text-sm lg:text-base xl:text-lg font-bold",
+            "w-9 h-9 lg:w-10 lg:h-10 xl:w-12 xl:h-12 rounded-lg lg:rounded-xl xl:rounded-2xl border-[2px] lg:border-[3px] border-background shadow-lg shadow-primary/5 transition-transform hover:scale-110 hover:z-10 cursor-pointer flex items-center justify-center text-white text-xs lg:text-sm xl:text-base font-bold",
             getAvatarColor(user.id),
           )}
           onMouseEnter={() => setIsOpen(true)}
@@ -309,25 +309,25 @@ function DashboardBentoGrid({
     <div className="grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6">
       {/* 1. Main Stat Card (Income Project Style) */}
       <BentoCard
-        className="col-span-12 lg:col-span-8 flex flex-col gap-3 sm:gap-4 lg:gap-5 xl:gap-6"
-        padding="p-4 sm:p-5 lg:p-6 xl:p-8"
+        className="col-span-12 lg:col-span-8 flex flex-col gap-3 sm:gap-4 lg:gap-4 xl:gap-6"
+        padding="p-4 sm:p-5 lg:p-5 xl:p-8"
       >
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 sm:gap-0">
           <div className="flex flex-col gap-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h3 className="text-base sm:text-xl font-bold text-foreground">
+              <h3 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold text-foreground">
                 Total Unit Terpasang
               </h3>
-              <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/10 text-primary text-[9px] sm:text-[10px] font-bold rounded-full">
+              <span className="px-2 py-0.5 bg-primary/10 text-primary text-[8px] sm:text-[9px] lg:text-[10px] font-bold rounded-full">
                 Provinsi Jambi
               </span>
             </div>
-            <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs sm:text-sm">
-              <TrendingUp size={12} className="sm:w-[14px] sm:h-[14px]" />
+            <div className="flex items-center gap-2 text-emerald-500 font-bold text-[10px] sm:text-xs">
+              <TrendingUp size={10} className="sm:w-3 sm:h-3" />
               +12.8%
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2">
             <div className="bg-muted px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-semibold text-muted-foreground">
               Tahun 2026
             </div>
@@ -368,7 +368,7 @@ function DashboardBentoGrid({
           </div>
 
           {/* Waveform-like Visual for Stats */}
-          <div className="hidden sm:flex flex-1 items-end justify-between h-24 sm:h-32 px-2 sm:px-4 relative max-w-md">
+          <div className="hidden lg:flex flex-1 items-end justify-between h-20 lg:h-24 xl:h-32 px-2 relative max-w-xs xl:max-w-md">
             <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
               <div className="w-full border-t border-dashed border-muted/50"></div>
               <div className="w-full border-t border-dashed border-muted/50"></div>
@@ -384,7 +384,7 @@ function DashboardBentoGrid({
                   animate={{ height: `${h}%` }}
                   transition={{ duration: 1, delay: i * 0.1 }}
                   className={cn(
-                    "w-4 sm:w-6 md:w-8 rounded-t-lg transition-all duration-500",
+                    "w-3 lg:w-4 xl:w-6 rounded-t-md lg:rounded-t-lg transition-all duration-500",
                     i === 3
                       ? "bg-primary shadow-lg shadow-primary/20"
                       : "bg-muted group-hover:bg-primary/40",
@@ -399,10 +399,10 @@ function DashboardBentoGrid({
       {/* 2. Operational Progress (Share Progress style) */}
       <BentoCard
         className="col-span-12 sm:col-span-6 lg:col-span-4 flex flex-col justify-between"
-        padding="p-4 sm:p-5 lg:p-6 xl:p-8"
+        padding="p-4 sm:p-5 lg:p-5 xl:p-8"
       >
         <div className="flex justify-between items-start">
-          <h3 className="text-base sm:text-lg lg:text-xl font-bold leading-tight text-foreground">
+          <h3 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold leading-tight text-foreground">
             Status
             <br />
             Operasional
@@ -414,8 +414,8 @@ function DashboardBentoGrid({
           </Link>
         </div>
 
-        <div className="relative py-2 sm:py-3 lg:py-4 flex items-center justify-center">
-          <svg className="w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 xl:w-48 xl:h-48 transform -rotate-90">
+        <div className="relative py-2 sm:py-3 flex items-center justify-center">
+          <svg className="w-28 h-28 sm:w-32 sm:h-32 lg:w-36 lg:h-36 xl:w-44 xl:h-44 transform -rotate-90">
             <circle
               cx="50%"
               cy="50%"
@@ -439,7 +439,7 @@ function DashboardBentoGrid({
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
+            <span className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-foreground">
               {operationalPercentage}%
             </span>
             <span className="text-[9px] sm:text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
@@ -863,28 +863,28 @@ function HeaderUsers({ usersPromise }: { usersPromise: UsersPromise }) {
   const safeUsers = users || [];
 
   return (
-    <div className="hidden xl:flex flex-col items-end gap-1.5 lg:gap-2 mr-1 lg:mr-2">
-      <span className="text-[8px] lg:text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.15em] lg:tracking-[0.2em] leading-none mb-0.5 lg:mb-1">
+    <div className="hidden lg:flex flex-col items-end gap-1 lg:gap-1.5 mr-1 lg:mr-2">
+      <span className="text-[8px] lg:text-[8px] xl:text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.12em] lg:tracking-[0.15em] leading-none mb-0.5">
         Staf Terdaftar
       </span>
-      <div className="flex items-center gap-2 lg:gap-3">
+      <div className="flex items-center gap-2">
         <div className="flex flex-col items-end">
-          <span className="text-foreground font-bold text-[9px] lg:text-[10px] leading-none mb-0.5">
+          <span className="text-foreground font-bold text-[8px] lg:text-[9px] xl:text-[10px] leading-none mb-0.5">
             {safeUsers.length > 0 ? safeUsers[0].name.split(" ")[0] : "Staf"}
           </span>
-          <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">
+          <span className="text-[7px] lg:text-[8px] xl:text-[9px] text-muted-foreground font-medium">
             {safeUsers.length} Personil Aktif
           </span>
         </div>
-        <div className="flex -space-x-3 lg:-space-x-4">
+        <div className="flex -space-x-2.5 lg:-space-x-3 xl:-space-x-4">
           {safeUsers.map((user) => (
             <UserAvatarWithPopover key={user.id} user={user} />
           ))}
           <Link
             href="/users"
-            className="w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 rounded-xl lg:rounded-2xl border-[3px] lg:border-[4px] border-background bg-muted/50 flex items-center justify-center text-primary/60 hover:bg-primary/10 hover:text-primary transition-all shadow-xl shadow-primary/5 cursor-pointer"
+            className="w-9 h-9 lg:w-10 lg:h-10 xl:w-12 xl:h-12 rounded-lg lg:rounded-xl xl:rounded-2xl border-[2px] lg:border-[3px] border-background bg-muted/50 flex items-center justify-center text-primary/60 hover:bg-primary/10 hover:text-primary transition-all shadow-lg shadow-primary/5 cursor-pointer"
           >
-            <Plus size={18} className="lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
+            <Plus size={14} className="lg:w-4 lg:h-4 xl:w-5 xl:h-5" />
           </Link>
         </div>
       </div>
@@ -902,18 +902,18 @@ export function DashboardClient({
   const greeting = getGreeting();
 
   return (
-    <div className="min-h-screen bg-background pt-4 lg:pt-8 font-sans selection:bg-primary/20 selection:text-primary">
-      <div className="max-w-[1700px] mx-auto space-y-8 lg:space-y-12 animate-fade-in px-4 lg:px-6 xl:px-4">
+    <div className="min-h-screen bg-background pt-4 lg:pt-6 xl:pt-8 font-sans selection:bg-primary/20 selection:text-primary">
+      <div className="max-w-[1700px] mx-auto space-y-6 lg:space-y-8 xl:space-y-12 animate-fade-in px-4 sm:px-6 lg:px-8 xl:px-6">
         {/* Header Section (Premium Bento Inspired) */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-6 xl:gap-8 mb-2 lg:mb-4">
-          <div>
-            <div className="flex items-center gap-2 sm:gap-3 mb-2 lg:mb-3 xl:mb-4">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-4 xl:gap-8 mb-2 lg:mb-4">
+          <div className="flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 lg:mb-2 xl:mb-4">
               <div className="h-1 w-6 sm:w-8 lg:w-10 xl:w-12 bg-primary rounded-full" />
-              <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.15em] sm:tracking-[0.2em] lg:tracking-[0.25em] xl:tracking-[0.3em]">
+              <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.15em] sm:tracking-[0.2em] lg:tracking-[0.2em] xl:tracking-[0.3em]">
                 Ringkasan Eksekutif
               </span>
             </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground tracking-tighter mb-1 select-none">
+            <h1 className="text-2xl sm:text-3xl lg:text-3xl xl:text-5xl font-black text-foreground tracking-tighter mb-1 select-none">
               {greeting},{" "}
               <span className="text-primary/80">{user?.name || "Admin"}</span>
             </h1>
@@ -926,29 +926,29 @@ export function DashboardClient({
                 Sesi Aktif
               </span>
             </div>
-            <p className="text-muted-foreground text-xs sm:text-sm lg:text-base font-bold tracking-tight">
+            <p className="text-muted-foreground text-xs sm:text-sm lg:text-sm xl:text-base font-bold tracking-tight max-w-md">
               Pantau infrastruktur energi terbarukan Provinsi Jambi secara
               real-time.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 lg:gap-6">
+          <div className="flex flex-wrap items-center gap-3 lg:gap-4 xl:gap-6 flex-shrink-0">
             <Suspense
               fallback={
-                <div className="hidden xl:flex flex-col items-end gap-2 mr-2">
-                  <span className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.2em] leading-none mb-1">
+                <div className="hidden lg:flex flex-col items-end gap-1 mr-1 lg:mr-2">
+                  <span className="text-[8px] lg:text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.15em] leading-none mb-0.5">
                     Staf Terdaftar
                   </span>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2">
                     <div className="flex flex-col items-end gap-1">
-                      <div className="w-12 h-2 bg-muted animate-pulse rounded-full" />
-                      <div className="w-16 h-2 bg-muted animate-pulse rounded-full opacity-50" />
+                      <div className="w-10 h-2 bg-muted animate-pulse rounded-full" />
+                      <div className="w-14 h-2 bg-muted animate-pulse rounded-full opacity-50" />
                     </div>
-                    <div className="flex -space-x-4">
+                    <div className="flex -space-x-3">
                       {[1, 2, 3, 4, 5].map((i) => (
                         <div
                           key={i}
-                          className="w-12 h-12 xl:w-14 xl:h-14 rounded-xl xl:rounded-2xl border-[3px] xl:border-[4px] border-background bg-muted animate-pulse"
+                          className="w-10 h-10 lg:w-11 lg:h-11 xl:w-12 xl:h-12 rounded-xl border-[2px] lg:border-[3px] border-background bg-muted animate-pulse"
                         />
                       ))}
                     </div>
@@ -959,10 +959,10 @@ export function DashboardClient({
               <HeaderUsers usersPromise={usersPromise} />
             </Suspense>
 
-            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 bg-muted/20 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl lg:rounded-3xl border border-border/40 backdrop-blur-sm w-full sm:w-auto">
+            <div className="flex items-center gap-2 sm:gap-2 lg:gap-3 bg-muted/20 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-border/40 backdrop-blur-sm w-full sm:w-auto">
               <Suspense
                 fallback={
-                  <div className="w-20 sm:w-24 lg:w-32 xl:w-40 h-9 sm:h-10 lg:h-12 bg-muted animate-pulse rounded-lg sm:rounded-xl lg:rounded-2xl" />
+                  <div className="w-20 sm:w-24 lg:w-28 xl:w-32 h-9 sm:h-10 lg:h-11 bg-muted animate-pulse rounded-lg sm:rounded-xl" />
                 }
               >
                 <ExportButtonWrapper
@@ -974,10 +974,10 @@ export function DashboardClient({
               <Link href="/report/new" className="flex-1 sm:flex-none">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 rounded-lg sm:rounded-xl lg:rounded-[1.25rem] px-3 sm:px-4 lg:px-6 xl:px-8 h-9 sm:h-10 lg:h-12 xl:h-14 font-black text-[10px] sm:text-xs lg:text-sm tracking-wide transition-all shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 group"
+                  className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 rounded-lg sm:rounded-xl lg:rounded-xl px-3 sm:px-4 lg:px-5 xl:px-8 h-9 sm:h-10 lg:h-11 xl:h-12 font-black text-[10px] sm:text-xs tracking-wide transition-all shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 group"
                 >
-                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 mr-1.5 sm:mr-2 lg:mr-3 group-hover:rotate-90 transition-transform duration-300" />
-                  <span className="hidden xs:inline">BUAT</span> LAPORAN
+                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1.5 sm:mr-2 group-hover:rotate-90 transition-transform duration-300" />
+                  LAPORAN
                 </Button>
               </Link>
             </div>
