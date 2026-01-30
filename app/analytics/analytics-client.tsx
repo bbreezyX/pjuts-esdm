@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -65,6 +66,12 @@ function StatCard({
 }
 
 export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Prepare trend data for chart
   const trendData = trend.labels.map((label, index) => ({
     month: label,
@@ -121,6 +128,13 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
     return null;
   };
 
+  // Chart loading placeholder
+  const ChartPlaceholder = () => (
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="animate-pulse bg-slate-100 rounded-lg w-full h-full min-h-[200px]" />
+    </div>
+  );
+
   return (
     <div className="space-y-8 p-1">
       {/* Summary Cards */}
@@ -163,7 +177,8 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
             <p className="text-slate-500 mt-1">Aktivitas laporan per bulan</p>
           </div>
           <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
+            {!isMounted ? <ChartPlaceholder /> : (
+            <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={200}>
               <LineChart data={trendData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis
@@ -193,6 +208,7 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
                 />
               </LineChart>
             </ResponsiveContainer>
+            )}
           </div>
         </div>
 
@@ -206,7 +222,8 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
           <div className="flex flex-col md:flex-row items-center justify-center gap-x-12 gap-y-8 min-h-[300px]">
              {/* Chart Section */}
              <div className="relative w-[220px] h-[220px] md:w-[260px] md:h-[260px] flex-shrink-0">
-                <ResponsiveContainer width="100%" height="100%">
+                {!isMounted ? <ChartPlaceholder /> : (
+                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={100}>
                   <PieChart>
                     <Pie
                       data={statusData}
@@ -226,6 +243,7 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
                     <Tooltip content={<CustomTooltip />} />
                   </PieChart>
                 </ResponsiveContainer>
+                )}
                 
                 {/* Center Stats */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
@@ -279,7 +297,8 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
           </Badge>
         </div>
         <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
+            {!isMounted ? <ChartPlaceholder /> : (
+            <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={200}>
               <BarChart
                 data={provinceChartData}
                 layout="vertical"
@@ -321,6 +340,7 @@ export function AnalyticsCharts({ stats, provinces, trend }: AnalyticsChartsProp
                 />
               </BarChart>
             </ResponsiveContainer>
+            )}
         </div>
         
         {/* Legend */}

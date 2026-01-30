@@ -420,10 +420,28 @@ function MapContainerComponent({
     try {
       const L = leafletRef.current;
       const map = mapRef.current;
-      const bounds = L.latLngBounds(
-        filteredPoints.map((p) => [p.latitude, p.longitude]),
+      
+      // Filter out points with invalid coordinates
+      const validPoints = filteredPoints.filter(
+        (p) => 
+          typeof p.latitude === 'number' && 
+          typeof p.longitude === 'number' &&
+          !isNaN(p.latitude) && 
+          !isNaN(p.longitude) &&
+          p.latitude >= -90 && p.latitude <= 90 &&
+          p.longitude >= -180 && p.longitude <= 180
       );
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+      
+      if (validPoints.length === 0) return;
+      
+      const bounds = L.latLngBounds(
+        validPoints.map((p) => [p.latitude, p.longitude]),
+      );
+      
+      // Check if bounds are valid before fitting
+      if (bounds.isValid()) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
+      }
     } catch (err) {
       console.error("Error fitting bounds:", err);
     }

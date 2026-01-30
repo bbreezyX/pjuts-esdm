@@ -26,6 +26,14 @@ const APP_URL = (
   "http://localhost:3000"
 ).replace(/\/$/, "");
 
+// Static assets URL for email images (must be publicly accessible)
+// Use R2_PUBLIC_URL or assets domain - emails cannot load from localhost
+const ASSETS_URL = (
+  process.env.R2_PUBLIC_URL ||
+  process.env.NEXT_PUBLIC_APP_URL ||
+  "https://assets.esdm.cloud"
+).replace(/\/$/, "");
+
 // ============================================
 // TYPES
 // ============================================
@@ -95,9 +103,8 @@ function BaseLayout(props: {
   children: string;
   previewText: string;
 }) {
-  // Use a reliable placeholder if local dev, assuming public folder is served
-  // In production, APP_URL should point to the actual domain where images are hosted
-  const logoUrl = `${APP_URL}/logo-esdm.png`;
+  // Use ASSETS_URL for email images - must be publicly accessible (not localhost)
+  const logoUrl = `${ASSETS_URL}/logo-esdm.png`;
 
   return `
 <!DOCTYPE html>

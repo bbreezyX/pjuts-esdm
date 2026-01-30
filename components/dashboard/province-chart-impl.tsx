@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
     BarChart,
     Bar,
@@ -24,6 +24,11 @@ interface ProvinceChartProps {
 }
 
 export function ProvinceChartImpl({ data }: ProvinceChartProps) {
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
     // Take top 8 provinces by total units
     const chartData = data.slice(0, 8).map((item) => ({
         name: item.province.length > 15
@@ -77,10 +82,20 @@ export function ProvinceChartImpl({ data }: ProvinceChartProps) {
         return null;
     };
 
+    if (!isMounted) {
+        return (
+            <div className="w-full h-full flex flex-col">
+                <div className="flex-1 w-full flex items-center justify-center">
+                    <div className="animate-pulse bg-muted rounded-lg w-full h-full min-h-[200px]" />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="w-full h-full flex flex-col">
-            <div className="flex-1 w-full">
-                <ResponsiveContainer width="100%" height="100%">
+            <div className="flex-1 w-full min-h-[200px]">
+                <ResponsiveContainer width="100%" height="100%" minWidth={100} minHeight={200}>
                     <BarChart
                         data={chartData}
                         layout="vertical"

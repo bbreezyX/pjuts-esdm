@@ -137,6 +137,7 @@ export function Navbar({ user }: NavbarProps) {
                     width={42}
                     height={42}
                     className="w-10 h-10 object-contain drop-shadow-md transition-all duration-300 group-hover:rotate-6 group-hover:scale-110"
+                    priority
                   />
                   <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-[3px] border-card animate-pulse" />
                 </div>
@@ -247,7 +248,7 @@ export function Navbar({ user }: NavbarProps) {
           <div className="relative w-full max-w-sm ml-auto bg-card shadow-2xl rounded-3xl border border-border overflow-hidden animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between p-6 border-b border-border">
               <div className="flex items-center gap-3">
-                <Image src="/logo-esdm.png" alt="Logo" width={32} height={32} />
+                <Image src="/logo-esdm.png" alt="Logo" width={32} height={32} priority />
                 <span className="font-bold text-foreground">Menu Navigasi</span>
               </div>
               <Button

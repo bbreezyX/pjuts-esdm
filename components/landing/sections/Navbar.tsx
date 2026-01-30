@@ -84,6 +84,7 @@ export const Navbar = () => {
               height={40}
               className="w-full h-full object-contain"
               alt="ESDM Logo"
+              priority
             />
           </div>
           <div className="flex flex-col -space-y-1">
