@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef, useMemo, memo, useCallback } from "react";
+import type * as L from "leaflet";
 import { MapPoint } from "@/types";
 import {
   BASE_LAYERS,
@@ -436,10 +437,10 @@ function MapContainerComponent({
       
       const bounds = L.latLngBounds(
         validPoints.map((p) => [p.latitude, p.longitude] as [number, number]),
-      );
+      ) as L.LatLngBounds;
       
       // Check if bounds are valid before fitting
-      if (bounds && typeof bounds.isValid === 'function' && bounds.isValid()) {
+      if (bounds && bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
       }
     } catch (err) {
