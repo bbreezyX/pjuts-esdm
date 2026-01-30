@@ -426,14 +426,14 @@ export function GisToolsPanel({
               }
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
               className={cn(
-                "fixed z-[1002]",
+                "absolute z-[1002]",
                 "bg-gradient-to-b from-white via-white to-slate-50",
                 "shadow-2xl overflow-hidden flex flex-col",
                 // Desktop Styles
-                "sm:right-4 sm:top-[90px] sm:bottom-4 sm:w-[400px]",
+                "sm:right-4 sm:top-4 sm:bottom-4 sm:w-[400px]",
                 "sm:rounded-2xl sm:border border-slate-200/50",
                 // Mobile Styles
-                "inset-x-4 bottom-4 h-[85vh]",
+                "inset-x-4 bottom-4 top-20",
                 "rounded-3xl border border-slate-200/50",
               )}
             >
@@ -445,7 +445,7 @@ export function GisToolsPanel({
                 <div className="w-12 h-1.5 rounded-full bg-slate-200/80" />
               </div>
               {/* Header */}
-              <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-white/80 backdrop-blur-md">
+              <div className="flex items-center justify-between p-5 border-b border-slate-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#003366] to-[#335f87] flex items-center justify-center shadow-lg shadow-blue-500/20">
                     <Compass className="w-5 h-5 text-white" />
@@ -871,7 +871,7 @@ export function GisToolsPanel({
               </div>
 
               {/* Footer */}
-              <div className="p-4 border-t border-slate-100 bg-white/80 backdrop-blur-md">
+              <div className="p-4 border-t border-slate-100">
                 <div className="flex items-center justify-between text-xs text-slate-500">
                   <span className="flex items-center gap-1">
                     <Ruler className="w-3 h-3" />
