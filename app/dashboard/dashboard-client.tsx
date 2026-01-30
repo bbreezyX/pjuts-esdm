@@ -243,7 +243,7 @@ function UserAvatarWithPopover({ user }: { user: DashboardUser }) {
       <PopoverTrigger asChild>
         <div
           className={cn(
-            "w-14 h-14 rounded-2xl border-[4px] border-background shadow-xl shadow-primary/5 transition-transform hover:scale-110 hover:z-10 cursor-pointer flex items-center justify-center text-white text-lg font-bold",
+            "w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 rounded-xl lg:rounded-2xl border-[3px] lg:border-[4px] border-background shadow-xl shadow-primary/5 transition-transform hover:scale-110 hover:z-10 cursor-pointer flex items-center justify-center text-white text-sm lg:text-base xl:text-lg font-bold",
             getAvatarColor(user.id),
           )}
           onMouseEnter={() => setIsOpen(true)}
@@ -306,11 +306,11 @@ function DashboardBentoGrid({
   const safeActivities = activities || [];
 
   return (
-    <div className="grid grid-cols-12 gap-6">
+    <div className="grid grid-cols-12 gap-4 lg:gap-5 xl:gap-6">
       {/* 1. Main Stat Card (Income Project Style) */}
       <BentoCard
-        className="col-span-12 lg:col-span-8 flex flex-col gap-4 sm:gap-6"
-        padding="p-5 sm:p-8"
+        className="col-span-12 lg:col-span-8 flex flex-col gap-3 sm:gap-4 lg:gap-5 xl:gap-6"
+        padding="p-4 sm:p-5 lg:p-6 xl:p-8"
       >
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 sm:gap-0">
           <div className="flex flex-col gap-1">
@@ -399,10 +399,10 @@ function DashboardBentoGrid({
       {/* 2. Operational Progress (Share Progress style) */}
       <BentoCard
         className="col-span-12 sm:col-span-6 lg:col-span-4 flex flex-col justify-between"
-        padding="p-5 sm:p-8"
+        padding="p-4 sm:p-5 lg:p-6 xl:p-8"
       >
         <div className="flex justify-between items-start">
-          <h3 className="text-lg sm:text-xl font-bold leading-tight text-foreground">
+          <h3 className="text-base sm:text-lg lg:text-xl font-bold leading-tight text-foreground">
             Status
             <br />
             Operasional
@@ -414,8 +414,8 @@ function DashboardBentoGrid({
           </Link>
         </div>
 
-        <div className="relative py-3 sm:py-4 flex items-center justify-center">
-          <svg className="w-36 h-36 sm:w-48 sm:h-48 transform -rotate-90">
+        <div className="relative py-2 sm:py-3 lg:py-4 flex items-center justify-center">
+          <svg className="w-32 h-32 sm:w-36 sm:h-36 lg:w-40 lg:h-40 xl:w-48 xl:h-48 transform -rotate-90">
             <circle
               cx="50%"
               cy="50%"
@@ -439,7 +439,7 @@ function DashboardBentoGrid({
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-3xl sm:text-4xl font-bold text-foreground">
+            <span className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground">
               {operationalPercentage}%
             </span>
             <span className="text-[9px] sm:text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">
@@ -487,8 +487,8 @@ function DashboardBentoGrid({
 
       {/* 3. Issues & Reminders (Reminders style) */}
       <BentoCard
-        className="col-span-12 sm:col-span-6 lg:col-span-4 flex flex-col gap-4 sm:gap-6"
-        padding="p-5 sm:p-8"
+        className="col-span-12 sm:col-span-6 lg:col-span-4 flex flex-col gap-3 sm:gap-4 lg:gap-5 xl:gap-6"
+        padding="p-4 sm:p-5 lg:p-6 xl:p-8"
       >
         <div className="flex justify-between items-center">
           <h3 className="text-base sm:text-lg font-bold text-foreground">
@@ -556,7 +556,7 @@ function DashboardBentoGrid({
       </BentoCard>
 
       {/* 4. Province Chart (Meeting Schedule style header + Large Grid) */}
-      <BentoCard className="col-span-12 lg:col-span-8" padding="p-5 sm:p-8">
+      <BentoCard className="col-span-12 lg:col-span-8" padding="p-4 sm:p-5 lg:p-6 xl:p-8">
         <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
           <div>
             <h3 className="text-base sm:text-xl font-bold mb-1 text-foreground">
@@ -617,14 +617,14 @@ function DashboardBentoGrid({
           </div>
         </div>
 
-        <div className="h-[260px] sm:h-[340px] w-full">
+        <div className="h-[220px] sm:h-[260px] lg:h-[300px] xl:h-[340px] w-full">
           <ProvinceChart data={safeProvinces} />
         </div>
       </BentoCard>
 
       {/* 5. Detail Table (Project Outsourcing style header + Table) */}
       <BentoCard className="col-span-12 lg:col-span-8" padding="p-0">
-        <div className="p-4 sm:p-8 pb-3 sm:pb-4">
+        <div className="p-4 sm:p-5 lg:p-6 xl:p-8 pb-2 sm:pb-3 lg:pb-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
             <div className="flex flex-col gap-1">
               <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/10 text-primary text-[9px] sm:text-[10px] font-bold rounded-full w-fit">
@@ -645,8 +645,8 @@ function DashboardBentoGrid({
           </div>
         </div>
 
-        <div className="overflow-x-auto px-4 sm:px-8 pb-4 sm:pb-8">
-          <table className="w-full text-left border-separate border-spacing-y-2 sm:border-spacing-y-3 min-w-[500px]">
+        <div className="overflow-x-auto px-4 sm:px-5 lg:px-6 xl:px-8 pb-4 sm:pb-5 lg:pb-6 xl:pb-8">
+          <table className="w-full text-left border-separate border-spacing-y-1.5 sm:border-spacing-y-2 lg:border-spacing-y-3 min-w-[500px]">
             <thead>
               <tr className="text-muted-foreground text-[9px] sm:text-[10px] font-bold uppercase tracking-widest">
                 <th className="px-3 sm:px-4 py-2">Kabupaten/Kota</th>
@@ -706,8 +706,8 @@ function DashboardBentoGrid({
 
       {/* 6. Reports Summary (Project Outsourcing style) */}
       <BentoCard
-        className="col-span-12 lg:col-span-4 flex flex-col justify-between gap-4 sm:gap-6"
-        padding="p-5 sm:p-8"
+        className="col-span-12 lg:col-span-4 flex flex-col justify-between gap-3 sm:gap-4 lg:gap-5 xl:gap-6"
+        padding="p-4 sm:p-5 lg:p-6 xl:p-8"
       >
         <div>
           <span className="px-2 sm:px-3 py-0.5 sm:py-1 bg-primary/10 text-primary text-[9px] sm:text-[10px] font-bold rounded-full mb-2 sm:mb-3 inline-block uppercase tracking-wider">
@@ -774,8 +774,8 @@ function DashboardBentoGrid({
 
       {/* 7. Activity Feed (Unified Bottom Card or separate?) */}
       <BentoCard
-        className="col-span-12 flex flex-col gap-5 sm:gap-8"
-        padding="p-5 sm:p-8"
+        className="col-span-12 flex flex-col gap-4 sm:gap-5 lg:gap-6 xl:gap-8"
+        padding="p-4 sm:p-5 lg:p-6 xl:p-8"
       >
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-0">
           <div>
@@ -811,7 +811,7 @@ function DashboardBentoGrid({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 xl:gap-12">
           <div className="lg:col-span-2">
             <ActivityFeed
               activities={safeActivities.map((a) => ({
@@ -863,28 +863,28 @@ function HeaderUsers({ usersPromise }: { usersPromise: UsersPromise }) {
   const safeUsers = users || [];
 
   return (
-    <div className="hidden xl:flex flex-col items-end gap-2 mr-2">
-      <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] leading-none mb-1">
+    <div className="hidden xl:flex flex-col items-end gap-1.5 lg:gap-2 mr-1 lg:mr-2">
+      <span className="text-[8px] lg:text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.15em] lg:tracking-[0.2em] leading-none mb-0.5 lg:mb-1">
         Staf Terdaftar
       </span>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2 lg:gap-3">
         <div className="flex flex-col items-end">
-          <span className="text-foreground font-bold text-[10px] leading-none mb-0.5">
+          <span className="text-foreground font-bold text-[9px] lg:text-[10px] leading-none mb-0.5">
             {safeUsers.length > 0 ? safeUsers[0].name.split(" ")[0] : "Staf"}
           </span>
-          <span className="text-[9px] text-muted-foreground font-medium">
+          <span className="text-[8px] lg:text-[9px] text-muted-foreground font-medium">
             {safeUsers.length} Personil Aktif
           </span>
         </div>
-        <div className="flex -space-x-4">
+        <div className="flex -space-x-3 lg:-space-x-4">
           {safeUsers.map((user) => (
             <UserAvatarWithPopover key={user.id} user={user} />
           ))}
           <Link
             href="/users"
-            className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted/50 flex items-center justify-center text-primary/60 hover:bg-primary/10 hover:text-primary transition-all shadow-xl shadow-primary/5 cursor-pointer"
+            className="w-10 h-10 lg:w-12 lg:h-12 xl:w-14 xl:h-14 rounded-xl lg:rounded-2xl border-[3px] lg:border-[4px] border-background bg-muted/50 flex items-center justify-center text-primary/60 hover:bg-primary/10 hover:text-primary transition-all shadow-xl shadow-primary/5 cursor-pointer"
           >
-            <Plus size={24} />
+            <Plus size={18} className="lg:w-5 lg:h-5 xl:w-6 xl:h-6" />
           </Link>
         </div>
       </div>
@@ -902,18 +902,18 @@ export function DashboardClient({
   const greeting = getGreeting();
 
   return (
-    <div className="min-h-screen bg-background pt-8 font-sans selection:bg-primary/20 selection:text-primary">
-      <div className="max-w-[1700px] mx-auto space-y-12 animate-fade-in px-4">
+    <div className="min-h-screen bg-background pt-4 lg:pt-8 font-sans selection:bg-primary/20 selection:text-primary">
+      <div className="max-w-[1700px] mx-auto space-y-8 lg:space-y-12 animate-fade-in px-4 lg:px-6 xl:px-4">
         {/* Header Section (Premium Bento Inspired) */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 lg:gap-8 mb-4">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-6 xl:gap-8 mb-2 lg:mb-4">
           <div>
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div className="h-1 w-8 sm:w-12 bg-primary rounded-full" />
-              <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.2em] sm:tracking-[0.3em]">
+            <div className="flex items-center gap-2 sm:gap-3 mb-2 lg:mb-3 xl:mb-4">
+              <div className="h-1 w-6 sm:w-8 lg:w-10 xl:w-12 bg-primary rounded-full" />
+              <span className="text-[9px] sm:text-[10px] font-black text-primary uppercase tracking-[0.15em] sm:tracking-[0.2em] lg:tracking-[0.25em] xl:tracking-[0.3em]">
                 Ringkasan Eksekutif
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tighter mb-1 select-none">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-black text-foreground tracking-tighter mb-1 select-none">
               {greeting},{" "}
               <span className="text-primary/80">{user?.name || "Admin"}</span>
             </h1>
@@ -926,13 +926,13 @@ export function DashboardClient({
                 Sesi Aktif
               </span>
             </div>
-            <p className="text-muted-foreground text-sm sm:text-base font-bold tracking-tight">
+            <p className="text-muted-foreground text-xs sm:text-sm lg:text-base font-bold tracking-tight">
               Pantau infrastruktur energi terbarukan Provinsi Jambi secara
               real-time.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-6">
+          <div className="flex flex-wrap items-center gap-4 lg:gap-6">
             <Suspense
               fallback={
                 <div className="hidden xl:flex flex-col items-end gap-2 mr-2">
@@ -948,7 +948,7 @@ export function DashboardClient({
                       {[1, 2, 3, 4, 5].map((i) => (
                         <div
                           key={i}
-                          className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted animate-pulse"
+                          className="w-12 h-12 xl:w-14 xl:h-14 rounded-xl xl:rounded-2xl border-[3px] xl:border-[4px] border-background bg-muted animate-pulse"
                         />
                       ))}
                     </div>
@@ -959,10 +959,10 @@ export function DashboardClient({
               <HeaderUsers usersPromise={usersPromise} />
             </Suspense>
 
-            <div className="flex items-center gap-2 sm:gap-4 bg-muted/20 p-1.5 sm:p-2 rounded-2xl sm:rounded-3xl border border-border/40 backdrop-blur-sm w-full sm:w-auto">
+            <div className="flex items-center gap-2 sm:gap-3 lg:gap-4 bg-muted/20 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl lg:rounded-3xl border border-border/40 backdrop-blur-sm w-full sm:w-auto">
               <Suspense
                 fallback={
-                  <div className="w-24 sm:w-40 h-10 sm:h-12 bg-muted animate-pulse rounded-xl sm:rounded-2xl" />
+                  <div className="w-20 sm:w-24 lg:w-32 xl:w-40 h-9 sm:h-10 lg:h-12 bg-muted animate-pulse rounded-lg sm:rounded-xl lg:rounded-2xl" />
                 }
               >
                 <ExportButtonWrapper
@@ -974,9 +974,9 @@ export function DashboardClient({
               <Link href="/report/new" className="flex-1 sm:flex-none">
                 <Button
                   size="lg"
-                  className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 rounded-xl sm:rounded-[1.25rem] px-4 sm:px-8 h-10 sm:h-14 font-black text-xs sm:text-sm tracking-wide transition-all shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 group"
+                  className="w-full sm:w-auto bg-primary text-white hover:bg-primary/90 rounded-lg sm:rounded-xl lg:rounded-[1.25rem] px-3 sm:px-4 lg:px-6 xl:px-8 h-9 sm:h-10 lg:h-12 xl:h-14 font-black text-[10px] sm:text-xs lg:text-sm tracking-wide transition-all shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 group"
                 >
-                  <Plus className="h-4 w-4 sm:h-5 sm:w-5 mr-2 sm:mr-3 group-hover:rotate-90 transition-transform duration-300" />
+                  <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4 lg:h-5 lg:w-5 mr-1.5 sm:mr-2 lg:mr-3 group-hover:rotate-90 transition-transform duration-300" />
                   <span className="hidden xs:inline">BUAT</span> LAPORAN
                 </Button>
               </Link>
