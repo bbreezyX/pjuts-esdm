@@ -1,9 +1,22 @@
 "use client";
 
-import { use, useState, useEffect, Suspense, useMemo } from "react";
+import {
+  use,
+  useState,
+  useEffect,
+  Suspense,
+  useMemo,
+  useCallback,
+} from "react";
 import dynamic from "next/dynamic";
 import { PageHeader } from "@/components/layout";
 import { MapFilters, MapLegend, UnitDetailDrawer } from "@/components/map";
+import { GisToolsPanel } from "@/components/map/gis-tools-panel";
+import {
+  LayerSwitcher,
+  type BaseLayerType,
+  type OverlayType,
+} from "@/components/map/layer-switcher";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPoint } from "@/types";
@@ -13,9 +26,16 @@ import { DashboardStats, ActionResult } from "@/app/actions/dashboard";
 type PointsPromise = Promise<ActionResult<MapPoint[]>>;
 type StatsPromise = Promise<ActionResult<DashboardStats>>;
 
+// Buffer configuration type
+interface BufferConfig {
+  center: [number, number];
+  radiusKm: number;
+}
+
 // Dynamic import for Leaflet (client-side only)
 const MapContainer = dynamic(
-  () => import("@/components/map/map-container").then((mod) => mod.MapContainer),
+  () =>
+    import("@/components/map/map-container").then((mod) => mod.MapContainer),
   {
     ssr: false,
     loading: () => (
@@ -27,7 +47,7 @@ const MapContainer = dynamic(
         </div>
       </div>
     ),
-  }
+  },
 );
 
 interface MapPageClientProps {
@@ -47,8 +67,8 @@ function FiltersSkeleton() {
   );
 }
 
-// Map content component that uses streaming data
-function MapContent({
+// Enhanced Map content with state management for layers
+function EnhancedMapContent({
   pointsPromise,
   selectedStatus,
   onPointClick,
@@ -57,15 +77,68 @@ function MapContent({
   selectedStatus: string | null;
   onPointClick: (point: MapPoint) => void;
 }) {
+  const [activeLayer, setActiveLayer] =
+    useState<BaseLayerType>("openstreetmap");
+  const [activeOverlays, setActiveOverlays] = useState<OverlayType[]>([]);
+  const [bufferConfig, setBufferConfig] = useState<BufferConfig | null>(null);
+  const [selectedPoint, setSelectedPoint] = useState<MapPoint | null>(null);
+
   const { data: points } = use(pointsPromise);
   const safePoints = useMemo(() => points || [], [points]);
 
+  const handlePointClick = useCallback(
+    (point: MapPoint) => {
+      setSelectedPoint(point);
+      onPointClick(point);
+    },
+    [onPointClick],
+  );
+
+  const handleBufferAnalysis = useCallback(
+    (radius: number, center: [number, number] | null) => {
+      if (center) {
+        setBufferConfig({ center, radiusKm: radius });
+      } else {
+        setBufferConfig(null);
+      }
+    },
+    [],
+  );
+
+  const handleLayerChange = useCallback((layer: BaseLayerType) => {
+    setActiveLayer(layer);
+  }, []);
+
+  const handleOverlayToggle = useCallback((overlay: OverlayType) => {
+    setActiveOverlays((prev) =>
+      prev.includes(overlay)
+        ? prev.filter((o) => o !== overlay)
+        : [...prev, overlay],
+    );
+  }, []);
+
   return (
-    <MapContainer
-      points={safePoints}
-      selectedStatus={selectedStatus}
-      onPointClick={onPointClick}
-    />
+    <>
+      <MapContainer
+        points={safePoints}
+        selectedStatus={selectedStatus}
+        onPointClick={handlePointClick}
+        activeLayer={activeLayer}
+        activeOverlays={activeOverlays}
+        bufferConfig={bufferConfig}
+      />
+      <GisToolsPanel
+        points={safePoints}
+        selectedPoint={selectedPoint}
+        onBufferAnalysis={handleBufferAnalysis}
+      />
+      <LayerSwitcher
+        activeLayer={activeLayer}
+        activeOverlays={activeOverlays}
+        onLayerChange={handleLayerChange}
+        onOverlayToggle={handleOverlayToggle}
+      />
+    </>
   );
 }
 
@@ -81,12 +154,15 @@ function FiltersSection({
 }) {
   const { data: stats } = use(statsPromise);
 
-  const counts = useMemo(() => ({
-    operational: stats?.operationalUnits || 0,
-    maintenanceNeeded: stats?.maintenanceNeeded || 0,
-    offline: stats?.offlineUnits || 0,
-    unverified: stats?.unverifiedUnits || 0,
-  }), [stats]);
+  const counts = useMemo(
+    () => ({
+      operational: stats?.operationalUnits || 0,
+      maintenanceNeeded: stats?.maintenanceNeeded || 0,
+      offline: stats?.offlineUnits || 0,
+      unverified: stats?.unverifiedUnits || 0,
+    }),
+    [stats],
+  );
 
   return (
     <MapFilters
@@ -97,7 +173,10 @@ function FiltersSection({
   );
 }
 
-export function MapPageClient({ pointsPromise, statsPromise }: MapPageClientProps) {
+export function MapPageClient({
+  pointsPromise,
+  statsPromise,
+}: MapPageClientProps) {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
 
@@ -109,13 +188,13 @@ export function MapPageClient({ pointsPromise, statsPromise }: MapPageClientProp
 
     window.addEventListener(
       "map-point-click",
-      handleMapPointClick as EventListener
+      handleMapPointClick as EventListener,
     );
 
     return () => {
       window.removeEventListener(
         "map-point-click",
-        handleMapPointClick as EventListener
+        handleMapPointClick as EventListener,
       );
     };
   }, []);
@@ -124,7 +203,7 @@ export function MapPageClient({ pointsPromise, statsPromise }: MapPageClientProp
     <>
       <PageHeader
         title="Peta PJUTS"
-        description="Visualisasi lokasi unit penerangan jalan umum tenaga surya"
+        description="Visualisasi lokasi unit penerangan jalan umum tenaga surya dengan fitur analisis GIS"
       />
 
       {/* Filters with Suspense */}
@@ -138,7 +217,7 @@ export function MapPageClient({ pointsPromise, statsPromise }: MapPageClientProp
         </Suspense>
       </div>
 
-      {/* Map Container with Suspense */}
+      {/* Map Container with GIS Tools */}
       <Card className="relative overflow-hidden">
         <div className="h-[600px]">
           <Suspense
@@ -152,7 +231,7 @@ export function MapPageClient({ pointsPromise, statsPromise }: MapPageClientProp
               </div>
             }
           >
-            <MapContent
+            <EnhancedMapContent
               pointsPromise={pointsPromise}
               selectedStatus={selectedStatus}
               onPointClick={(point) => setSelectedUnitId(point.id)}

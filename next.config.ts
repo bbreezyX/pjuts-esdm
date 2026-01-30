@@ -110,8 +110,9 @@ const nextConfig: NextConfig = {
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
-          "connect-src 'self' ws: wss: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
+          // Map tile providers: OSM, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
+          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://a.tile.opentopomap.org https://b.tile.opentopomap.org https://c.tile.opentopomap.org https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.thunderforest.com",
+          "connect-src 'self' ws: wss: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com",
           "frame-ancestors 'none'",
         ].join("; ")
       : [
@@ -119,8 +120,9 @@ const nextConfig: NextConfig = {
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
-          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com",
-          "connect-src 'self' https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com",
+          // Map tile providers: OSM, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
+          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://a.tile.opentopomap.org https://b.tile.opentopomap.org https://c.tile.opentopomap.org https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.thunderforest.com",
+          "connect-src 'self' https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com",
           "frame-ancestors 'none'",
         ].join("; ");
 

@@ -2,6 +2,12 @@
 
 import { useEffect, useState, useRef, useMemo, memo, useCallback } from "react";
 import { MapPoint } from "@/types";
+import {
+  BASE_LAYERS,
+  OVERLAY_LAYERS,
+  type BaseLayerType,
+  type OverlayType,
+} from "./layer-switcher";
 
 interface MapContainerProps {
   points: MapPoint[];
@@ -9,6 +15,12 @@ interface MapContainerProps {
   selectedStatus?: string | null;
   center?: [number, number];
   zoom?: number;
+  activeLayer?: BaseLayerType;
+  activeOverlays?: OverlayType[];
+  bufferConfig?: {
+    center: [number, number];
+    radiusKm: number;
+  } | null;
 }
 
 // Status colors
@@ -19,7 +31,7 @@ const STATUS_COLORS = {
   UNVERIFIED: "#94a3b8",
 } as const;
 
-// Leaflet types for CDN-loaded library
+// Types for Leaflet CDN library
 interface LeafletDivIcon {
   className: string;
   html: string;
@@ -35,7 +47,20 @@ interface LeafletMarker {
 interface LeafletLayerGroup {
   addTo: (map: LeafletMap) => LeafletLayerGroup;
   clearLayers: () => void;
-  addLayer: (marker: LeafletMarker) => void;
+  addLayer: (marker: LeafletMarker | LeafletCircle) => void;
+  removeLayer: (layer: LeafletCircle) => void;
+}
+
+interface LeafletCircle {
+  addTo: (map: LeafletMap) => LeafletCircle;
+  remove: () => void;
+  setLatLng: (latlng: [number, number]) => void;
+  setRadius: (radius: number) => void;
+}
+
+interface LeafletTileLayer {
+  addTo: (map: LeafletMap) => LeafletTileLayer;
+  remove: () => void;
 }
 
 interface LeafletMap {
@@ -43,24 +68,28 @@ interface LeafletMap {
   invalidateSize: () => void;
   fitBounds: (
     bounds: LeafletLatLngBounds,
-    options?: { padding?: [number, number]; maxZoom?: number }
+    options?: { padding?: [number, number]; maxZoom?: number },
   ) => void;
+  removeLayer: (layer: LeafletTileLayer | LeafletCircle) => void;
+  addLayer: (layer: LeafletTileLayer) => void;
 }
 
-// Leaflet bounds object - opaque type from CDN library
 type LeafletLatLngBounds = unknown;
 
 interface LeafletLibrary {
   map: (
     container: HTMLElement,
-    options?: Record<string, unknown>
+    options?: Record<string, unknown>,
   ) => LeafletMap;
   tileLayer: (
     url: string,
-    options?: Record<string, unknown>
-  ) => { addTo: (map: LeafletMap) => void };
+    options?: Record<string, unknown>,
+  ) => LeafletTileLayer;
   control: {
     zoom: (options?: { position?: string }) => {
+      addTo: (map: LeafletMap) => void;
+    };
+    scale: (options?: { position?: string; imperial?: boolean }) => {
       addTo: (map: LeafletMap) => void;
     };
   };
@@ -68,12 +97,22 @@ interface LeafletLibrary {
   divIcon: (options: LeafletDivIcon) => LeafletDivIcon;
   marker: (
     coords: [number, number],
-    options?: { icon?: LeafletDivIcon }
+    options?: { icon?: LeafletDivIcon },
   ) => LeafletMarker;
+  circle: (
+    coords: [number, number],
+    options?: {
+      radius?: number;
+      color?: string;
+      fillColor?: string;
+      fillOpacity?: number;
+      weight?: number;
+      dashArray?: string;
+    },
+  ) => LeafletCircle;
   latLngBounds: (coords: [number, number][]) => LeafletLatLngBounds;
 }
 
-// Extend Window interface for Leaflet
 declare global {
   interface Window {
     L?: LeafletLibrary;
@@ -90,6 +129,9 @@ function MapContainerComponent({
   selectedStatus,
   center = DEFAULT_CENTER,
   zoom = DEFAULT_ZOOM,
+  activeLayer = "openstreetmap",
+  activeOverlays = [],
+  bufferConfig = null,
 }: MapContainerProps) {
   const mapRef = useRef<LeafletMap | null>(null);
   const markersRef = useRef<LeafletLayerGroup | null>(null);
@@ -99,8 +141,10 @@ function MapContainerComponent({
   const [error, setError] = useState<string | null>(null);
   const leafletRef = useRef<LeafletLibrary | null>(null);
   const initializedRef = useRef(false);
-  
-  // Store initial center and zoom in refs to avoid re-initialization
+  const tileLayerRef = useRef<LeafletTileLayer | null>(null);
+  const overlayLayersRef = useRef<Map<string, LeafletTileLayer>>(new Map());
+  const bufferCircleRef = useRef<LeafletCircle | null>(null);
+
   const initialCenterRef = useRef(center);
   const initialZoomRef = useRef(zoom);
 
@@ -141,16 +185,14 @@ function MapContainerComponent({
     });
   }, []);
 
-  // Load Leaflet via script tag (more reliable than dynamic import in production)
+  // Load Leaflet
   useEffect(() => {
-    // Check if Leaflet is already loaded
     if (window.L) {
       leafletRef.current = window.L;
       setIsLoaded(true);
       return;
     }
 
-    // Load Leaflet from CDN
     const script = document.createElement("script");
     script.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
     script.integrity = "sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=";
@@ -169,13 +211,9 @@ function MapContainerComponent({
     };
 
     document.head.appendChild(script);
-
-    return () => {
-      // Don't remove script on cleanup as it might be used by other components
-    };
   }, []);
 
-  // Initialize map - only runs once when Leaflet is loaded
+  // Initialize map
   useEffect(() => {
     if (!isLoaded || !containerRef.current || initializedRef.current) return;
 
@@ -184,8 +222,7 @@ function MapContainerComponent({
 
     try {
       initializedRef.current = true;
-      
-      // Create map with initial values from refs
+
       const map = L.map(containerRef.current, {
         center: initialCenterRef.current,
         zoom: initialZoomRef.current,
@@ -193,21 +230,28 @@ function MapContainerComponent({
         preferCanvas: true,
       });
 
+      // Get initial layer config
+      const layerConfig =
+        BASE_LAYERS.find((l) => l.id === activeLayer) || BASE_LAYERS[0];
+
       // Add tile layer
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        maxZoom: 18,
-      }).addTo(map);
+      const tileLayer = L.tileLayer(layerConfig.url, {
+        attribution: layerConfig.attribution,
+        maxZoom: layerConfig.maxZoom || 18,
+      });
+      tileLayer.addTo(map);
+      tileLayerRef.current = tileLayer;
 
       // Add zoom control
       L.control.zoom({ position: "topright" }).addTo(map);
+
+      // Add scale control for GIS professionalism
+      L.control.scale({ position: "bottomright", imperial: false }).addTo(map);
 
       // Create markers layer
       markersRef.current = L.layerGroup().addTo(map);
       mapRef.current = map;
 
-      // Force resize after a short delay
       setTimeout(() => {
         if (mapRef.current === map && initializedRef.current) {
           map.invalidateSize();
@@ -226,18 +270,126 @@ function MapContainerComponent({
         mapRef.current.remove();
         mapRef.current = null;
         markersRef.current = null;
+        tileLayerRef.current = null;
+        bufferCircleRef.current = null;
         initializedRef.current = false;
       }
     };
-  }, [isLoaded]); // Only depend on isLoaded - center/zoom are read from refs
+  }, [isLoaded]);
+
+  // Update tile layer when activeLayer changes
+  useEffect(() => {
+    if (!isReady || !mapRef.current || !leafletRef.current) return;
+
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    const layerConfig =
+      BASE_LAYERS.find((l) => l.id === activeLayer) || BASE_LAYERS[0];
+
+    try {
+      // Remove existing tile layer
+      if (tileLayerRef.current) {
+        map.removeLayer(tileLayerRef.current);
+      }
+
+      // Add new tile layer
+      const newTileLayer = L.tileLayer(layerConfig.url, {
+        attribution: layerConfig.attribution,
+        maxZoom: layerConfig.maxZoom || 18,
+      });
+      newTileLayer.addTo(map);
+      tileLayerRef.current = newTileLayer;
+    } catch (err) {
+      console.error("Error switching layer:", err);
+    }
+  }, [activeLayer, isReady]);
+
+  // Update buffer circle
+  useEffect(() => {
+    if (!isReady || !mapRef.current || !leafletRef.current) return;
+
+    const L = leafletRef.current;
+    const map = mapRef.current;
+
+    try {
+      // Remove existing buffer
+      if (bufferCircleRef.current) {
+        bufferCircleRef.current.remove();
+        bufferCircleRef.current = null;
+      }
+
+      // Add new buffer if config exists
+      if (bufferConfig) {
+        const radiusMeters = bufferConfig.radiusKm * 1000;
+        const circle = L.circle(bufferConfig.center, {
+          radius: radiusMeters,
+          color: "#10b981",
+          fillColor: "#10b981",
+          fillOpacity: 0.15,
+          weight: 2,
+          dashArray: "5, 10",
+        });
+        circle.addTo(map);
+        bufferCircleRef.current = circle;
+      }
+    } catch (err) {
+      console.error("Error updating buffer:", err);
+    }
+  }, [bufferConfig, isReady]);
+
+  // Update overlay layers when activeOverlays changes
+  useEffect(() => {
+    if (!isReady || !mapRef.current || !leafletRef.current) return;
+
+    const L = leafletRef.current;
+    const map = mapRef.current;
+
+    try {
+      // Get current overlay IDs
+      const currentOverlayIds = Array.from(overlayLayersRef.current.keys());
+
+      // Remove overlays that are no longer active
+      for (const overlayId of currentOverlayIds) {
+        if (!activeOverlays.includes(overlayId as OverlayType)) {
+          const layer = overlayLayersRef.current.get(overlayId);
+          if (layer) {
+            map.removeLayer(layer);
+            overlayLayersRef.current.delete(overlayId);
+          }
+        }
+      }
+
+      // Add overlays that are newly active
+      for (const overlayId of activeOverlays) {
+        if (!overlayLayersRef.current.has(overlayId)) {
+          const overlayConfig = OVERLAY_LAYERS.find((o) => o.id === overlayId);
+          if (overlayConfig) {
+            const overlayLayer = L.tileLayer(overlayConfig.url, {
+              attribution: overlayConfig.attribution,
+            });
+            overlayLayer.addTo(map);
+            overlayLayersRef.current.set(overlayId, overlayLayer);
+          }
+        }
+      }
+    } catch (err) {
+      console.error("Error updating overlays:", err);
+    }
+  }, [activeOverlays, isReady]);
 
   // Update markers
   useEffect(() => {
-    if (!isReady || !markersRef.current || !leafletRef.current || !initializedRef.current) return;
+    if (
+      !isReady ||
+      !markersRef.current ||
+      !leafletRef.current ||
+      !initializedRef.current
+    )
+      return;
 
     const L = leafletRef.current;
     const markers = markersRef.current;
-    
+
     try {
       markers.clearLayers();
 
@@ -269,7 +421,7 @@ function MapContainerComponent({
       const L = leafletRef.current;
       const map = mapRef.current;
       const bounds = L.latLngBounds(
-        filteredPoints.map((p) => [p.latitude, p.longitude])
+        filteredPoints.map((p) => [p.latitude, p.longitude]),
       );
       map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
     } catch (err) {

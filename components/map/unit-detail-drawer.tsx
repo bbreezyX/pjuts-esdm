@@ -96,8 +96,8 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
 
   return (
     <>
-      {/* Drawer */}
-      <div className="fixed inset-2 sm:inset-y-4 sm:right-4 sm:left-auto sm:w-[500px] bg-white shadow-2xl z-50 animate-slide-in-right flex flex-col rounded-3xl overflow-hidden border border-white/20">
+      {/* Drawer - positioned within map area */}
+      <div className="fixed right-4 sm:w-[500px] bg-white shadow-2xl z-50 animate-slide-in-right flex flex-col rounded-2xl overflow-hidden border border-white/20 top-[280px] sm:top-[250px] bottom-4 left-4 sm:left-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-4 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/50 sticky top-0 z-10">
           <div>
@@ -169,10 +169,10 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                         detail.unit.lastStatus === "OPERATIONAL"
                           ? "bg-green-500"
                           : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
-                          ? "bg-amber-500"
-                          : detail.unit.lastStatus === "OFFLINE"
-                          ? "bg-red-500"
-                          : "bg-slate-500"
+                            ? "bg-amber-500"
+                            : detail.unit.lastStatus === "OFFLINE"
+                              ? "bg-red-500"
+                              : "bg-slate-500",
                       )}
                     />
 
@@ -196,10 +196,10 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                             detail.unit.lastStatus === "OPERATIONAL"
                               ? "bg-green-100 text-green-600"
                               : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
-                              ? "bg-amber-100 text-amber-600"
-                              : detail.unit.lastStatus === "OFFLINE"
-                              ? "bg-red-100 text-red-600"
-                              : "bg-slate-100 text-slate-600"
+                                ? "bg-amber-100 text-amber-600"
+                                : detail.unit.lastStatus === "OFFLINE"
+                                  ? "bg-red-100 text-red-600"
+                                  : "bg-slate-100 text-slate-600",
                           )}
                         >
                           {detail.unit.lastStatus === "OPERATIONAL" ? (
@@ -238,9 +238,9 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                                     BATTERY_THRESHOLDS.OPERATIONAL_MIN
                                     ? "text-green-500"
                                     : detail.recentReports[0].batteryVoltage >=
-                                      BATTERY_THRESHOLDS.MAINTENANCE_MIN
-                                    ? "text-amber-500"
-                                    : "text-red-500"
+                                        BATTERY_THRESHOLDS.MAINTENANCE_MIN
+                                      ? "text-amber-500"
+                                      : "text-red-500",
                                 )}
                               />
                               <span className="text-2xl font-bold tracking-tight text-slate-900">
@@ -309,7 +309,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                           className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 flex items-center justify-between group cursor-pointer hover:border-primary-400 transition-colors"
                           onClick={() => {
                             navigator.clipboard.writeText(
-                              `${detail.unit.latitude}, ${detail.unit.longitude}`
+                              `${detail.unit.latitude}, ${detail.unit.longitude}`,
                             );
                             toast({
                               description: "Koordinat berhasil disalin",
@@ -332,7 +332,7 @@ export function UnitDetailDrawer({ unitId, onClose }: UnitDetailDrawerProps) {
                           onClick={() => {
                             window.open(
                               `https://www.google.com/maps?q=${detail.unit.latitude},${detail.unit.longitude}`,
-                              "_blank"
+                              "_blank",
                             );
                           }}
                         >
