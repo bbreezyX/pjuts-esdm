@@ -8,13 +8,14 @@ import {
   type SubmitReportInput,
   isValidCuid,
 } from "@/lib/validations";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { getStatusFromVoltage } from "@/lib/constants";
 import { sendReportNotificationToAdmins } from "@/lib/email";
 import { logReportAudit } from "@/lib/audit";
 import { ERROR_MESSAGES } from "@/lib/errors";
 import { type ActionResult } from "@/types";
+import { CacheTags } from "@/lib/cache";
 
 // ============================================
 // TYPES
@@ -254,10 +255,12 @@ export async function submitReport(
     });
 
     // 9. Revalidate cached data
-    revalidatePath("/dashboard");
-    revalidatePath("/reports");
-    revalidatePath("/units");
     revalidatePath("/map");
+    updateTag(CacheTags.DASHBOARD_STATS);
+    updateTag(CacheTags.PROVINCE_STATS);
+    updateTag(CacheTags.RECENT_ACTIVITY);
+    updateTag(CacheTags.MONTHLY_TREND);
+    updateTag(CacheTags.MAP_POINTS);
 
     // 10. Send email notification to admins
     // Note: We await this to ensure email is sent before serverless function terminates
@@ -504,8 +507,12 @@ export async function deleteReport(reportId: string): Promise<ActionResult> {
       imagesDeleted: report.images.length,
     });
 
-    revalidatePath("/dashboard");
     revalidatePath("/reports");
+    updateTag(CacheTags.DASHBOARD_STATS);
+    updateTag(CacheTags.PROVINCE_STATS);
+    updateTag(CacheTags.RECENT_ACTIVITY);
+    updateTag(CacheTags.MONTHLY_TREND);
+    updateTag(CacheTags.MAP_POINTS);
 
     return { success: true };
   } catch (error) {

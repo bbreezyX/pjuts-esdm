@@ -57,8 +57,14 @@ interface DashboardClientProps {
   usersPromise: UsersPromise;
   user?: {
     name?: string | null;
+    role?: string | null;
   };
 }
+
+const ROLE_LABELS: Record<string, string> = {
+  ADMIN: "Administrator",
+  FIELD_STAFF: "Tim Lapangan",
+};
 
 /**
  * Get the initial letter(s) from a user's name for avatar display
@@ -261,7 +267,7 @@ function UserAvatarWithPopover({ user }: { user: DashboardUser }) {
             {user.name}
           </span>
           <span className="text-primary text-[9px] font-black uppercase tracking-[0.15em]">
-            {user.role}
+            {ROLE_LABELS[user.role] || user.role}
           </span>
           {/* Tooltip Arrow */}
           <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-r border-b border-border rotate-45" />
@@ -861,16 +867,26 @@ function HeaderUsers({ usersPromise }: { usersPromise: UsersPromise }) {
       <span className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em] leading-none mb-1">
         Staf Terdaftar
       </span>
-      <div className="flex -space-x-4">
-        {safeUsers.map((user) => (
-          <UserAvatarWithPopover key={user.id} user={user} />
-        ))}
-        <Link
-          href="/users"
-          className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted/50 flex items-center justify-center text-primary/60 hover:bg-primary/10 hover:text-primary transition-all shadow-xl shadow-primary/5 cursor-pointer"
-        >
-          <Plus size={24} />
-        </Link>
+      <div className="flex items-center gap-3">
+        <div className="flex flex-col items-end">
+          <span className="text-foreground font-bold text-[10px] leading-none mb-0.5">
+            {safeUsers.length > 0 ? safeUsers[0].name.split(" ")[0] : "Staf"}
+          </span>
+          <span className="text-[9px] text-muted-foreground font-medium">
+            {safeUsers.length} Personil Aktif
+          </span>
+        </div>
+        <div className="flex -space-x-4">
+          {safeUsers.map((user) => (
+            <UserAvatarWithPopover key={user.id} user={user} />
+          ))}
+          <Link
+            href="/users"
+            className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted/50 flex items-center justify-center text-primary/60 hover:bg-primary/10 hover:text-primary transition-all shadow-xl shadow-primary/5 cursor-pointer"
+          >
+            <Plus size={24} />
+          </Link>
+        </div>
       </div>
     </div>
   );
@@ -884,7 +900,6 @@ export function DashboardClient({
   user,
 }: DashboardClientProps) {
   const greeting = getGreeting();
-  const displayName = user?.name?.split(" ")[0] || "Admin";
 
   return (
     <div className="min-h-screen bg-background pt-8 font-sans selection:bg-primary/20 selection:text-primary">
@@ -898,9 +913,19 @@ export function DashboardClient({
                 Ringkasan Eksekutif
               </span>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tighter mb-2 sm:mb-3">
-              {greeting}, <span className="text-primary/80">{displayName}</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-foreground tracking-tighter mb-1 select-none">
+              {greeting},{" "}
+              <span className="text-primary/80">{user?.name || "Admin"}</span>
             </h1>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-black rounded-md uppercase tracking-wider">
+                {ROLE_LABELS[user?.role || ""] || "Akses Terbatas"}
+              </div>
+              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                Sesi Aktif
+              </span>
+            </div>
             <p className="text-muted-foreground text-sm sm:text-base font-bold tracking-tight">
               Pantau infrastruktur energi terbarukan Provinsi Jambi secara
               real-time.
@@ -914,13 +939,19 @@ export function DashboardClient({
                   <span className="text-[9px] font-black text-muted-foreground/20 uppercase tracking-[0.2em] leading-none mb-1">
                     Staf Terdaftar
                   </span>
-                  <div className="flex -space-x-4">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <div
-                        key={i}
-                        className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted animate-pulse"
-                      />
-                    ))}
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-end gap-1">
+                      <div className="w-12 h-2 bg-muted animate-pulse rounded-full" />
+                      <div className="w-16 h-2 bg-muted animate-pulse rounded-full opacity-50" />
+                    </div>
+                    <div className="flex -space-x-4">
+                      {[1, 2, 3, 4, 5].map((i) => (
+                        <div
+                          key={i}
+                          className="w-14 h-14 rounded-2xl border-[4px] border-background bg-muted animate-pulse"
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               }

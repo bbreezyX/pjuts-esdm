@@ -7,12 +7,13 @@ import {
   type CreatePjutsUnitInput,
   isValidCuid,
 } from "@/lib/validations";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { Prisma, UnitStatus, Role } from "@prisma/client";
 import { sendUnitNotificationToFieldStaff } from "@/lib/email";
 import { logUnitAudit } from "@/lib/audit";
 import { ERROR_MESSAGES } from "@/lib/errors";
 import { type ActionResult } from "@/types";
+import { CacheTags } from "@/lib/cache";
 
 // ============================================
 // TYPES
@@ -119,9 +120,10 @@ export async function createPjutsUnit(
       longitude: unit.longitude,
     });
 
-    revalidatePath("/dashboard");
-    revalidatePath("/units");
     revalidatePath("/map");
+    updateTag(CacheTags.DASHBOARD_STATS);
+    updateTag(CacheTags.PROVINCE_STATS);
+    updateTag(CacheTags.MAP_POINTS);
 
     // Send email notification to field staff
     // Note: We await this to ensure email is sent before serverless function terminates
@@ -336,9 +338,10 @@ export async function updatePjutsUnit(
       newValues: JSON.parse(JSON.stringify(input)),
     });
 
-    revalidatePath("/dashboard");
-    revalidatePath("/units");
     revalidatePath("/map");
+    updateTag(CacheTags.DASHBOARD_STATS);
+    updateTag(CacheTags.PROVINCE_STATS);
+    updateTag(CacheTags.MAP_POINTS);
 
     return {
       success: true,
@@ -420,9 +423,10 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
       reportsDeleted: existing._count.reports,
     });
 
-    revalidatePath("/dashboard");
-    revalidatePath("/units");
     revalidatePath("/map");
+    updateTag(CacheTags.DASHBOARD_STATS);
+    updateTag(CacheTags.PROVINCE_STATS);
+    updateTag(CacheTags.MAP_POINTS);
 
     return { success: true };
   } catch (error) {
@@ -590,9 +594,10 @@ export async function bulkCreateUnits(units: CreatePjutsUnitInput[]): Promise<
     }
 
     if (createdCount > 0) {
-      revalidatePath("/dashboard");
-      revalidatePath("/units");
       revalidatePath("/map");
+      updateTag(CacheTags.DASHBOARD_STATS);
+      updateTag(CacheTags.PROVINCE_STATS);
+      updateTag(CacheTags.MAP_POINTS);
 
       // Log audit
       await logUnitAudit("BULK_CREATE_UNIT", "BULK", session.user.id, {

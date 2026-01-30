@@ -2,7 +2,7 @@
 
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { Prisma, Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
@@ -11,6 +11,7 @@ import { logUserAudit } from "@/lib/audit";
 import { ERROR_MESSAGES } from "@/lib/errors";
 import { type ActionResult } from "@/types";
 import { isValidCuid } from "@/lib/validations";
+import { CacheTags } from "@/lib/cache";
 
 // ============================================
 // TYPES & SCHEMAS
@@ -51,7 +52,6 @@ const updateUserSchema = z.object({
   role: z.nativeEnum(Role),
 });
 
-
 // ============================================
 // GET USERS
 // ============================================
@@ -86,7 +86,9 @@ export async function getUsers(): Promise<ActionResult<UserData[]>> {
 // CREATE USER
 // ============================================
 
-export async function createUser(formData: FormData): Promise<ActionResult<UserData>> {
+export async function createUser(
+  formData: FormData,
+): Promise<ActionResult<UserData>> {
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
@@ -144,6 +146,7 @@ export async function createUser(formData: FormData): Promise<ActionResult<UserD
     });
 
     revalidatePath("/users");
+    updateTag(CacheTags.DASHBOARD_STATS);
     return { success: true, data: user };
   } catch (error) {
     console.error("Create user error:", error);
@@ -155,7 +158,10 @@ export async function createUser(formData: FormData): Promise<ActionResult<UserD
 // UPDATE USER
 // ============================================
 
-export async function updateUser(userId: string, formData: FormData): Promise<ActionResult<UserData>> {
+export async function updateUser(
+  userId: string,
+  formData: FormData,
+): Promise<ActionResult<UserData>> {
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
@@ -214,6 +220,7 @@ export async function updateUser(userId: string, formData: FormData): Promise<Ac
     });
 
     revalidatePath("/users");
+    updateTag(CacheTags.DASHBOARD_STATS);
     return { success: true, data: user };
   } catch (error) {
     console.error("Update user error:", error);
@@ -257,6 +264,7 @@ export async function deleteUser(userId: string): Promise<ActionResult> {
     });
 
     revalidatePath("/users");
+    updateTag(CacheTags.DASHBOARD_STATS);
     return { success: true };
   } catch (error) {
     console.error("Delete user error:", error);
@@ -268,7 +276,9 @@ export async function deleteUser(userId: string): Promise<ActionResult> {
 // TOGGLE USER STATUS (Enable/Disable)
 // ============================================
 
-export async function toggleUserStatus(userId: string): Promise<ActionResult<UserData>> {
+export async function toggleUserStatus(
+  userId: string,
+): Promise<ActionResult<UserData>> {
   try {
     const session = await auth();
     if (session?.user?.role !== "ADMIN") {
@@ -336,6 +346,7 @@ export async function toggleUserStatus(userId: string): Promise<ActionResult<Use
     }
 
     revalidatePath("/users");
+    updateTag(CacheTags.DASHBOARD_STATS);
     return { success: true, data: user };
   } catch (error) {
     console.error("Toggle user status error:", error);

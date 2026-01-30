@@ -35,7 +35,10 @@ export default async function DashboardPage() {
         provincesPromise={provincesPromise}
         activitiesPromise={activitiesPromise}
         usersPromise={usersPromise}
-        user={{ name: session.user.name }}
+        user={{
+          name: session.user.name,
+          role: session.user.role,
+        }}
       />
     </AppShell>
   );
