@@ -435,11 +435,11 @@ function MapContainerComponent({
       if (validPoints.length === 0) return;
       
       const bounds = L.latLngBounds(
-        validPoints.map((p) => [p.latitude, p.longitude]),
+        validPoints.map((p) => [p.latitude, p.longitude] as [number, number]),
       );
       
       // Check if bounds are valid before fitting
-      if (bounds.isValid()) {
+      if (bounds && typeof bounds.isValid === 'function' && bounds.isValid()) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
       }
     } catch (err) {
