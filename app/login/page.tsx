@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useCallback } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -13,22 +13,41 @@ import {
   ShieldCheck,
   Globe,
   Building2,
+  KeyRound,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PinInput } from "@/components/ui/pin-input";
 import { useLanguage } from "@/lib/language-context";
 import { motion, AnimatePresence } from "framer-motion";
+
+type LoginStep = "credentials" | "pin-challenge";
+
+interface PinChallengeData {
+  pin: string;
+  expiresAt: number;
+}
 
 function LoginFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useLanguage();
+  
+  // Form state
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [idleMessage, setIdleMessage] = useState(false);
+  
+  // PIN challenge state
+  const [step, setStep] = useState<LoginStep>("credentials");
+  const [pinChallenge, setPinChallenge] = useState<PinChallengeData | null>(null);
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
 
   useEffect(() => {
     if (searchParams.get("reason") === "idle") {
@@ -36,12 +55,99 @@ function LoginFormContent() {
     }
   }, [searchParams]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Countdown timer for PIN expiry
+  useEffect(() => {
+    if (!pinChallenge) return;
+    
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, Math.floor((pinChallenge.expiresAt - Date.now()) / 1000));
+      setTimeLeft(remaining);
+      
+      if (remaining === 0) {
+        setError(t("login.pin_expired"));
+        setStep("credentials");
+        setPinChallenge(null);
+        setPinInput("");
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [pinChallenge, t]);
+
+  const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
+      const response = await fetch("/api/auth/pin-challenge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.error === "RATE_LIMITED") {
+          setError(t("login.error_rate_limit"));
+        } else if (data.error === "ACCOUNT_DISABLED") {
+          setError(t("login.error_disabled"));
+        } else {
+          setError(t("login.error_credentials"));
+        }
+        return;
+      }
+
+      // Move to PIN challenge step
+      setPinChallenge({
+        pin: data.pin,
+        expiresAt: Date.now() + (data.expiresIn * 1000),
+      });
+      setTimeLeft(data.expiresIn);
+      setStep("pin-challenge");
+      setPinInput("");
+      setPinError(false);
+    } catch {
+      setError(t("login.error_general"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePinSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (pinInput.length !== 6) return;
+    
+    setLoading(true);
+    setPinError(false);
+
+    try {
+      // Verify PIN
+      const verifyResponse = await fetch("/api/auth/pin-challenge", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, pin: pinInput }),
+      });
+
+      const verifyData = await verifyResponse.json();
+
+      if (!verifyResponse.ok) {
+        setPinError(true);
+        setPinInput("");
+        if (verifyData.error === "MAX_ATTEMPTS") {
+          setError(t("login.error_max_attempts"));
+          setStep("credentials");
+          setPinChallenge(null);
+        } else if (verifyData.error === "PIN_EXPIRED") {
+          setError(t("login.pin_expired"));
+          setStep("credentials");
+          setPinChallenge(null);
+        }
+        return;
+      }
+
+      // PIN verified - now sign in
       const result = await signIn("credentials", {
         email,
         password,
@@ -50,6 +156,8 @@ function LoginFormContent() {
 
       if (result?.error) {
         setError(t("login.error_credentials"));
+        setStep("credentials");
+        setPinChallenge(null);
       } else {
         router.push("/dashboard");
         router.refresh();
@@ -61,8 +169,151 @@ function LoginFormContent() {
     }
   };
 
+  const handleBackToCredentials = useCallback(() => {
+    setStep("credentials");
+    setPinChallenge(null);
+    setPinInput("");
+    setPinError(false);
+    setError("");
+  }, []);
+
+  const handleRefreshPin = async () => {
+    setLoading(true);
+    setPinError(false);
+    setPinInput("");
+    
+    try {
+      const response = await fetch("/api/auth/pin-challenge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPinChallenge({
+          pin: data.pin,
+          expiresAt: Date.now() + (data.expiresIn * 1000),
+        });
+        setTimeLeft(data.expiresIn);
+      } else {
+        setError(t("login.error_general"));
+        setStep("credentials");
+      }
+    } catch {
+      setError(t("login.error_general"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Auto-submit when PIN is complete
+  useEffect(() => {
+    if (pinInput.length === 6 && step === "pin-challenge" && !loading) {
+      const form = document.getElementById("pin-form") as HTMLFormElement;
+      form?.requestSubmit();
+    }
+  }, [pinInput, step, loading]);
+
+  if (step === "pin-challenge" && pinChallenge) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="space-y-5"
+      >
+        {/* Header */}
+        <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
+          <div className="p-2 rounded-lg bg-primary/10">
+            <KeyRound className="w-5 h-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-base font-semibold text-slate-900">
+              {t("login.pin_title")}
+            </h3>
+            <p className="text-xs text-slate-500">
+              {t("login.pin_instruction")}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className={`w-1.5 h-1.5 rounded-full ${timeLeft > 30 ? "bg-green-500" : timeLeft > 10 ? "bg-amber-500" : "bg-red-500"}`} />
+            <span className={`text-xs font-mono font-medium tabular-nums ${timeLeft > 30 ? "text-slate-500" : timeLeft > 10 ? "text-amber-600" : "text-red-600"}`}>
+              {Math.floor(timeLeft / 60)}:{(timeLeft % 60).toString().padStart(2, "0")}
+            </span>
+          </div>
+        </div>
+
+        {/* PIN Display - Compact */}
+        <div className="bg-slate-50 rounded-xl p-4">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
+              {t("login.your_code")}
+            </span>
+            <button
+              type="button"
+              onClick={handleRefreshPin}
+              disabled={loading}
+              className="text-xs text-primary hover:text-primary/80 font-medium flex items-center gap-1"
+            >
+              <RefreshCw className={`w-3 h-3 ${loading ? "animate-spin" : ""}`} />
+              {t("login.new_code")}
+            </button>
+          </div>
+          <div className="flex justify-center gap-1.5 mt-3">
+            {pinChallenge.pin.split("").map((digit, i) => (
+              <span
+                key={i}
+                className="w-9 h-11 flex items-center justify-center bg-white rounded-lg text-xl font-bold text-slate-900 border border-slate-200"
+              >
+                {digit}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* PIN Input */}
+        <form id="pin-form" onSubmit={handlePinSubmit} className="space-y-4">
+          <div>
+            <label className="block text-xs font-medium text-slate-500 uppercase tracking-wide mb-2 text-center">
+              {t("login.enter_code")}
+            </label>
+            <PinInput
+              value={pinInput}
+              onChange={setPinInput}
+              disabled={loading}
+              error={pinError}
+            />
+            {pinError && (
+              <p className="text-xs text-red-600 text-center mt-2">
+                {t("login.pin_incorrect")}
+              </p>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            disabled={loading || pinInput.length !== 6}
+            className="w-full h-11 rounded-lg bg-primary hover:bg-primary/90 text-white font-semibold shadow-md shadow-primary/20 transition-all"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : t("login.verify")}
+          </Button>
+
+          <button
+            type="button"
+            onClick={handleBackToCredentials}
+            className="w-full text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors flex items-center justify-center gap-1"
+          >
+            <ArrowLeft className="w-3 h-3" />
+            {t("login.back")}
+          </button>
+        </form>
+      </motion.div>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleCredentialsSubmit} className="space-y-6">
       <AnimatePresence>
         {(idleMessage || error) && (
           <motion.div
@@ -100,7 +351,7 @@ function LoginFormContent() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="name@esdm.go.id"
             required
-            className="h-12 rounded-lg bg-slate-50 border-slate-200 hover:border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm font-medium text-slate-900 placeholder:text-slate-400"
+            className="h-12 rounded-lg bg-slate-50 border-slate-200 hover:border-slate-300 focus:border-primary focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all shadow-sm font-medium text-slate-900 placeholder:text-slate-400"
           />
         </div>
 
@@ -115,7 +366,7 @@ function LoginFormContent() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="h-12 rounded-lg bg-slate-50 border-slate-200 hover:border-slate-300 focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all shadow-sm pr-12 font-medium text-slate-900 placeholder:text-slate-400"
+              className="h-12 rounded-lg bg-slate-50 border-slate-200 hover:border-slate-300 focus:border-primary focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all shadow-sm pr-12 font-medium text-slate-900 placeholder:text-slate-400"
             />
             <button
               type="button"
@@ -296,9 +547,7 @@ export default function LoginPage() {
           {/* Footer Links */}
           <div className="mt-8 pt-6 border-t border-slate-100 text-center">
              <p className="text-xs text-slate-400 font-medium">
-                Protected by reCAPTCHA and subject to the 
-                <a href="#" className="text-primary hover:underline ml-1">Privacy Policy</a> and 
-                <a href="#" className="text-primary hover:underline ml-1">Terms of Service</a>.
+                {t("login.security_note")}
              </p>
           </div>
         </div>
