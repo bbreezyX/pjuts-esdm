@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPjutsUnits } from "@/app/actions/units";
 import { UnitStatus } from "@prisma/client";
+import {
+  withApiRateLimit,
+  createRateLimitResponse,
+  applyRateLimitHeaders,
+  RATE_LIMIT_TIERS,
+} from "@/lib/api-rate-limit";
 
 /**
  * GET /api/units
  * Returns paginated list of PJUTS units
+ * 
+ * Rate limit: SEARCH tier (100 req/min)
  * 
  * Query params:
  * - page: Page number (default: 1)
@@ -15,6 +23,12 @@ import { UnitStatus } from "@prisma/client";
  */
 export async function GET(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const rateLimitResult = await withApiRateLimit(request, RATE_LIMIT_TIERS.SEARCH);
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     const searchParams = request.nextUrl.searchParams;
     
     const page = parseInt(searchParams.get("page") || "1");
@@ -46,10 +60,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       ...result.data,
     });
+
+    // Add rate limit headers to successful response
+    return applyRateLimitHeaders(response, rateLimitResult);
   } catch (error) {
     console.error("Units API error:", error);
     return NextResponse.json(
@@ -58,4 +75,3 @@ export async function GET(request: NextRequest) {
     );
   }
 }
-

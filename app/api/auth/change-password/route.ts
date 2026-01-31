@@ -1,16 +1,35 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
+import {
+  withApiRateLimit,
+  createRateLimitResponse,
+  applyRateLimitHeaders,
+  RATE_LIMIT_TIERS,
+} from "@/lib/api-rate-limit";
 
 const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Password saat ini wajib diisi"),
   newPassword: z.string().min(6, "Password baru minimal 6 karakter"),
 });
 
-export async function POST(request: Request) {
+/**
+ * POST /api/auth/change-password
+ * Change user password
+ * 
+ * Rate limit: SENSITIVE tier (30 req/min)
+ * This is a security-sensitive operation, so we use stricter limits.
+ */
+export async function POST(request: NextRequest) {
   try {
+    // Apply rate limiting (sensitive operation)
+    const rateLimitResult = await withApiRateLimit(request, RATE_LIMIT_TIERS.SENSITIVE);
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -58,10 +77,12 @@ export async function POST(request: Request) {
       data: { password: hashedPassword },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: "Password berhasil diubah",
     });
+
+    return applyRateLimitHeaders(response, rateLimitResult);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

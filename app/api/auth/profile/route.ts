@@ -1,15 +1,33 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/db";
 import { z } from "zod";
+import {
+  withApiRateLimit,
+  createRateLimitResponse,
+  applyRateLimitHeaders,
+  RATE_LIMIT_TIERS,
+} from "@/lib/api-rate-limit";
 
 const updateProfileSchema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),
 });
 
-export async function PATCH(request: Request) {
+/**
+ * PATCH /api/auth/profile
+ * Update user profile
+ * 
+ * Rate limit: SENSITIVE tier (30 req/min)
+ */
+export async function PATCH(request: NextRequest) {
   try {
+    // Apply rate limiting (sensitive operation)
+    const rateLimitResult = await withApiRateLimit(request, RATE_LIMIT_TIERS.SENSITIVE);
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -50,10 +68,12 @@ export async function PATCH(request: Request) {
       },
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: updatedUser,
     });
+
+    return applyRateLimitHeaders(response, rateLimitResult);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -70,8 +90,20 @@ export async function PATCH(request: Request) {
   }
 }
 
-export async function GET() {
+/**
+ * GET /api/auth/profile
+ * Get current user profile
+ * 
+ * Rate limit: STANDARD tier (60 req/min)
+ */
+export async function GET(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const rateLimitResult = await withApiRateLimit(request, RATE_LIMIT_TIERS.STANDARD);
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     const session = await auth();
 
     if (!session?.user?.id) {
@@ -100,10 +132,12 @@ export async function GET() {
       );
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: user,
     });
+
+    return applyRateLimitHeaders(response, rateLimitResult);
   } catch (error) {
     console.error("Error fetching profile:", error);
     return NextResponse.json(

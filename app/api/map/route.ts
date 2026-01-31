@@ -7,10 +7,18 @@ import {
   ApplicationError,
   ErrorCode,
 } from "@/lib/errors";
+import {
+  withApiRateLimit,
+  createRateLimitResponse,
+  applyRateLimitHeaders,
+  RATE_LIMIT_TIERS,
+} from "@/lib/api-rate-limit";
 
 /**
  * GET /api/map
  * Returns map points for the monitoring dashboard
+ * 
+ * Rate limit: SEARCH tier (100 req/min)
  * 
  * Query params:
  * - status: Filter by unit status (OPERATIONAL, MAINTENANCE_NEEDED, OFFLINE, UNVERIFIED)
@@ -18,6 +26,12 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
+    // Apply rate limiting
+    const rateLimitResult = await withApiRateLimit(request, RATE_LIMIT_TIERS.SEARCH);
+    if (!rateLimitResult.success) {
+      return createRateLimitResponse(rateLimitResult);
+    }
+
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get("status") as UnitStatus | null;
     
@@ -49,12 +63,14 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    return createApiSuccessResponse({
+    const response = createApiSuccessResponse({
       data: result.data,
       count: result.data?.length || 0,
     });
+
+    // Add rate limit headers to successful response
+    return applyRateLimitHeaders(response, rateLimitResult);
   } catch (error) {
     return createApiErrorResponse(error);
   }
 }
-
