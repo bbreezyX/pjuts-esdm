@@ -22,6 +22,7 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPoint } from "@/types";
 import { DashboardStats, ActionResult } from "@/app/actions/dashboard";
+import { useMobileNav } from "@/hooks/use-mobile-nav";
 
 // Promise Types
 type PointsPromise = Promise<ActionResult<MapPoint[]>>;
@@ -92,6 +93,9 @@ function EnhancedMapContent({
     return safePoints.find((p) => p.id === selectedUnitId) || null;
   }, [safePoints, selectedUnitId]);
 
+  // Check if drawer is open (unit is selected)
+  const isDrawerOpen = !!selectedUnitId;
+
   const handlePointClick = useCallback(
     (point: MapPoint) => {
       onPointClick(point);
@@ -137,12 +141,14 @@ function EnhancedMapContent({
         points={safePoints}
         selectedPoint={selectedPoint}
         onBufferAnalysis={handleBufferAnalysis}
+        hideOnMobile={isDrawerOpen}
       />
       <LayerSwitcher
         activeLayer={activeLayer}
         activeOverlays={activeOverlays}
         onLayerChange={handleLayerChange}
         onOverlayToggle={handleOverlayToggle}
+        hideOnMobile={isDrawerOpen}
       />
     </>
   );
@@ -202,6 +208,13 @@ export function MapPageClient({
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+  const { setAutoHide } = useMobileNav();
+
+  // Hide mobile nav on map page for full map visibility
+  useEffect(() => {
+    setAutoHide(true);
+    return () => setAutoHide(false); // Show nav again when leaving map page
+  }, [setAutoHide]);
 
   // Listen for map point clicks from popup buttons
   useEffect(() => {
@@ -270,7 +283,7 @@ export function MapPageClient({
               onPointClick={(point) => setSelectedUnitId(point.id)}
             />
           </Suspense>
-          <MapLegend />
+          <MapLegend hideOnMobile={!!selectedUnitId} />
         </div>
       </Card>
 

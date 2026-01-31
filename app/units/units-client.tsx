@@ -460,9 +460,11 @@ export function UnitsPageClient({
         {/* Mobile Cards */}
         <div className="lg:hidden space-y-3">
           {initialUnits.length === 0 ? (
-            <Card className="p-6 text-center text-slate-500 text-sm">
-              Tidak ada unit ditemukan
-            </Card>
+            <Card className="p-12 text-center">
+              <Lightbulb className="h-12 w-12 mx-auto text-slate-300 mb-4" />
+              <p className="text-slate-500 font-medium">Tidak ada unit ditemukan</p>
+              <p className="text-slate-400 text-sm mt-1">Coba ubah filter pencarian</p>
+          </Card>
           ) : (
             initialUnits.map((unit, index) => (
               <Card

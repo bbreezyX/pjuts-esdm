@@ -11,6 +11,7 @@ import {
   Eye,
   EyeOff,
   Check,
+  GripVertical,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -55,6 +56,7 @@ interface LayerSwitcherProps {
   onLayerChange: (layer: BaseLayerType) => void;
   onOverlayToggle: (overlay: OverlayType) => void;
   className?: string;
+  hideOnMobile?: boolean;
 }
 
 // ============================================
@@ -195,9 +197,12 @@ export function LayerSwitcher({
   onLayerChange,
   onOverlayToggle,
   className,
+  hideOnMobile = false,
 }: LayerSwitcherProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showOverlays, setShowOverlays] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   // Find active layer config
   const activeLayerConfig =
@@ -221,40 +226,110 @@ export function LayerSwitcher({
 
   return (
     <div
-      className={cn("absolute top-4 left-4 z-[1000]", className)}
+      className={cn(
+        "absolute inset-0 pointer-events-none z-[999]",
+        hideOnMobile && "sm:block hidden", // Hide on mobile when drawer is open
+        className,
+      )}
       data-layer-switcher
     >
       <AnimatePresence mode="wait">
         {!isExpanded ? (
-          // Collapsed state - compact elegant button
-          <motion.button
+          // Collapsed state - draggable interactive button
+          <motion.div
             key="collapsed"
+            drag
+            dragConstraints={{ top: -100, left: -100, right: 400, bottom: 400 }}
+            dragElastic={0.05}
+            dragMomentum={false}
+            dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
+            onDragStart={() => setIsDragging(true)}
+            onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
-            onClick={() => setIsExpanded(true)}
-            className={cn(
-              "group flex items-center gap-2.5 px-3 py-2.5",
-              "bg-white/95 backdrop-blur-md border border-slate-200/60",
-              "shadow-[0_8px_30px_rgb(0,0,0,0.12)] rounded-2xl",
-              "transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.16)] hover:scale-[1.02] active:scale-[0.98]",
-              "text-slate-700",
-            )}
-            title="Ganti Peta Dasar"
+            className="absolute top-4 left-4 pointer-events-auto"
+            style={{ touchAction: "none" }}
           >
-            <div className="w-7 h-7 rounded-lg overflow-hidden shadow-sm border border-slate-100">
-              <LayerPreview layer={activeLayerConfig} isActive={false} />
-            </div>
-            <div className="text-left hidden sm:block">
-              <div className="text-xs font-semibold text-slate-700">
-                {activeLayerConfig.name}
-              </div>
-              <div className="text-[9px] text-slate-400">Ubah peta</div>
-            </div>
-            <Layers className="w-4 h-4 text-slate-400 group-hover:text-[#D4AF37] transition-colors" />
-          </motion.button>
+            <motion.button
+              onClick={() => !isDragging && setIsExpanded(true)}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              className={cn(
+                "group flex items-center gap-2 px-2 py-2",
+                "bg-white/95 backdrop-blur-md border border-slate-200/60",
+                "shadow-lg rounded-2xl",
+                "transition-all duration-300",
+                "text-slate-700",
+                "cursor-grab active:cursor-grabbing",
+                "select-none",
+                isDragging && "shadow-2xl",
+              )}
+              animate={{ scale: isDragging ? 1.05 : 1 }}
+              title="Peta Dasar - Drag untuk pindahkan"
+            >
+              {/* Drag Handle */}
+              <GripVertical className="w-3 h-3 text-slate-300 group-hover:text-slate-400 transition-colors" />
+              
+              {/* Animated Layer Preview */}
+              <motion.div 
+                className="relative w-9 h-9 rounded-xl overflow-hidden shadow-sm border border-slate-100"
+                animate={{ 
+                  rotateY: isHovered ? 180 : 0,
+                }}
+                transition={{ duration: 0.6, ease: "easeInOut" }}
+                style={{ transformStyle: "preserve-3d" }}
+              >
+                {/* Front - Current Layer */}
+                <div 
+                  className="absolute inset-0 backface-hidden"
+                  style={{ backfaceVisibility: "hidden" }}
+                >
+                  <LayerPreview layer={activeLayerConfig} isActive={false} />
+                </div>
+                {/* Back - Layers Icon */}
+                <div 
+                  className="absolute inset-0 bg-gradient-to-br from-[#003366] to-[#335f87] flex items-center justify-center"
+                  style={{ backfaceVisibility: "hidden", transform: "rotateY(180deg)" }}
+                >
+                  <Layers className="w-5 h-5 text-white" />
+                </div>
+              </motion.div>
+
+              {/* Text with slide animation */}
+              <AnimatePresence mode="wait">
+                {isHovered && !isDragging && (
+                  <motion.div
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: "auto", opacity: 1 }}
+                    exit={{ width: 0, opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="overflow-hidden whitespace-nowrap"
+                  >
+                    <div className="text-left px-1">
+                      <div className="text-xs font-semibold text-slate-700">
+                        {activeLayerConfig.name}
+                      </div>
+                      <div className="text-[9px] text-slate-400">Klik untuk ubah</div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Pulsing indicator when overlays active */}
+              {activeOverlays.length > 0 && (
+                <motion.div
+                  className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#D4AF37] flex items-center justify-center text-[8px] font-bold text-white shadow-md"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                >
+                  {activeOverlays.length}
+                </motion.div>
+              )}
+            </motion.button>
+          </motion.div>
         ) : (
-          // Expanded state - full panel
+          // Expanded state - full panel (fixed position, not draggable)
           <motion.div
             key="expanded"
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -262,6 +337,7 @@ export function LayerSwitcher({
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
             className={cn(
+              "absolute top-4 left-4 pointer-events-auto",
               "bg-white/95 backdrop-blur-xl border border-slate-200/50",
               "shadow-2xl rounded-3xl overflow-hidden",
               "w-[320px] sm:w-[360px]",

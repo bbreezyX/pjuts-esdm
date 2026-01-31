@@ -8,9 +8,13 @@ import {
   ClipboardList,
   Lightbulb,
   Plus,
+  ChevronUp,
+  ChevronDown,
+  X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useMobileNav } from "@/hooks/use-mobile-nav";
 
 const navItems = [
   { href: "/dashboard", label: "Home", icon: LayoutGrid },
@@ -22,10 +26,56 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { isVisible, show, hide, autoHideEnabled } = useMobileNav();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-4 px-4 bg-gradient-to-t from-background via-background/90 to-transparent pt-12 pointer-events-none">
+    <>
+      {/* Show Nav Button - appears when nav is hidden */}
+      <AnimatePresence>
+        {!isVisible && autoHideEnabled && (
+          <motion.button
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            onClick={show}
+            className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 md:hidden bg-white/90 backdrop-blur-xl border border-slate-200 shadow-lg rounded-full px-4 py-2 flex items-center gap-2 text-slate-600 active:scale-95 transition-transform"
+          >
+            <ChevronUp className="w-4 h-4" />
+            <span className="text-xs font-semibold">Menu</span>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* Main Navigation */}
+      <AnimatePresence>
+        {isVisible && (
+          <motion.nav 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            transition={{ 
+              type: "spring", 
+              damping: 25, 
+              stiffness: 300,
+            }}
+            className="fixed bottom-0 left-0 right-0 z-40 md:hidden pb-4 px-4 bg-gradient-to-t from-background via-background/90 to-transparent pt-12 pointer-events-none"
+          >
       <div className="relative pointer-events-auto max-w-md mx-auto">
+        {/* Hide Nav Button - only shows on map page when autoHide is enabled */}
+        {autoHideEnabled && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.2 }}
+            onClick={hide}
+            className="absolute -top-16 right-0 z-50 bg-white/90 backdrop-blur-xl border border-slate-200 shadow-lg rounded-full p-2 text-slate-500 active:scale-95 transition-transform"
+            aria-label="Sembunyikan menu"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </motion.button>
+        )}
+
         {/* Floating center button - Tactical Action Button */}
         <div className="absolute left-1/2 -translate-x-1/2 -top-12 z-50">
           <Link
@@ -175,6 +225,9 @@ export function MobileNav() {
           <div className="h-safe-area-inset-bottom" />
         </div>
       </div>
-    </nav>
+        </motion.nav>
+      )}
+    </AnimatePresence>
+    </>
   );
 }

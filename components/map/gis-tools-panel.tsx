@@ -20,6 +20,7 @@ import {
   FileText,
   CheckCircle2,
   Loader2,
+  GripVertical,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -36,6 +37,7 @@ interface GisToolsPanelProps {
   _onCoverageCalculation?: (data: CoverageData) => void;
   _onProximityAnalysis?: (data: ProximityResult[]) => void;
   selectedPoint?: MapPoint | null;
+  hideOnMobile?: boolean;
 }
 
 interface CoverageData {
@@ -237,6 +239,7 @@ export function GisToolsPanel({
   _onCoverageCalculation,
   _onProximityAnalysis,
   selectedPoint,
+  hideOnMobile = false,
 }: GisToolsPanelProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<ToolSectionId | null>(
@@ -245,6 +248,7 @@ export function GisToolsPanel({
   const [bufferRadius, setBufferRadius] = useState(5); // km
   const [isExporting, setIsExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   // Responsive check
   const isDesktop = useMediaQuery("(min-width: 640px)");
@@ -379,24 +383,50 @@ export function GisToolsPanel({
 
   return (
     <>
-      {/* Toggle Button - positioned below zoom controls to avoid overlap */}
-      <motion.button
-        onClick={() => setIsOpen(true)}
+      {/* Toggle Button - Draggable, positioned bottom-left to avoid overlap with Layer Switcher */}
+      <motion.div
+        drag
+        dragConstraints={{ top: -400, left: -200, right: 200, bottom: 100 }}
+        dragElastic={0.05}
+        dragMomentum={false}
+        dragTransition={{ bounceStiffness: 300, bounceDamping: 20 }}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={() => setTimeout(() => setIsDragging(false), 50)}
         className={cn(
-          "absolute top-[140px] right-[10px] z-[1000]",
-          "bg-white/95 backdrop-blur-xl border border-slate-200/60",
-          "shadow-lg rounded-xl p-2.5",
-          "transition-all hover:shadow-xl hover:scale-105 active:scale-95",
-          "text-[#003366] group",
+          "absolute bottom-[80px] left-[10px] z-[1000]",
           isOpen && "opacity-0 pointer-events-none",
+          hideOnMobile && "sm:block hidden", // Hide on mobile when drawer is open
         )}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Buka GIS Tools"
-        title="Analisis Spasial"
+        style={{ touchAction: "none" }}
       >
-        <Compass className="w-5 h-5 group-hover:rotate-45 transition-transform duration-300" />
-      </motion.button>
+        <motion.button
+          onClick={() => !isDragging && setIsOpen(true)}
+          className={cn(
+            "bg-white/95 backdrop-blur-xl border border-slate-200/60",
+            "shadow-lg rounded-xl",
+            "transition-shadow duration-200",
+            "text-[#003366] group",
+            "cursor-grab active:cursor-grabbing",
+            "select-none",
+            isDragging ? "shadow-2xl" : "hover:shadow-xl",
+          )}
+          whileHover={{ scale: isDragging ? 1 : 1.05 }}
+          animate={{ scale: isDragging ? 1.1 : 1 }}
+          aria-label="Buka GIS Tools (drag untuk pindahkan)"
+          title="Analisis Spasial - Drag untuk pindahkan"
+        >
+          <div className="flex items-center gap-1 p-2.5">
+            <GripVertical className={cn(
+              "w-3 h-3 transition-colors",
+              isDragging ? "text-slate-500" : "text-slate-300 group-hover:text-slate-400"
+            )} />
+            <Compass className={cn(
+              "w-5 h-5 transition-transform duration-300",
+              !isDragging && "group-hover:rotate-45"
+            )} />
+          </div>
+        </motion.button>
+      </motion.div>
 
       {/* Panel Overlay */}
       <AnimatePresence>
