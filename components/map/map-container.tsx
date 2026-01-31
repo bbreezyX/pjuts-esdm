@@ -282,6 +282,7 @@ function MapContainerComponent({
       const tileLayer = L.tileLayer(layerConfig.url, {
         attribution: layerConfig.attribution,
         maxZoom: layerConfig.maxZoom || 18,
+        subdomains: layerConfig.subdomains || "abc",
       });
       tileLayer.addTo(map);
       tileLayerRef.current = tileLayer;
@@ -340,6 +341,7 @@ function MapContainerComponent({
       const newTileLayer = L.tileLayer(layerConfig.url, {
         attribution: layerConfig.attribution,
         maxZoom: layerConfig.maxZoom || 18,
+        subdomains: layerConfig.subdomains || "abc",
       });
       newTileLayer.addTo(map);
       tileLayerRef.current = newTileLayer;
@@ -410,6 +412,7 @@ function MapContainerComponent({
           if (overlayConfig) {
             const overlayLayer = L.tileLayer(overlayConfig.url, {
               attribution: overlayConfig.attribution,
+              subdomains: overlayConfig.subdomains || "abc",
             });
             overlayLayer.addTo(map);
             overlayLayersRef.current.set(overlayId, overlayLayer);

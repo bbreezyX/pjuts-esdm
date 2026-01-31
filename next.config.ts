@@ -14,6 +14,54 @@ const withPWA = withPWAInit({
   workboxOptions: {
     skipWaiting: true,
     clientsClaim: true,
+    // Runtime caching for map tiles - use NetworkOnly to bypass SW caching for external tiles
+    runtimeCaching: [
+      {
+        // OpenStreetMap tiles - safe to cache
+        urlPattern: /^https:\/\/[a-c]\.tile\.openstreetmap\.org\/.*/i,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "osm-tiles",
+          expiration: {
+            maxEntries: 500,
+            maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          },
+          cacheableResponse: {
+            statuses: [0, 200],
+          },
+        },
+      },
+      {
+        // Google Maps satellite tiles - use NetworkOnly to avoid any caching issues
+        urlPattern: /^https:\/\/mt[0-3]\.google\.com\/.*/i,
+        handler: "NetworkOnly",
+      },
+      {
+        // ESRI/ArcGIS satellite tiles - use NetworkOnly to avoid CSP issues
+        urlPattern: /^https:\/\/.*\.?arcgisonline\.com\/.*/i,
+        handler: "NetworkOnly",
+      },
+      {
+        // CARTO basemap tiles - safe to cache
+        urlPattern: /^https:\/\/[a-d]\.basemaps\.cartocdn\.com\/.*/i,
+        handler: "CacheFirst",
+        options: {
+          cacheName: "carto-tiles",
+          expiration: {
+            maxEntries: 500,
+            maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+          },
+          cacheableResponse: {
+            statuses: [0, 200],
+          },
+        },
+      },
+      {
+        // Catch-all for any other external tile providers - bypass SW
+        urlPattern: /^https:\/\/.*\/(tile|tiles|MapServer|vt)\/.*/i,
+        handler: "NetworkOnly",
+      },
+    ],
   },
 });
 
@@ -110,9 +158,9 @@ const nextConfig: NextConfig = {
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://static.cloudflareinsights.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
-          // Map tile providers: OSM, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
-          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://a.tile.opentopomap.org https://b.tile.opentopomap.org https://c.tile.opentopomap.org https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.thunderforest.com",
-          "connect-src 'self' ws: wss: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.cloudflareinsights.com https://*.cloudflare.com https://static.cloudflareinsights.com",
+          // Map tile providers: OSM, Google, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
+          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com https://mt0.google.com https://mt1.google.com https://mt2.google.com https://mt3.google.com https://*.google.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://a.tile.opentopomap.org https://b.tile.opentopomap.org https://c.tile.opentopomap.org https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.thunderforest.com",
+          "connect-src 'self' ws: wss: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://mt0.google.com https://mt1.google.com https://mt2.google.com https://mt3.google.com https://*.google.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.cloudflareinsights.com https://*.cloudflare.com https://static.cloudflareinsights.com",
           "frame-ancestors 'none'",
         ].join("; ")
       : [
@@ -120,9 +168,9 @@ const nextConfig: NextConfig = {
           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://unpkg.com https://static.cloudflareinsights.com",
           "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com",
           "font-src 'self' https://fonts.gstatic.com",
-          // Map tile providers: OSM, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
-          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://a.tile.opentopomap.org https://b.tile.opentopomap.org https://c.tile.opentopomap.org https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.thunderforest.com",
-          "connect-src 'self' https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.cloudflareinsights.com https://*.cloudflare.com https://static.cloudflareinsights.com",
+          // Map tile providers: OSM, Google, Esri, OpenTopoMap, CartoDB, Stadia, Thunderforest
+          "img-src 'self' data: blob: https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://tile.openstreetmap.org https://a.tile.openstreetmap.org https://b.tile.openstreetmap.org https://c.tile.openstreetmap.org https://unpkg.com https://mt0.google.com https://mt1.google.com https://mt2.google.com https://mt3.google.com https://*.google.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://a.tile.opentopomap.org https://b.tile.opentopomap.org https://c.tile.opentopomap.org https://*.basemaps.cartocdn.com https://a.basemaps.cartocdn.com https://b.basemaps.cartocdn.com https://c.basemaps.cartocdn.com https://d.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.thunderforest.com",
+          "connect-src 'self' https://assets.esdm.cloud https://esdm.cloud https://*.r2.dev https://*.r2.cloudflarestorage.com https://*.tile.openstreetmap.org https://*.openstreetmap.org https://tile.openstreetmap.org https://unpkg.com https://mt0.google.com https://mt1.google.com https://mt2.google.com https://mt3.google.com https://*.google.com https://server.arcgisonline.com https://*.arcgisonline.com https://*.tile.opentopomap.org https://*.basemaps.cartocdn.com https://tiles.stadiamaps.com https://*.stadiamaps.com https://tile.thunderforest.com https://*.cloudflareinsights.com https://*.cloudflare.com https://static.cloudflareinsights.com",
           "frame-ancestors 'none'",
         ].join("; ");
 

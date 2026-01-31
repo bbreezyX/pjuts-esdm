@@ -36,6 +36,7 @@ export interface LayerConfig {
   attribution: string;
   maxZoom?: number;
   opacity?: number;
+  subdomains?: string;
 }
 
 export interface OverlayConfig {
@@ -45,6 +46,7 @@ export interface OverlayConfig {
   url: string;
   attribution: string;
   isEnabled: boolean;
+  subdomains?: string;
 }
 
 interface LayerSwitcherProps {
@@ -75,18 +77,20 @@ export const BASE_LAYERS: LayerConfig[] = [
     name: "Satelit",
     description: "Citra satelit resolusi tinggi",
     icon: Satellite,
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution: '&copy; <a href="https://www.esri.com">Esri</a>',
-    maxZoom: 19,
+    // Use Google satellite tiles (more reliable, no CSP issues)
+    url: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+    attribution: '&copy; <a href="https://www.google.com/maps">Google</a>',
+    maxZoom: 20,
   },
   {
     id: "toner",
     name: "Monokrom",
     description: "Hitam putih high contrast",
     icon: Building2,
-    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
+    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
     attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
     maxZoom: 19,
+    subdomains: "abcd",
   },
 ];
 
@@ -95,9 +99,10 @@ export const OVERLAY_LAYERS: OverlayConfig[] = [
     id: "labels",
     name: "Label Nama",
     icon: MapIcon,
-    url: "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}{r}.png",
+    url: "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
     attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
     isEnabled: false,
+    subdomains: "abcd",
   },
 ];
 
