@@ -12,7 +12,7 @@ const plusJakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://esdm.cloud"),
+  metadataBase: new URL("https://www.esdm.cloud"),
   title: {
     default:
       "PJUTS ESDM Jambi - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "id_ID",
-    url: "https://esdm.cloud",
+    url: "https://www.esdm.cloud",
     siteName: "PJUTS ESDM Jambi",
     title:
       "PJUTS ESDM Jambi - Sistem Monitoring Penerangan Jalan Umum Tenaga Surya",
