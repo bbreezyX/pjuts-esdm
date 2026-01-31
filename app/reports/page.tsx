@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { getReports } from "@/app/actions/reports";
 import { getRegencies } from "@/app/actions/units";
 import { AppShell } from "@/components/layout";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Plus } from "lucide-react";
 import Link from "next/link";
 import { ReportsPageClient } from "./reports-client";
@@ -15,6 +17,39 @@ interface SearchParams {
   search?: string;
   startDate?: string;
   endDate?: string;
+}
+
+// Skeleton for reports table while streaming
+function ReportsTableSkeleton() {
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-3">
+        <Skeleton className="h-10 w-40" />
+        <Skeleton className="h-10 w-32" />
+        <Skeleton className="h-10 w-48" />
+      </div>
+      <div className="border rounded-2xl overflow-hidden">
+        <div className="bg-slate-50 p-4">
+          <div className="flex gap-4">
+            {[1, 2, 3, 4, 5].map((i) => (
+              <Skeleton key={i} className="h-4 flex-1" />
+            ))}
+          </div>
+        </div>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="p-4 border-t">
+            <div className="flex gap-4 items-center">
+              <Skeleton className="h-12 w-12 rounded-lg" />
+              <Skeleton className="h-4 flex-1" />
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export default async function ReportsPage({
@@ -34,20 +69,14 @@ export default async function ReportsPage({
   const startDate = params.startDate ? new Date(params.startDate) : undefined;
   const endDate = params.endDate ? new Date(params.endDate) : undefined;
 
-  const [reportsResult, regenciesResult] = await Promise.all([
-    getReports({
-      page,
-      regency,
-      startDate,
-      endDate,
-    }),
-    getRegencies(),
-  ]);
-
-  const reports = reportsResult.data?.reports || [];
-  const total = reportsResult.data?.total || 0;
-  const totalPages = reportsResult.data?.totalPages || 1;
-  const regencies = regenciesResult.data || [];
+  // Start fetching data - DO NOT AWAIT to enable streaming
+  const reportsPromise = getReports({
+    page,
+    regency,
+    startDate,
+    endDate,
+  });
+  const regenciesPromise = getRegencies();
 
   return (
     <AppShell
@@ -93,15 +122,15 @@ export default async function ReportsPage({
         </div>
       </div>
 
-      <ReportsPageClient
-        initialReports={reports}
-        total={total}
-        page={page}
-        totalPages={totalPages}
-        regencies={regencies}
-        initialRegency={regency}
-        isAdmin={session.user.role === "ADMIN"}
-      />
+      <Suspense fallback={<ReportsTableSkeleton />}>
+        <ReportsPageClient
+          reportsPromise={reportsPromise}
+          regenciesPromise={regenciesPromise}
+          page={page}
+          initialRegency={regency}
+          isAdmin={session.user.role === "ADMIN"}
+        />
+      </Suspense>
     </AppShell>
   );
 }

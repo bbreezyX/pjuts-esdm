@@ -1,13 +1,12 @@
 "use client";
 
-import { use, Suspense, useState } from "react";
+import { use, Suspense } from "react";
 import Link from "next/link";
 import {
   TrendingUp,
   ArrowUpRight,
   Plus,
   Briefcase,
-  AlertCircle,
   CheckCircle2,
   AlertTriangle,
   WifiOff,
@@ -17,12 +16,10 @@ import {
 } from "lucide-react";
 import { ActivityFeed } from "@/components/dashboard/activity-feed";
 import { ProvinceChart } from "@/components/dashboard/charts-lazy";
+import { BentoCard } from "@/components/dashboard/bento-card";
+import { UserAvatarWithPopover, getUserInitial } from "@/components/dashboard/user-avatar";
+import { StatusBadgeWithPopover } from "@/components/dashboard/status-badge-popover";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   DashboardStats,
   ProvinceStats,
@@ -66,215 +63,12 @@ const ROLE_LABELS: Record<string, string> = {
   FIELD_STAFF: "Tim Lapangan",
 };
 
-/**
- * Get the initial letter(s) from a user's name for avatar display
- */
-function getUserInitial(name: string): string {
-  return name.charAt(0).toUpperCase();
-}
-
-/**
- * Generate a consistent background color based on user ID
- * Uses theme-consistent primary blue shades for a clean look
- */
-function getAvatarColor(userId: string): string {
-  const colors = [
-    "bg-primary-500",
-    "bg-primary-600",
-    "bg-primary-700",
-    "bg-primary-400",
-  ];
-  // Simple hash based on userId to get consistent color
-  const hash = userId
-    .split("")
-    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  return colors[hash % colors.length];
-}
-
 function getGreeting() {
   const hour = new Date().getHours();
   if (hour < 11) return "Selamat Pagi";
   if (hour < 15) return "Selamat Siang";
   if (hour < 19) return "Selamat Sore";
   return "Selamat Malam";
-}
-
-// ==========================================
-// BENTO COMPONENTS
-// ==========================================
-
-function BentoCard({
-  children,
-  className,
-  padding = "p-8",
-}: {
-  children: React.ReactNode;
-  className?: string;
-  padding?: string;
-}) {
-  return (
-    <div
-      className={cn(
-        "bg-card rounded-bento border border-border shadow-sm overflow-hidden",
-        padding,
-        className,
-      )}
-    >
-      {children}
-    </div>
-  );
-}
-
-/**
- * Enhanced Status Badge with Reveal Tooltip
- */
-function StatusBadgeWithPopover({ prov }: { prov: ProvinceStats }) {
-  const [isOpen, setIsOpen] = useState(false);
-  const totalIssues = prov.maintenanceNeeded + prov.offline;
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <div
-          className="relative flex flex-wrap gap-1.5 sm:gap-2 cursor-help"
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
-        >
-          {prov.operational > 0 && (
-            <div className="flex items-center gap-1 bg-emerald-500/10 text-emerald-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-bold border border-emerald-500/20">
-              <CheckCircle2 size={8} className="sm:w-[10px] sm:h-[10px]" />
-              {prov.operational} OK
-            </div>
-          )}
-          {totalIssues > 0 && (
-            <div className="flex items-center gap-1 bg-amber-500/10 text-amber-600 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-bold border border-amber-500/20">
-              <AlertCircle size={8} className="sm:w-[10px] sm:h-[10px]" />
-              {totalIssues} Issue
-            </div>
-          )}
-        </div>
-      </PopoverTrigger>
-      <PopoverContent
-        side="top"
-        align="start"
-        sideOffset={12}
-        className="z-50 p-0 border-none bg-transparent shadow-none w-auto"
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="min-w-[220px] bg-white/95 backdrop-blur-xl border border-border p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] relative overflow-hidden"
-        >
-          <div className="flex flex-col gap-3 relative z-10">
-            <div>
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none block mb-1">
-                Rincian Kondisi
-              </span>
-              <span className="text-xs font-bold text-foreground">
-                {prov.province}
-              </span>
-            </div>
-
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between group/item">
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
-                  <span className="text-xs font-bold text-muted-foreground">
-                    Operasional
-                  </span>
-                </div>
-                <span className="text-xs font-black text-emerald-600">
-                  {prov.operational}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between group/item">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.3)]" />
-                  <span className="text-xs font-bold text-muted-foreground">
-                    Perbaikan
-                  </span>
-                </div>
-                <span className="text-xs font-black text-amber-600">
-                  {prov.maintenanceNeeded}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between group/item">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.3)]" />
-                  <span className="text-xs font-bold text-muted-foreground">
-                    Offline
-                  </span>
-                </div>
-                <span className="text-xs font-black text-red-600">
-                  {prov.offline}
-                </span>
-              </div>
-            </div>
-
-            <div className="pt-2.5 mt-1 border-t border-border flex items-center justify-between">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                Total Aset
-              </span>
-              <span className="text-xs font-black text-foreground">
-                {prov.totalUnits}
-              </span>
-            </div>
-          </div>
-          {/* Tooltip Arrow */}
-          <div className="absolute top-full left-4 -translate-y-[1px] w-3 h-3 bg-white border-r border-b border-border rotate-45" />
-        </motion.div>
-      </PopoverContent>
-    </Popover>
-  );
-}
-
-/**
- * User Avatar with premium hover popover
- */
-function UserAvatarWithPopover({ user }: { user: DashboardUser }) {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <Popover open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverTrigger asChild>
-        <div
-          className={cn(
-            "w-9 h-9 lg:w-10 lg:h-10 xl:w-12 xl:h-12 rounded-lg lg:rounded-xl xl:rounded-2xl border-[2px] lg:border-[3px] border-background shadow-lg shadow-primary/5 transition-transform hover:scale-110 hover:z-10 cursor-pointer flex items-center justify-center text-white text-xs lg:text-sm xl:text-base font-bold",
-            getAvatarColor(user.id),
-          )}
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
-        >
-          {getUserInitial(user.name)}
-        </div>
-      </PopoverTrigger>
-      <PopoverContent
-        side="top"
-        align="center"
-        sideOffset={14}
-        className="z-50 p-0 border-none bg-transparent shadow-none w-auto pointer-events-none"
-      >
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, y: 10 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="bg-white/95 backdrop-blur-md px-4 py-2.5 rounded-2xl border border-border shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex flex-col items-center gap-0.5 relative"
-        >
-          <span className="text-foreground font-bold text-xs whitespace-nowrap tracking-tight">
-            {user.name}
-          </span>
-          <span className="text-primary text-[9px] font-black uppercase tracking-[0.15em]">
-            {ROLE_LABELS[user.role] || user.role}
-          </span>
-          {/* Tooltip Arrow */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-white border-r border-b border-border rotate-45" />
-        </motion.div>
-      </PopoverContent>
-    </Popover>
-  );
 }
 
 // ==========================================

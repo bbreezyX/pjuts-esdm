@@ -1,30 +1,45 @@
 "use client";
 
-import { useState, useTransition, useCallback, useRef } from "react";
+import { use, useState, useTransition, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReportsTable } from "@/components/reports/reports-table";
 import { ReportsFilters } from "@/components/reports/reports-filters";
 import { ReportData } from "@/app/actions/reports";
+import { ActionResult } from "@/types";
 
-interface ReportsPageClientProps {
-  initialReports: ReportData[];
+// Promise types for streaming
+type ReportsPromise = Promise<ActionResult<{
+  reports: ReportData[];
   total: number;
   page: number;
   totalPages: number;
-  regencies: string[];
+}>>;
+type RegenciesPromise = Promise<ActionResult<string[]>>;
+
+interface ReportsPageClientProps {
+  reportsPromise: ReportsPromise;
+  regenciesPromise: RegenciesPromise;
+  page: number;
   initialRegency?: string;
   isAdmin?: boolean;
 }
 
 export function ReportsPageClient({
-  initialReports,
-  total,
+  reportsPromise,
+  regenciesPromise,
   page,
-  totalPages,
-  regencies,
   initialRegency,
   isAdmin = false,
 }: ReportsPageClientProps) {
+  // Unwrap promises using use() hook for streaming
+  const { data: reportsData } = use(reportsPromise);
+  const { data: regenciesData } = use(regenciesPromise);
+
+  const reports = reportsData?.reports || [];
+  const total = reportsData?.total || 0;
+  const totalPages = reportsData?.totalPages || 1;
+  const regencies = regenciesData || [];
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -137,7 +152,7 @@ export function ReportsPageClient({
 
       <div className={isPending ? "opacity-50 pointer-events-none" : ""}>
         <ReportsTable
-          reports={initialReports}
+          reports={reports}
           total={total}
           page={page}
           totalPages={totalPages}
