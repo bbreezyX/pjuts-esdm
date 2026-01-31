@@ -1,9 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Use Edge runtime for faster auth checks at the edge
-export const runtime = "edge";
-
 export const config = {
   matcher: [
     /*
