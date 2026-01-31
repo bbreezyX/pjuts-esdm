@@ -89,7 +89,7 @@ export const BASE_LAYERS: LayerConfig[] = [
     description: "Hitam putih high contrast",
     icon: Building2,
     // CartoDB Positron - light monochrome style
-    url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+    url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     maxZoom: 19,
@@ -102,7 +102,7 @@ export const OVERLAY_LAYERS: OverlayConfig[] = [
     id: "labels",
     name: "Label Nama",
     icon: MapIcon,
-    url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_only_labels/{z}/{x}/{y}.png",
+    url: "https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png",
     attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
     isEnabled: false,
     subdomains: "abcd",
