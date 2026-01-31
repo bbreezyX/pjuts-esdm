@@ -279,12 +279,15 @@ function MapContainerComponent({
         BASE_LAYERS.find((l) => l.id === activeLayer) || BASE_LAYERS[0];
 
       // Add tile layer
-      const tileLayer = L.tileLayer(layerConfig.url, {
+      const tileLayerOptions: Record<string, unknown> = {
         attribution: layerConfig.attribution,
         maxZoom: layerConfig.maxZoom || 18,
-        // Pass subdomains if defined (Leaflet accepts string or array)
-        subdomains: layerConfig.subdomains || ["a", "b", "c"],
-      });
+      };
+      // Only add subdomains if the layer config defines them
+      if (layerConfig.subdomains) {
+        tileLayerOptions.subdomains = layerConfig.subdomains;
+      }
+      const tileLayer = L.tileLayer(layerConfig.url, tileLayerOptions);
       tileLayer.addTo(map);
       tileLayerRef.current = tileLayer;
 
@@ -339,12 +342,15 @@ function MapContainerComponent({
       }
 
       // Add new tile layer
-      const newTileLayer = L.tileLayer(layerConfig.url, {
+      const tileLayerOptions: Record<string, unknown> = {
         attribution: layerConfig.attribution,
         maxZoom: layerConfig.maxZoom || 18,
-        // Pass subdomains if defined (Leaflet accepts string or array)
-        subdomains: layerConfig.subdomains || ["a", "b", "c"],
-      });
+      };
+      // Only add subdomains if the layer config defines them
+      if (layerConfig.subdomains) {
+        tileLayerOptions.subdomains = layerConfig.subdomains;
+      }
+      const newTileLayer = L.tileLayer(layerConfig.url, tileLayerOptions);
       newTileLayer.addTo(map);
       tileLayerRef.current = newTileLayer;
     } catch (err) {
@@ -412,11 +418,14 @@ function MapContainerComponent({
         if (!overlayLayersRef.current.has(overlayId)) {
           const overlayConfig = OVERLAY_LAYERS.find((o) => o.id === overlayId);
           if (overlayConfig) {
-            const overlayLayer = L.tileLayer(overlayConfig.url, {
+            const overlayOptions: Record<string, unknown> = {
               attribution: overlayConfig.attribution,
-              // Pass subdomains if defined (Leaflet accepts string or array)
-              subdomains: overlayConfig.subdomains || ["a", "b", "c"],
-            });
+            };
+            // Only add subdomains if the overlay config defines them
+            if (overlayConfig.subdomains) {
+              overlayOptions.subdomains = overlayConfig.subdomains;
+            }
+            const overlayLayer = L.tileLayer(overlayConfig.url, overlayOptions);
             overlayLayer.addTo(map);
             overlayLayersRef.current.set(overlayId, overlayLayer);
           }

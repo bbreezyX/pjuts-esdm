@@ -77,19 +77,21 @@ export const BASE_LAYERS: LayerConfig[] = [
     name: "Satelit",
     description: "Citra satelit resolusi tinggi",
     icon: Satellite,
-    // Use Google satellite tiles with proper subdomain rotation
-    url: "https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
-    attribution: '&copy; <a href="https://www.google.com/maps">Google</a>',
-    maxZoom: 20,
-    subdomains: ["mt0", "mt1", "mt2", "mt3"],
+    // Esri World Imagery - free and reliable satellite tiles
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attribution:
+      '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics',
+    maxZoom: 19,
   },
   {
     id: "toner",
     name: "Monokrom",
     description: "Hitam putih high contrast",
     icon: Building2,
-    url: "https://{s}.basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png",
-    attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+    // CartoDB Positron - light monochrome style
+    url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png",
+    attribution:
+      '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
     maxZoom: 19,
     subdomains: "abcd",
   },
@@ -100,7 +102,7 @@ export const OVERLAY_LAYERS: OverlayConfig[] = [
     id: "labels",
     name: "Label Nama",
     icon: MapIcon,
-    url: "https://{s}.basemaps.cartocdn.com/rastertiles/light_only_labels/{z}/{x}/{y}.png",
+    url: "https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_only_labels/{z}/{x}/{y}.png",
     attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
     isEnabled: false,
     subdomains: "abcd",
