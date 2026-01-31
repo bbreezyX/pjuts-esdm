@@ -595,63 +595,63 @@ export default function LoginPage() {
 
       {/* Right Panel - Login Form */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 xl:p-24 relative">
-        {/* Top Left Action - Back to Home */}
-        <div className="absolute top-6 left-6 lg:top-12 lg:left-12">
-          <Link
-            href="/"
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            <span>{t("nav.beranda")}</span>
-          </Link>
-        </div>
-
-        {/* Top Right Actions */}
-        <div className="absolute top-6 right-6 lg:top-12 lg:right-12 flex items-center gap-4">
-          <button
-            onClick={toggleLanguage}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
-          >
-            <Globe className="w-4 h-4" />
-            <span>{language.toUpperCase()}</span>
-          </button>
-        </div>
-
-        <div className="w-full max-w-[420px] bg-white rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 p-8 md:p-10">
-          {/* Mobile Logo (Visible only on mobile) */}
-          <div className="lg:hidden flex justify-center mb-8">
-             <Image
-                src="/logo-esdm.png"
-                alt="Logo ESDM"
-                width={64}
-                height={64}
-                className="w-16 h-16 object-contain"
-              />
+        <div className="w-full max-w-[420px]">
+          {/* Navigation Row - Above the card */}
+          <div className="flex items-center justify-between mb-4">
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors group"
+            >
+              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+              <span>{t("nav.beranda")}</span>
+            </Link>
+            
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors"
+            >
+              <Globe className="w-4 h-4" />
+              <span>{language.toUpperCase()}</span>
+            </button>
           </div>
 
-          <div className="text-center lg:text-left mb-10">
-            <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight mb-2">
-              {t("login.welcome")}
-            </h1>
-            <p className="text-slate-500 font-medium">
-              {t("login.welcome_sub")}
-            </p>
-          </div>
+          {/* Login Card */}
+          <div className="bg-white rounded-2xl shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-slate-100 p-8 md:p-10">
+            {/* Mobile Logo (Visible only on mobile) */}
+            <div className="lg:hidden flex justify-center mb-8">
+               <Image
+                  src="/logo-esdm.png"
+                  alt="Logo ESDM"
+                  width={64}
+                  height={64}
+                  className="w-16 h-16 object-contain"
+                />
+            </div>
 
-          <Suspense fallback={<LoginFormFallback />}>
-            <LoginFormContent />
-          </Suspense>
+            <div className="text-center lg:text-left mb-10">
+              <h1 className="text-2xl lg:text-3xl font-bold text-slate-900 tracking-tight mb-2">
+                {t("login.welcome")}
+              </h1>
+              <p className="text-slate-500 font-medium">
+                {t("login.welcome_sub")}
+              </p>
+            </div>
 
-          {/* Footer Links */}
-          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
-             <p className="text-xs text-slate-400 font-medium">
-                {t("login.security_note")}
-             </p>
+            <Suspense fallback={<LoginFormFallback />}>
+              <LoginFormContent />
+            </Suspense>
+
+            {/* Footer Links */}
+            <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+               <p className="text-xs text-slate-400 font-medium">
+                  {t("login.security_note")}
+               </p>
+            </div>
           </div>
-        </div>
-        
-        <div className="mt-8 text-center text-sm text-slate-500 font-medium">
-            &copy; {new Date().getFullYear()} Dinas ESDM Provinsi Jambi. All rights reserved.
+          
+          <div className="mt-6 text-center text-sm text-slate-500 font-medium">
+              &copy; {new Date().getFullYear()} Dinas ESDM Provinsi Jambi. All rights reserved.
+          </div>
         </div>
       </div>
     </main>
