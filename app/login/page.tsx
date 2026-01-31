@@ -26,6 +26,7 @@ type LoginStep = "credentials" | "pin-challenge";
 
 interface PinChallengeData {
   pin: string;
+  sessionToken: string;
   expiresAt: number;
 }
 
@@ -102,6 +103,7 @@ function LoginFormContent() {
       // Move to PIN challenge step
       setPinChallenge({
         pin: data.pin,
+        sessionToken: data.sessionToken,
         expiresAt: Date.now() + (data.expiresIn * 1000),
       });
       setTimeLeft(data.expiresIn);
@@ -127,7 +129,7 @@ function LoginFormContent() {
       const verifyResponse = await fetch("/api/auth/pin-challenge", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, pin: pinInput }),
+        body: JSON.stringify({ email, pin: pinInput, sessionToken: pinChallenge?.sessionToken }),
       });
 
       const verifyData = await verifyResponse.json();
@@ -194,6 +196,7 @@ function LoginFormContent() {
       if (response.ok) {
         setPinChallenge({
           pin: data.pin,
+          sessionToken: data.sessionToken,
           expiresAt: Date.now() + (data.expiresIn * 1000),
         });
         setTimeLeft(data.expiresIn);

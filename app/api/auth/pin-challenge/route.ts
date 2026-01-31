@@ -21,6 +21,7 @@ const requestPinSchema = z.object({
 const verifyPinSchema = z.object({
   email: z.string().email(),
   pin: z.string().length(6).regex(/^\d+$/),
+  sessionToken: z.string().min(1),
 });
 
 /**
@@ -71,11 +72,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Generate PIN challenge
-    const pin = await createPinChallenge(email);
+    const { pin, sessionToken } = await createPinChallenge(email);
 
     return NextResponse.json({
       success: true,
       pin, // Display this to the user
+      sessionToken, // Store this client-side for verification
       expiresIn: 120, // seconds
     });
   } catch (error) {
@@ -100,16 +102,18 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email: rawEmail, pin } = verifyPinSchema.parse(body);
+    const { email: rawEmail, pin, sessionToken } = verifyPinSchema.parse(body);
     const email = rawEmail.toLowerCase().trim();
 
-    const result = await verifyPinChallenge(email, pin);
+    const result = await verifyPinChallenge(email, pin, sessionToken);
 
     if (!result.success) {
       const statusMap: Record<string, number> = {
         PIN_EXPIRED: 410,
         MAX_ATTEMPTS: 429,
         INVALID_PIN: 401,
+        INVALID_SESSION: 401,
+        RATE_LIMITED: 429,
       };
       return NextResponse.json(
         { error: result.reason },
