@@ -36,7 +36,7 @@ export interface LayerConfig {
   attribution: string;
   maxZoom?: number;
   opacity?: number;
-  subdomains?: string;
+  subdomains?: string | string[];
 }
 
 export interface OverlayConfig {
@@ -46,7 +46,7 @@ export interface OverlayConfig {
   url: string;
   attribution: string;
   isEnabled: boolean;
-  subdomains?: string;
+  subdomains?: string | string[];
 }
 
 interface LayerSwitcherProps {
@@ -77,10 +77,11 @@ export const BASE_LAYERS: LayerConfig[] = [
     name: "Satelit",
     description: "Citra satelit resolusi tinggi",
     icon: Satellite,
-    // Use Google satellite tiles (more reliable, no CSP issues)
-    url: "https://mt1.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
+    // Use Google satellite tiles with proper subdomain rotation
+    url: "https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}",
     attribution: '&copy; <a href="https://www.google.com/maps">Google</a>',
     maxZoom: 20,
+    subdomains: ["mt0", "mt1", "mt2", "mt3"],
   },
   {
     id: "toner",

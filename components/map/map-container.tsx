@@ -282,7 +282,8 @@ function MapContainerComponent({
       const tileLayer = L.tileLayer(layerConfig.url, {
         attribution: layerConfig.attribution,
         maxZoom: layerConfig.maxZoom || 18,
-        subdomains: layerConfig.subdomains || "abc",
+        // Pass subdomains if defined (Leaflet accepts string or array)
+        ...(layerConfig.subdomains && { subdomains: layerConfig.subdomains }),
       });
       tileLayer.addTo(map);
       tileLayerRef.current = tileLayer;
@@ -341,7 +342,8 @@ function MapContainerComponent({
       const newTileLayer = L.tileLayer(layerConfig.url, {
         attribution: layerConfig.attribution,
         maxZoom: layerConfig.maxZoom || 18,
-        subdomains: layerConfig.subdomains || "abc",
+        // Pass subdomains if defined (Leaflet accepts string or array)
+        ...(layerConfig.subdomains && { subdomains: layerConfig.subdomains }),
       });
       newTileLayer.addTo(map);
       tileLayerRef.current = newTileLayer;
@@ -412,7 +414,10 @@ function MapContainerComponent({
           if (overlayConfig) {
             const overlayLayer = L.tileLayer(overlayConfig.url, {
               attribution: overlayConfig.attribution,
-              subdomains: overlayConfig.subdomains || "abc",
+              // Pass subdomains if defined (Leaflet accepts string or array)
+              ...(overlayConfig.subdomains && {
+                subdomains: overlayConfig.subdomains,
+              }),
             });
             overlayLayer.addTo(map);
             overlayLayersRef.current.set(overlayId, overlayLayer);
