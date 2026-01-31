@@ -77,10 +77,12 @@ function LoginFormContent() {
 
   const handleCredentialsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[LOGIN] handleCredentialsSubmit called - fetching PIN challenge");
     setError("");
     setLoading(true);
 
     try {
+      console.log("[LOGIN] Calling /api/auth/pin-challenge POST");
       const response = await fetch("/api/auth/pin-challenge", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -100,16 +102,17 @@ function LoginFormContent() {
         return;
       }
 
-      // Move to PIN challenge step
+      // Move to PIN challenge step - clear input first to prevent auto-submit race
+      console.log("[LOGIN] PIN challenge received, transitioning to PIN step");
+      setPinInput("");
+      setPinError(false);
+      setStep("pin-challenge");
       setPinChallenge({
         pin: data.pin,
         sessionToken: data.sessionToken,
         expiresAt: Date.now() + (data.expiresIn * 1000),
       });
       setTimeLeft(data.expiresIn);
-      setStep("pin-challenge");
-      setPinInput("");
-      setPinError(false);
     } catch {
       setError(t("login.error_general"));
     } finally {
@@ -119,7 +122,7 @@ function LoginFormContent() {
 
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pinInput.length !== 6) return;
+    if (pinInput.length !== 6 || !pinChallenge) return;
     
     setLoading(true);
     setPinError(false);
@@ -137,15 +140,16 @@ function LoginFormContent() {
       if (!verifyResponse.ok) {
         setPinError(true);
         setPinInput("");
-        if (verifyData.error === "MAX_ATTEMPTS") {
+        if (verifyData.error === "MAX_ATTEMPTS" || verifyData.error === "RATE_LIMITED") {
           setError(t("login.error_max_attempts"));
           setStep("credentials");
           setPinChallenge(null);
-        } else if (verifyData.error === "PIN_EXPIRED") {
+        } else if (verifyData.error === "PIN_EXPIRED" || verifyData.error === "INVALID_SESSION") {
           setError(t("login.pin_expired"));
           setStep("credentials");
           setPinChallenge(null);
         }
+        // For INVALID_PIN, just show the error but stay on PIN screen
         return;
       }
 
@@ -194,12 +198,16 @@ function LoginFormContent() {
       const data = await response.json();
 
       if (response.ok) {
+        // Clear PIN input first before setting challenge to prevent auto-submit race
+        setPinInput("");
+        setPinError(false);
         setPinChallenge({
           pin: data.pin,
           sessionToken: data.sessionToken,
           expiresAt: Date.now() + (data.expiresIn * 1000),
         });
         setTimeLeft(data.expiresIn);
+        setStep("pin-challenge");
       } else {
         setError(t("login.error_general"));
         setStep("credentials");
@@ -211,13 +219,17 @@ function LoginFormContent() {
     }
   };
 
-  // Auto-submit when PIN is complete
-  useEffect(() => {
-    if (pinInput.length === 6 && step === "pin-challenge" && !loading) {
-      const form = document.getElementById("pin-form") as HTMLFormElement;
-      form?.requestSubmit();
-    }
-  }, [pinInput, step, loading]);
+  // Auto-submit disabled - user must click the button
+  // This prevents race conditions with state updates
+  // useEffect(() => {
+  //   if (pinInput.length === 6 && step === "pin-challenge" && !loading && pinChallenge) {
+  //     const timer = setTimeout(() => {
+  //       const form = document.getElementById("pin-form") as HTMLFormElement;
+  //       form?.requestSubmit();
+  //     }, 100);
+  //     return () => clearTimeout(timer);
+  //   }
+  // }, [pinInput, step, loading, pinChallenge]);
 
   if (step === "pin-challenge" && pinChallenge) {
     return (
@@ -247,9 +259,9 @@ function LoginFormContent() {
           </div>
         </div>
 
-        {/* PIN Display - Compact */}
-        <div className="bg-slate-50 rounded-xl p-4">
-          <div className="flex items-center justify-between">
+        {/* PIN Display - CAPTCHA style */}
+        <div className="relative overflow-hidden rounded-xl bg-white border border-slate-200">
+          <div className="flex items-center justify-between px-4 pt-3">
             <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">
               {t("login.your_code")}
             </span>
@@ -263,15 +275,98 @@ function LoginFormContent() {
               {t("login.new_code")}
             </button>
           </div>
-          <div className="flex justify-center gap-1.5 mt-3">
-            {pinChallenge.pin.split("").map((digit, i) => (
-              <span
-                key={i}
-                className="w-9 h-11 flex items-center justify-center bg-white rounded-lg text-xl font-bold text-slate-900 border border-slate-200"
-              >
-                {digit}
-              </span>
-            ))}
+          
+          {/* CAPTCHA Canvas */}
+          <div className="relative h-24 mx-4 mb-3 select-none" style={{ userSelect: 'none' }}>
+            {/* Background noise dots */}
+            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+              {Array.from({ length: 30 }).map((_, i) => {
+                const hue = Math.floor(Math.random() * 360);
+                return (
+                  <circle
+                    key={`dot-${i}`}
+                    cx={`${5 + Math.random() * 90}%`}
+                    cy={`${10 + Math.random() * 80}%`}
+                    r={1 + Math.random() * 3}
+                    fill={`hsla(${hue}, 70%, 45%, ${0.3 + Math.random() * 0.4})`}
+                  />
+                );
+              })}
+            </svg>
+            
+            {/* Wavy crossing lines */}
+            <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
+              {Array.from({ length: 3 }).map((_, i) => {
+                const hue = Math.floor(Math.random() * 360);
+                return (
+                  <path
+                    key={`line-${i}`}
+                    d={`M 0 ${30 + i * 20} Q ${50 + Math.random() * 30} ${20 + Math.random() * 40}, ${100 + Math.random() * 30} ${40 + Math.random() * 20} T ${200 + Math.random() * 30} ${30 + Math.random() * 30} T 300 ${40 + Math.random() * 20}`}
+                    stroke={`hsla(${hue}, 70%, 40%, ${0.4 + Math.random() * 0.3})`}
+                    strokeWidth={1 + Math.random()}
+                    fill="none"
+                  />
+                );
+              })}
+            </svg>
+            
+            {/* Distorted digits */}
+            <div 
+              className="absolute inset-0 flex items-center justify-center"
+              style={{ 
+                fontFamily: "'Brush Script MT', 'Segoe Script', cursive",
+                pointerEvents: 'none',
+              }}
+            >
+              {pinChallenge.pin.split("").map((digit, i) => {
+                const rotation = (i % 2 === 0 ? 1 : -1) * (8 + (i * 5) % 15);
+                const translateY = Math.sin(i * 1.2) * 12;
+                const translateX = (i - 2.5) * 28;
+                const scale = 0.9 + Math.random() * 0.3;
+                const hue = Math.floor(Math.random() * 360);
+                
+                return (
+                  <span
+                    key={i}
+                    className="absolute text-4xl font-bold"
+                    style={{
+                      color: `hsl(${hue}, 70%, 35%)`,
+                      transform: `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotation}deg) scale(${scale})`,
+                      textShadow: `2px 2px 4px hsla(${hue}, 70%, 35%, 0.3)`,
+                      filter: 'url(#captcha-distort)',
+                    }}
+                  >
+                    {digit}
+                  </span>
+                );
+              })}
+            </div>
+            
+            {/* SVG filter for distortion */}
+            <svg className="absolute" width="0" height="0">
+              <defs>
+                <filter id="captcha-distort">
+                  <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="2" result="turbulence" />
+                  <feDisplacementMap in="SourceGraphic" in2="turbulence" scale="3" xChannelSelector="R" yChannelSelector="G" />
+                </filter>
+              </defs>
+            </svg>
+            
+            {/* More scattered dots */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none">
+              {Array.from({ length: 15 }).map((_, i) => {
+                const hue = Math.floor(Math.random() * 360);
+                return (
+                  <circle
+                    key={`scatter-${i}`}
+                    cx={`${Math.random() * 100}%`}
+                    cy={`${Math.random() * 100}%`}
+                    r={2 + Math.random() * 4}
+                    fill={`hsla(${hue}, 60%, 50%, ${0.2 + Math.random() * 0.3})`}
+                  />
+                );
+              })}
+            </svg>
           </div>
         </div>
 

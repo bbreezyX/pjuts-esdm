@@ -39,22 +39,15 @@ export const Workflow = () => {
       id="workflow"
       className="relative pt-40 pb-32 bg-white overflow-hidden"
     >
-      {/* Moving Background Pattern */}
-      <div className="absolute inset-0 opacity-100 pointer-events-none">
-        <motion.div
-          animate={{
-            backgroundPosition: ["0px 0px", "50px 50px"],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute inset-0"
+      {/* Background Pattern - CSS animation for smooth mobile performance */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div 
+          className="absolute inset-0 animate-dot-drift will-change-transform"
           style={{
             backgroundImage:
               "radial-gradient(circle at 2px 2px, rgba(0, 51, 102, 0.05) 2px, transparent 0)",
             backgroundSize: "40px 40px",
+            transform: 'translateZ(0)'
           }}
         />
       </div>
@@ -189,8 +182,9 @@ export const Workflow = () => {
               </div>
             </div>
 
-            <div className="absolute -top-10 -right-10 w-40 h-40 bg-accent/20 rounded-full blur-3xl -z-10" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl -z-10" />
+            {/* Decorative blurs - reduced on mobile for performance */}
+            <div className="absolute -top-10 -right-10 w-20 h-20 md:w-40 md:h-40 bg-accent/20 rounded-full blur-xl md:blur-3xl -z-10" />
+            <div className="absolute -bottom-10 -left-10 w-20 h-20 md:w-40 md:h-40 bg-primary/20 rounded-full blur-xl md:blur-3xl -z-10" />
           </motion.div>
         </div>
       </div>

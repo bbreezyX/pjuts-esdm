@@ -1477,10 +1477,111 @@ input[type="file"]::file-selector-button:hover {
   .animate-scale-in,
   .animate-pulse-slow,
   .animate-pulse-slower,
-  .animate-on-scroll {
+  .animate-on-scroll,
+  .animate-dot-drift,
+  .animate-float-slow,
+  .animate-float-slow-reverse,
+  .animate-marquee-reverse {
     animation: none;
     opacity: 1;
     transform: none;
     transition: none;
+  }
+}
+
+/* ============================================
+   Mobile-Optimized Landing Page Animations
+   GPU-accelerated using transform3d
+   ============================================ */
+
+/* Dot pattern drift - uses transform instead of background-position for GPU acceleration */
+@keyframes dot-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(40px, 40px, 0);
+  }
+}
+
+.animate-dot-drift {
+  animation: dot-drift 25s linear infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Marquee animations for running text */
+@keyframes marquee-ltr {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-marquee-reverse {
+  animation: marquee-ltr 25s linear infinite;
+  will-change: transform;
+}
+
+/* Floating animations for hero stat cards - GPU accelerated */
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0);
+  }
+}
+
+@keyframes float-slow-reverse {
+  0%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(0, 10px, 0);
+  }
+}
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.animate-float-slow-reverse {
+  animation: float-slow-reverse 7s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Mobile performance optimizations */
+@media (max-width: 768px) {
+  /* Slower animations on mobile to reduce battery drain */
+  .animate-dot-drift {
+    animation-duration: 35s;
+  }
+  
+  /* Disable floating animations on mobile - they're hidden anyway */
+  .animate-float-slow,
+  .animate-float-slow-reverse {
+    animation: none;
+  }
+  
+  /* Reduce blur intensity on mobile for better performance */
+  .blur-3xl {
+    filter: blur(32px);
+  }
+  
+  .blur-\[120px\] {
+    filter: blur(40px);
+  }
+  
+  .blur-\[100px\] {
+    filter: blur(35px);
   }
 }

@@ -29,8 +29,12 @@ const verifyPinSchema = z.object({
  * Step 1: Validate credentials and generate PIN challenge
  */
 export async function POST(request: NextRequest) {
+  console.log("[PIN API] POST request received - creating PIN challenge");
+  
   try {
     const body = await request.json();
+    console.log("[PIN API] Request body email:", body.email);
+    
     const { email: rawEmail, password } = requestPinSchema.parse(body);
     const email = rawEmail.toLowerCase().trim();
 
@@ -73,6 +77,8 @@ export async function POST(request: NextRequest) {
 
     // Generate PIN challenge
     const { pin, sessionToken } = await createPinChallenge(email);
+    
+    console.log("[PIN API] PIN challenge created successfully for:", email);
 
     return NextResponse.json({
       success: true,
@@ -102,10 +108,21 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
+    
+    // Log incoming request for debugging
+    console.log("[PIN API] Verify request received:", { 
+      email: body.email, 
+      pinLength: body.pin?.length,
+      hasSessionToken: !!body.sessionToken,
+      sessionTokenLength: body.sessionToken?.length 
+    });
+    
     const { email: rawEmail, pin, sessionToken } = verifyPinSchema.parse(body);
     const email = rawEmail.toLowerCase().trim();
 
     const result = await verifyPinChallenge(email, pin, sessionToken);
+    
+    console.log("[PIN API] Verify result:", result);
 
     if (!result.success) {
       const statusMap: Record<string, number> = {

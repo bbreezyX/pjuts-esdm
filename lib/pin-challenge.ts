@@ -120,13 +120,18 @@ export async function createPinChallenge(email: string): Promise<{ pin: string; 
   const key = getChallengeKey(email);
   const data = { pin, attempts: 0, sessionToken };
 
+  console.log(`[PIN] Creating challenge for ${email}, key: ${key}`);
+  console.log(`[PIN] Redis configured: ${isRedisConfigured()}`);
+
   // Always try Redis first if configured
   if (isRedisConfigured()) {
     try {
       const redis = getRedis();
       if (redis) {
         await redis.set(key, JSON.stringify(data), { ex: PIN_EXPIRY_SECONDS });
-        console.log(`[PIN] Created challenge in Redis for ${email}`);
+        // Verify it was stored
+        const verify = await redis.get(key);
+        console.log(`[PIN] Created challenge in Redis for ${email}, verified: ${!!verify}`);
         return { pin, sessionToken };
       }
     } catch (error) {
@@ -140,7 +145,7 @@ export async function createPinChallenge(email: string): Promise<{ pin: string; 
     ...data,
     expiresAt: Date.now() + PIN_EXPIRY_SECONDS * 1000,
   });
-  console.log(`[PIN] Created challenge in memory for ${email}`);
+  console.log(`[PIN] Created challenge in memory for ${email}, store size: ${memoryStore.size}`);
   
   return { pin, sessionToken };
 }
@@ -166,12 +171,16 @@ export async function verifyPinChallenge(
   let storedData: { pin: string; attempts: number; sessionToken: string } | null = null;
   let useRedis = false;
 
+  console.log(`[PIN] Verifying challenge for ${email}, key: ${key}`);
+  console.log(`[PIN] Redis configured: ${isRedisConfigured()}`);
+
   // Try Redis first if configured
   if (isRedisConfigured()) {
     try {
       const redis = getRedis();
       if (redis) {
         const data = await redis.get<string | { pin: string; attempts: number; sessionToken: string }>(key);
+        console.log(`[PIN] Redis lookup result: ${data ? 'found' : 'not found'}`);
         if (data) {
           storedData = typeof data === "string" ? JSON.parse(data) : data;
           useRedis = true;
@@ -186,11 +195,13 @@ export async function verifyPinChallenge(
   // Fallback to memory if not found in Redis
   if (!storedData) {
     cleanupMemoryStore();
+    console.log(`[PIN] Checking memory store, size: ${memoryStore.size}, keys: ${Array.from(memoryStore.keys()).join(', ')}`);
     const memData = memoryStore.get(key);
     if (memData && memData.expiresAt > Date.now()) {
       storedData = { pin: memData.pin, attempts: memData.attempts, sessionToken: memData.sessionToken };
       console.log(`[PIN] Found challenge in memory for ${email}`);
     } else if (memData) {
+      console.log(`[PIN] Challenge expired in memory for ${email}`);
       memoryStore.delete(key);
     }
   }
@@ -202,8 +213,23 @@ export async function verifyPinChallenge(
   }
 
   // Verify session token first (prevents attackers from guessing PINs without valid session)
-  const tokenValid = storedData.sessionToken && sessionToken &&
-    crypto.timingSafeEqual(Buffer.from(sessionToken), Buffer.from(storedData.sessionToken));
+  if (!storedData.sessionToken || !sessionToken) {
+    console.log(`[PIN] Missing session token for ${email}`);
+    await incrementVerifyRateLimit(email);
+    return { success: false, reason: "INVALID_SESSION" };
+  }
+
+  // Check token length before timing-safe comparison
+  if (sessionToken.length !== storedData.sessionToken.length) {
+    console.log(`[PIN] Session token length mismatch for ${email}`);
+    await incrementVerifyRateLimit(email);
+    return { success: false, reason: "INVALID_SESSION" };
+  }
+
+  const tokenValid = crypto.timingSafeEqual(
+    Buffer.from(sessionToken),
+    Buffer.from(storedData.sessionToken)
+  );
   
   if (!tokenValid) {
     console.log(`[PIN] Invalid session token for ${email}`);

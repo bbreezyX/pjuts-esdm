@@ -14,22 +14,15 @@ export const CTA = () => {
 
   return (
     <section className="relative pt-40 pb-32 px-6 bg-white overflow-hidden">
-      {/* Moving Background Pattern */}
-      <div className="absolute inset-0 opacity-100 pointer-events-none">
-        <motion.div
-          animate={{
-            backgroundPosition: ["0px 0px", "50px 50px"],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear",
-          }}
-          className="absolute inset-0"
+      {/* Background Pattern - CSS animation for smooth mobile performance */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div 
+          className="absolute inset-0 animate-dot-drift will-change-transform"
           style={{
             backgroundImage:
               "radial-gradient(circle at 2px 2px, rgba(0, 51, 102, 0.05) 2px, transparent 0)",
             backgroundSize: "40px 40px",
+            transform: 'translateZ(0)'
           }}
         />
       </div>

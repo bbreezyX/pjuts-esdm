@@ -52,6 +52,11 @@ export default {
         "slide-in-right": "slideInRight 0.3s ease-out forwards",
         shimmer: "shimmer 1.5s infinite",
         marquee: "marquee 30s linear infinite",
+        "marquee-reverse": "marqueeReverse 30s linear infinite",
+        // Optimized landing page animations - GPU accelerated
+        "dot-drift": "dotDrift 25s linear infinite",
+        "float-slow": "floatSlow 6s ease-in-out infinite",
+        "float-slow-reverse": "floatSlowReverse 7s ease-in-out infinite",
       },
       keyframes: {
         fadeIn: {
@@ -88,6 +93,40 @@ export default {
           },
           "100%": {
             transform: "translateX(-50%)",
+          },
+        },
+        marqueeReverse: {
+          "0%": {
+            transform: "translateX(-50%)",
+          },
+          "100%": {
+            transform: "translateX(0%)",
+          },
+        },
+        // GPU-accelerated dot pattern drift using transform instead of background-position
+        dotDrift: {
+          "0%": {
+            transform: "translate3d(0, 0, 0)",
+          },
+          "100%": {
+            transform: "translate3d(40px, 40px, 0)",
+          },
+        },
+        // Floating animations for hero stats cards
+        floatSlow: {
+          "0%, 100%": {
+            transform: "translate3d(0, 0, 0)",
+          },
+          "50%": {
+            transform: "translate3d(0, -10px, 0)",
+          },
+        },
+        floatSlowReverse: {
+          "0%, 100%": {
+            transform: "translate3d(0, 0, 0)",
+          },
+          "50%": {
+            transform: "translate3d(0, 10px, 0)",
           },
         },
       },
