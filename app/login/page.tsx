@@ -102,7 +102,7 @@ function LoginFormContent() {
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t("login.email_placeholder")}
             required
-            className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all shadow-sm"
+            className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all shadow-sm focus-visible:ring-0 focus-visible:ring-offset-0"
           />
         </div>
 
@@ -114,7 +114,7 @@ function LoginFormContent() {
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t("login.password_placeholder")}
             required
-            className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all pr-12 shadow-sm"
+            className="h-12 rounded-xl bg-white border-slate-200 hover:border-primary-300 focus:border-primary-500 focus:bg-white transition-all pr-12 shadow-sm focus-visible:ring-0 focus-visible:ring-offset-0"
           />
           <button
             type="button"
