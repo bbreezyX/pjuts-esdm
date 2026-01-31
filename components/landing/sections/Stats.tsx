@@ -39,9 +39,29 @@ export const Stats = () => {
   return (
     <section
       id="statistik"
-      className="pt-32 pb-24 px-6 bg-white border-y border-border"
+      className="relative pt-32 pb-24 px-6 bg-white overflow-hidden"
     >
-      <div className="max-w-7xl mx-auto">
+      {/* Moving Background Pattern */}
+      <div className="absolute inset-0 opacity-100 pointer-events-none">
+        <motion.div
+          animate={{
+            backgroundPosition: ["0px 0px", "50px 50px"],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 2px 2px, rgba(0, 51, 102, 0.05) 2px, transparent 0)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col lg:flex-row gap-20 items-start">
           <div className="lg:w-1/3">
             <span className="inline-block px-3 py-1 bg-accent/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-md mb-6 border border-accent/20">

@@ -37,12 +37,30 @@ export const Workflow = () => {
   return (
     <section
       id="workflow"
-      className="pt-40 pb-32 bg-background relative overflow-hidden"
+      className="relative pt-40 pb-32 bg-white overflow-hidden"
     >
-      {/* Background accents */}
-      <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
+      {/* Moving Background Pattern */}
+      <div className="absolute inset-0 opacity-100 pointer-events-none">
+        <motion.div
+          animate={{
+            backgroundPosition: ["0px 0px", "50px 50px"],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 2px 2px, rgba(0, 51, 102, 0.05) 2px, transparent 0)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
 
-      <div className="max-w-7xl mx-auto px-6">
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
         <div className="flex flex-col lg:flex-row gap-20 items-center mb-32">
           <div className="lg:w-1/2">
             <motion.div
@@ -118,7 +136,7 @@ export const Workflow = () => {
             viewport={{ once: true }}
             className="lg:w-1/2 relative"
           >
-            <div className="bg-card border border-border rounded-[48px] p-12 shadow-2xl relative z-10">
+            <div className="bg-white/60 backdrop-blur-md border border-border/50 rounded-[48px] p-12 shadow-2xl relative z-10">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500/20" />

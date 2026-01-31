@@ -36,8 +36,32 @@ export const Challenges = () => {
   ];
 
   return (
-    <section id="sistem" className="pt-40 pb-32 px-6 bg-white">
-      <div className="max-w-7xl mx-auto">
+    <section
+      id="sistem"
+      className="relative pt-40 pb-32 px-6 bg-white overflow-hidden"
+    >
+      {/* Moving Background Pattern */}
+      <div className="absolute inset-0 opacity-100 pointer-events-none">
+        <motion.div
+          animate={{
+            backgroundPosition: ["0px 0px", "50px 50px"],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 2px 2px, rgba(0, 51, 102, 0.05) 2px, transparent 0)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
+
+
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="mb-20 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div>
             <span className="inline-block px-3 py-1 bg-accent/10 text-primary text-[10px] font-bold uppercase tracking-widest rounded-md mb-6 border border-accent/20">

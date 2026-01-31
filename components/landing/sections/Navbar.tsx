@@ -67,14 +67,16 @@ export const Navbar = () => {
     <motion.header
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 px-6 py-6 transition-all duration-300"
+      className={`fixed top-0 left-0 right-0 z-50 px-6 transition-all duration-500 ${
+        scrolled ? "py-4" : "py-6"
+      }`}
     >
       <div
-        className={`max-w-7xl mx-auto flex items-center justify-between transition-all duration-500 border ${
+        className={`max-w-7xl mx-auto flex items-center justify-between transition-all duration-500 ${
           scrolled
-            ? "bg-primary/80 backdrop-blur-xl border-white/10 py-3 shadow-2xl"
-            : "bg-white/5 backdrop-blur-md border-white/10 py-4 shadow-xl"
-        } rounded-full px-6 transition-all duration-300`}
+            ? "bg-black/20 backdrop-blur-md border border-white/10 py-3 px-6 shadow-lg rounded-full"
+            : "bg-transparent border-transparent py-2 px-0"
+        }`}
       >
         <div className="flex items-center gap-4">
           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border border-white/10 p-1.5 overflow-hidden shadow-inner">
@@ -88,29 +90,36 @@ export const Navbar = () => {
             />
           </div>
           <div className="flex flex-col -space-y-1">
-            <span className="font-black tracking-tight text-white text-base">
+            <span className="font-black tracking-tight text-white text-base drop-shadow-md">
               PJUTS<span className="text-accent">ESDM</span>
             </span>
-            <span className="text-[8px] font-bold text-white/40 uppercase tracking-[0.2em]">
+            <span className="text-[8px] font-bold text-white/60 uppercase tracking-[0.2em] drop-shadow-sm">
               {t("nav.ministry")}
             </span>
           </div>
         </div>
 
-        <nav className="hidden lg:flex items-center gap-1 bg-white/5 rounded-full p-1 border border-white/5">
+        <nav className="hidden lg:flex items-center gap-2">
           {navItemKeys.map((item) => {
             const isActive = activeSection === item.href.replace("#", "");
             return (
               <Link
                 key={item.key}
                 href={item.href}
-                className={`px-5 py-2 rounded-full text-[11px] font-bold tracking-wide transition-all ${
+                className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 ${
                   isActive
-                    ? "bg-accent text-primary shadow-lg shadow-accent/20"
-                    : "text-white/70 hover:text-white hover:bg-white/10"
+                    ? "text-white"
+                    : "text-white/70 hover:text-white"
                 }`}
               >
-                {t(item.key)}
+                {isActive && (
+                  <motion.div
+                    layoutId="activeSection"
+                    className="absolute inset-0 bg-white/10 rounded-full -z-10"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <span className="relative drop-shadow-sm">{t(item.key)}</span>
               </Link>
             );
           })}

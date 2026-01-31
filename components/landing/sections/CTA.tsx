@@ -13,12 +13,33 @@ export const CTA = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="pt-40 pb-32 px-6">
+    <section className="relative pt-40 pb-32 px-6 bg-white overflow-hidden">
+      {/* Moving Background Pattern */}
+      <div className="absolute inset-0 opacity-100 pointer-events-none">
+        <motion.div
+          animate={{
+            backgroundPosition: ["0px 0px", "50px 50px"],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 2px 2px, rgba(0, 51, 102, 0.05) 2px, transparent 0)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
+
+
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="max-w-7xl mx-auto bg-primary text-white rounded-[64px] p-16 md:p-24 text-center relative overflow-hidden"
+        className="max-w-7xl mx-auto bg-primary text-white rounded-[48px] p-16 md:p-24 text-center relative overflow-hidden shadow-2xl shadow-primary/20 border border-white/10"
       >
         <div className="relative z-10 max-w-2xl mx-auto">
           <h2 className="text-4xl md:text-6xl font-bold tracking-tighter mb-8 leading-tight text-white">
@@ -35,10 +56,13 @@ export const CTA = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             href="/login"
-            className="bg-accent text-primary h-16 px-12 inline-flex items-center gap-3 rounded-2xl font-bold text-xl shadow-2xl shadow-accent/40"
+            className="relative overflow-hidden bg-accent text-primary h-16 px-12 inline-flex items-center gap-3 rounded-full font-bold text-xl shadow-[0_0_40px_-10px_rgba(212,175,55,0.5)] hover:shadow-[0_0_60px_-10px_rgba(212,175,55,0.7)] group transition-all duration-300"
           >
-            {t("cta.button")}
-            <ArrowRight className="w-6 h-6" />
+            <span className="relative z-10 flex items-center gap-3">
+              {t("cta.button")}
+              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+            </span>
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
           </motion.a>
         </div>
 

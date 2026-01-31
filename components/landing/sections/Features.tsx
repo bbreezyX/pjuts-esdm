@@ -37,8 +37,32 @@ export const Features = () => {
   ];
 
   return (
-    <section id="bantuan" className="pt-40 pb-32 px-6 bg-esdm-gray/10">
-      <div className="max-w-7xl mx-auto">
+    <section
+      id="bantuan"
+      className="relative pt-40 pb-32 px-6 bg-white overflow-hidden"
+    >
+      {/* Moving Background Pattern */}
+      <div className="absolute inset-0 opacity-100 pointer-events-none">
+        <motion.div
+          animate={{
+            backgroundPosition: ["0px 0px", "50px 50px"],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 2px 2px, rgba(0, 51, 102, 0.05) 2px, transparent 0)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
+
+
+      <div className="max-w-7xl mx-auto relative z-10">
         <div className="flex flex-col lg:flex-row justify-between items-start mb-24 gap-12">
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-3">
@@ -52,9 +76,12 @@ export const Features = () => {
               <span className="text-primary">{t("faq.title_2")}</span>
             </h2>
           </div>
-          <button className="bg-primary text-white px-10 py-5 rounded-2xl font-bold text-sm hover:bg-primary/90 transition-all flex items-center gap-3 group shadow-xl shadow-primary/20">
-            {t("faq.cta")}
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          <button className="relative overflow-hidden bg-primary text-white px-8 py-4 rounded-full font-bold text-sm hover:bg-primary/90 transition-all flex items-center gap-3 group shadow-[0_0_30px_-10px_rgba(0,51,102,0.5)]">
+            <span className="relative z-10 flex items-center gap-2">
+              {t("faq.cta")}
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </span>
+            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
           </button>
         </div>
 
@@ -66,7 +93,7 @@ export const Features = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="group p-8 bg-white rounded-[32px] border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 flex gap-8 items-start"
+              className="group p-8 bg-white/60 backdrop-blur-md rounded-[32px] border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5 flex gap-8 items-start"
             >
               <div className="w-24 h-24 rounded-2xl overflow-hidden shrink-0 border border-border p-2 group-hover:bg-primary/5 transition-colors relative">
                 <Image
