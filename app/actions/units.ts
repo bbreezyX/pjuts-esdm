@@ -292,12 +292,26 @@ export async function updatePjutsUnit(
       };
     }
 
-    // Validate unitId format
-    if (!isValidCuid(unitId)) {
+    // Log the unitId being validated for debugging
+    console.log("[UPDATE_UNIT] Attempting to update unit with ID:", unitId);
+    console.log("[UPDATE_UNIT] ID length:", unitId?.length);
+    console.log("[UPDATE_UNIT] ID type:", typeof unitId);
+
+    // Validate unitId format - but be more lenient
+    if (!unitId || typeof unitId !== "string" || unitId.trim() === "") {
+      console.error("[UPDATE_UNIT] Invalid unitId: empty or not a string");
       return {
         success: false,
-        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
+        error: "ID unit tidak valid (kosong atau format salah)",
       };
+    }
+
+    // Check CUID format but only warn, don't block
+    const isValidCuidFormat = isValidCuid(unitId);
+    if (!isValidCuidFormat) {
+      console.warn("[UPDATE_UNIT] ID does not match CUID format:", unitId);
+      console.warn("[UPDATE_UNIT] Expected format: c[a-z0-9]{24} (25 chars)");
+      // Continue anyway - let database query determine if ID exists
     }
 
     // Only admins can update units
@@ -309,18 +323,32 @@ export async function updatePjutsUnit(
     }
 
     // Check if unit exists
+    console.log("[UPDATE_UNIT] Querying database for unit:", unitId);
     const existing = await prisma.pjutsUnit.findUnique({
       where: { id: unitId },
     });
 
     if (!existing) {
+      console.error("[UPDATE_UNIT] Unit not found in database:", unitId);
+      console.error("[UPDATE_UNIT] This could mean:");
+      console.error("  1. The ID doesn't exist in the database");
+      console.error("  2. The ID format doesn't match what's stored");
+      console.error("  3. Database connection issue");
       return {
         success: false,
-        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
+        error: `Unit dengan ID ${unitId} tidak ditemukan di database. Pastikan unit masih ada dan ID benar.`,
       };
     }
 
+    console.log("[UPDATE_UNIT] Found existing unit:", {
+      id: existing.id,
+      serialNumber: existing.serialNumber,
+      province: existing.province,
+      regency: existing.regency,
+    });
+
     // Update the unit
+    console.log("[UPDATE_UNIT] Updating unit with data:", input);
     const unit = await prisma.pjutsUnit.update({
       where: { id: unitId },
       data: input,
@@ -331,6 +359,8 @@ export async function updatePjutsUnit(
       },
     });
 
+    console.log("[UPDATE_UNIT] Unit updated successfully:", unit.serialNumber);
+
     // Log audit event
     await logUnitAudit("UPDATE_UNIT", unit.id, session.user.id, {
       serialNumber: unit.serialNumber,
@@ -339,6 +369,7 @@ export async function updatePjutsUnit(
     });
 
     revalidatePath("/map");
+    revalidatePath("/units");
     updateTag(CacheTags.DASHBOARD_STATS);
     updateTag(CacheTags.PROVINCE_STATS);
     updateTag(CacheTags.MAP_POINTS);
@@ -348,10 +379,17 @@ export async function updatePjutsUnit(
       data: unit as PjutsUnitData,
     };
   } catch (error) {
-    console.error("Update unit error:", error);
+    console.error("[UPDATE_UNIT] Error updating unit:", error);
+    console.error("[UPDATE_UNIT] Error details:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return {
       success: false,
-      error: ERROR_MESSAGES.UNIT_UPDATE_FAILED,
+      error: error instanceof Error 
+        ? `Gagal memperbarui unit: ${error.message}` 
+        : ERROR_MESSAGES.UNIT_UPDATE_FAILED,
     };
   }
 }
@@ -370,12 +408,26 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
       };
     }
 
-    // Validate unitId format
-    if (!isValidCuid(unitId)) {
+    // Log the unitId being validated for debugging
+    console.log("[DELETE_UNIT] Attempting to delete unit with ID:", unitId);
+    console.log("[DELETE_UNIT] ID length:", unitId?.length);
+    console.log("[DELETE_UNIT] ID type:", typeof unitId);
+
+    // Validate unitId format - but be more lenient
+    if (!unitId || typeof unitId !== "string" || unitId.trim() === "") {
+      console.error("[DELETE_UNIT] Invalid unitId: empty or not a string");
       return {
         success: false,
-        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
+        error: "ID unit tidak valid (kosong atau format salah)",
       };
+    }
+
+    // Check CUID format but only warn, don't block
+    const isValidCuidFormat = isValidCuid(unitId);
+    if (!isValidCuidFormat) {
+      console.warn("[DELETE_UNIT] ID does not match CUID format:", unitId);
+      console.warn("[DELETE_UNIT] Expected format: c[a-z0-9]{24} (25 chars)");
+      // Continue anyway - let database query determine if ID exists
     }
 
     // Only admins can delete units
@@ -387,6 +439,7 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
     }
 
     // Check if unit exists
+    console.log("[DELETE_UNIT] Querying database for unit:", unitId);
     const existing = await prisma.pjutsUnit.findUnique({
       where: { id: unitId },
       include: {
@@ -397,11 +450,18 @@ export async function deletePjutsUnit(unitId: string): Promise<ActionResult> {
     });
 
     if (!existing) {
+      console.error("[DELETE_UNIT] Unit not found in database:", unitId);
       return {
         success: false,
-        error: ERROR_MESSAGES.UNIT_NOT_FOUND,
+        error: `Unit dengan ID ${unitId} tidak ditemukan di database.`,
       };
     }
+
+    console.log("[DELETE_UNIT] Found unit to delete:", {
+      id: existing.id,
+      serialNumber: existing.serialNumber,
+      reportCount: existing._count.reports,
+    });
 
     // Warn if unit has reports (cascade will delete them)
     if (existing._count.reports > 0) {
