@@ -384,6 +384,58 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
               )}
             />
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="latitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Latitude
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="-1.6098"
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        disabled={isSubmitting}
+                        className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="longitude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium text-slate-700">
+                      Longitude
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="any"
+                        placeholder="103.6071"
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        disabled={isSubmitting}
+                        className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <DialogFooter className="flex justify-end gap-3 pt-4">
               <Button
                 type="button"
