@@ -380,7 +380,7 @@ export function ReportFormClient({
             <ArrowLeft className="h-5 w-5 text-slate-600" />
           </Link>
           <div className="flex flex-col items-center">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 mb-0.5">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-blue-600 mb-0.5">
               PJUTS Jambi
             </span>
             <h1 className="text-sm font-extrabold text-slate-800">
@@ -392,9 +392,9 @@ export function ReportFormClient({
               <motion.div
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="bg-emerald-50 p-1.5 rounded-lg border border-emerald-100 shadow-sm shadow-emerald-50"
+                className="bg-blue-50 p-1.5 rounded-lg border border-blue-100 shadow-sm shadow-blue-50"
               >
-                <Save className="h-3.5 w-3.5 text-emerald-600" />
+                <Save className="h-3.5 w-3.5 text-blue-600" />
               </motion.div>
             )}
           </div>
@@ -431,7 +431,7 @@ export function ReportFormClient({
                   <Icon
                     className={cn(
                       "h-4 w-4 mb-1 transition-colors",
-                      isActive ? "text-emerald-600" : "text-slate-500",
+                      isActive ? "text-blue-600" : "text-slate-500",
                     )}
                   />
                   <span
@@ -483,7 +483,7 @@ export function ReportFormClient({
                         </label>
                         <Badge
                           variant="secondary"
-                          className="bg-emerald-50 text-emerald-700 border-emerald-100 text-[10px] rounded-full"
+                          className="bg-blue-50 text-blue-700 border-blue-100 text-[10px] rounded-full"
                         >
                           Auto-Detected
                         </Badge>
@@ -499,8 +499,8 @@ export function ReportFormClient({
                             className={cn(
                               "w-full text-left p-4 rounded-3xl border-2 transition-all flex items-center justify-between group",
                               formData.unitId === u.id
-                                ? "bg-emerald-600 border-emerald-600 text-white shadow-xl shadow-emerald-200"
-                                : "bg-white border-slate-100 hover:border-emerald-200 shadow-sm",
+                                ? "bg-blue-700 border-blue-700 text-white shadow-xl shadow-blue-200"
+                                : "bg-white border-slate-100 hover:border-blue-200 shadow-sm",
                             )}
                           >
                             <div className="flex items-center gap-4">
@@ -509,7 +509,7 @@ export function ReportFormClient({
                                   "w-12 h-12 rounded-2xl flex items-center justify-center transition-colors",
                                   formData.unitId === u.id
                                     ? "bg-white/20"
-                                    : "bg-emerald-50 text-emerald-600",
+                                    : "bg-blue-50 text-blue-600",
                                 )}
                               >
                                 {formData.unitId === u.id ? (
@@ -526,7 +526,7 @@ export function ReportFormClient({
                                   className={cn(
                                     "text-[10px] font-bold uppercase tracking-wider",
                                     formData.unitId === u.id
-                                      ? "text-emerald-100"
+                                      ? "text-blue-100"
                                       : "text-slate-400",
                                   )}
                                 >
@@ -536,7 +536,7 @@ export function ReportFormClient({
                               </div>
                             </div>
                             {formData.unitId !== u.id && (
-                              <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-emerald-400 transition-colors" />
+                              <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-blue-400 transition-colors" />
                             )}
                           </motion.button>
                         ))}
@@ -591,7 +591,7 @@ export function ReportFormClient({
                               className={cn(
                                 "w-full text-left px-4 py-3.5 rounded-2xl transition-all border border-transparent",
                                 formData.unitId === u.id
-                                  ? "bg-emerald-50 border-emerald-100 text-emerald-900"
+                                  ? "bg-blue-50 border-blue-100 text-blue-900"
                                   : "hover:bg-slate-50 text-slate-700",
                               )}
                             >
@@ -605,7 +605,7 @@ export function ReportFormClient({
                                   </span>
                                 </div>
                                 {formData.unitId === u.id && (
-                                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                                  <CheckCircle2 className="h-4 w-4 text-blue-600" />
                                 )}
                               </div>
                             </button>
@@ -678,16 +678,14 @@ export function ReportFormClient({
                       className={cn(
                         "aspect-square rounded-3xl border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-all",
                         formData.latitude
-                          ? "bg-white border-emerald-200 text-emerald-600 hover:bg-emerald-50 hover:border-emerald-300"
+                          ? "bg-white border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300"
                           : "bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed",
                       )}
                     >
                       <div
                         className={cn(
                           "p-4 rounded-2xl transition-colors",
-                          formData.latitude
-                            ? "bg-emerald-50"
-                            : "bg-slate-200/50",
+                          formData.latitude ? "bg-blue-50" : "bg-slate-200/50",
                         )}
                       >
                         {imageProcessing ? (
@@ -712,14 +710,14 @@ export function ReportFormClient({
                     <div
                       className={cn(
                         "p-3 rounded-2xl backdrop-blur-md",
-                        formData.latitude ? "bg-emerald-500/20" : "bg-white/5",
+                        formData.latitude ? "bg-blue-500/20" : "bg-white/5",
                       )}
                     >
                       <MapPin
                         className={cn(
                           "h-5 w-5",
                           formData.latitude
-                            ? "text-emerald-400"
+                            ? "text-blue-400"
                             : "text-amber-400 animate-pulse",
                         )}
                       />
@@ -730,7 +728,7 @@ export function ReportFormClient({
                           Field Geotagging
                         </span>
                         {geoLoading && (
-                          <Loader2 className="h-2.5 w-2.5 animate-spin text-emerald-500" />
+                          <Loader2 className="h-2.5 w-2.5 animate-spin text-blue-500" />
                         )}
                       </div>
                       <p className="text-sm font-bold tracking-tight mt-1 font-mono">
@@ -831,8 +829,8 @@ export function ReportFormClient({
             {step === 4 && (
               <div className="space-y-6 pb-4">
                 <div className="text-center space-y-2 mb-8">
-                  <div className="mx-auto w-20 h-20 bg-emerald-600/10 rounded-[28px] flex items-center justify-center mb-4 border border-emerald-600/20">
-                    <ClipboardCheck className="h-10 w-10 text-emerald-600" />
+                  <div className="mx-auto w-20 h-20 bg-blue-600/10 rounded-[28px] flex items-center justify-center mb-4 border border-blue-600/20">
+                    <ClipboardCheck className="h-10 w-10 text-blue-600" />
                   </div>
                   <h2 className="text-2xl font-black text-slate-900 tracking-tight">
                     Siap Dikirim
@@ -843,7 +841,7 @@ export function ReportFormClient({
                 </div>
 
                 <div className="space-y-4">
-                  <Card className="rounded-[32px] overflow-hidden border-slate-200/60 shadow-2xl shadow-emerald-900/5">
+                  <Card className="rounded-[32px] overflow-hidden border-slate-200/60 shadow-2xl shadow-blue-900/5">
                     <div className="bg-slate-900 p-6 flex justify-between items-center text-white">
                       <div>
                         <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 block mb-1">
@@ -853,7 +851,7 @@ export function ReportFormClient({
                           {selectedUnit?.serialNumber}
                         </h3>
                       </div>
-                      <Badge className="bg-emerald-500 hover:bg-emerald-500 text-white rounded-full px-3 py-1 font-black shadow-lg shadow-emerald-500/20 border-0">
+                      <Badge className="bg-blue-600 hover:bg-blue-600 text-white rounded-full px-3 py-1 font-black shadow-lg shadow-blue-600/20 border-0">
                         VAL-2026
                       </Badge>
                     </div>
@@ -865,7 +863,7 @@ export function ReportFormClient({
                             Voltase
                           </span>
                           <div className="flex items-center gap-2">
-                            <Zap className="h-4 w-4 text-emerald-500" />
+                            <Zap className="h-4 w-4 text-blue-500" />
                             <span className="text-xl font-black text-slate-800">
                               {formData.batteryVoltage || "0.0"}
                               <span className="text-[10px] font-bold text-slate-400 ml-1">
@@ -879,7 +877,7 @@ export function ReportFormClient({
                             Dokumentasi
                           </span>
                           <div className="flex items-center gap-2">
-                            <Camera className="h-4 w-4 text-emerald-500" />
+                            <Camera className="h-4 w-4 text-blue-500" />
                             <span className="text-xl font-black text-slate-800">
                               {formData.images.length}
                               <span className="text-[10px] font-bold text-slate-400 ml-1">
@@ -924,7 +922,7 @@ export function ReportFormClient({
                     className={cn(
                       "p-5 rounded-[24px] text-sm font-black text-center border-2",
                       submitResult.success
-                        ? "bg-emerald-50 border-emerald-100 text-emerald-700"
+                        ? "bg-green-50 border-green-100 text-green-700"
                         : "bg-red-50 border-red-100 text-red-700",
                     )}
                   >
@@ -973,7 +971,7 @@ export function ReportFormClient({
             </Button>
           ) : (
             <Button
-              className="h-16 px-10 rounded-2xl bg-emerald-600 border-0 text-white font-black uppercase tracking-[0.2em] text-xs flex-[2] hover:bg-emerald-700 active:scale-[0.97] transition-all shadow-xl shadow-emerald-500/30"
+              className="h-16 px-10 rounded-2xl bg-blue-600 border-0 text-white font-black uppercase tracking-[0.2em] text-xs flex-[2] hover:bg-blue-700 active:scale-[0.97] transition-all shadow-xl shadow-blue-500/30"
               onClick={handleSubmit}
               disabled={isSubmitting || !isOnline}
             >

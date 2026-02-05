@@ -79,7 +79,7 @@ export const submitReportSchema = z.object({
 
   latitude: latitudeSchema,
   longitude: longitudeSchema,
-  batteryVoltage: batteryVoltageSchema,
+  batteryVoltage: batteryVoltageSchema.optional(),
 
   notes: z
     .string()
@@ -170,11 +170,9 @@ export const imageFileSchema = z.object({
   size: z.number().max(MAX_FILE_SIZE, {
     message: `Image size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`,
   }),
-  type: z
-    .string()
-    .refine((type) => ACCEPTED_IMAGE_TYPES.includes(type), {
-      message: "Only JPEG, PNG, and WebP images are accepted",
-    }),
+  type: z.string().refine((type) => ACCEPTED_IMAGE_TYPES.includes(type), {
+    message: "Only JPEG, PNG, and WebP images are accepted",
+  }),
 });
 
 // ============================================

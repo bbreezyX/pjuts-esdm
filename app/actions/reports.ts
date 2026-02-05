@@ -194,7 +194,7 @@ export async function submitReport(
     const report = await prisma.report.create({
       data: {
         unitId: validatedData.unitId,
-        batteryVoltage: validatedData.batteryVoltage,
+        batteryVoltage: validatedData.batteryVoltage ?? 0, // Default to 0 if not provided
         latitude: validatedData.latitude,
         longitude: validatedData.longitude,
         notes: validatedData.notes || null,
@@ -230,7 +230,13 @@ export async function submitReport(
     });
 
     // 8. Update unit status based on battery voltage (using centralized thresholds)
-    const newStatus = getStatusFromVoltage(validatedData.batteryVoltage);
+    // If battery voltage is not provided, keep status as UNVERIFIED or don't change existing status
+    const newStatus =
+      validatedData.batteryVoltage !== undefined
+        ? getStatusFromVoltage(validatedData.batteryVoltage)
+        : unit.lastStatus === UnitStatus.UNVERIFIED
+          ? UnitStatus.UNVERIFIED
+          : unit.lastStatus;
 
     // Check if this is the first verification (unit was UNVERIFIED)
     // On first verification, we update: status, installDate, and coordinates
@@ -284,7 +290,7 @@ export async function submitReport(
           unitProvince: report.unit.province,
           unitRegency: report.unit.regency,
           reporterName: report.user.name,
-          batteryVoltage: validatedData.batteryVoltage,
+          batteryVoltage: validatedData.batteryVoltage ?? 0, // Default to 0 if not provided
           reportId: report.id,
         });
 
