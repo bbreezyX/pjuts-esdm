@@ -194,8 +194,13 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="PJUTS-XXX-000"
+                        placeholder="PJUTS-JAKARTA-001"
                         {...field}
+                        onChange={(e) => {
+                          // Auto-convert to uppercase
+                          const upperValue = e.target.value.toUpperCase();
+                          field.onChange(upperValue);
+                        }}
                         disabled={isEdit || isSubmitting}
                         className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                       />
@@ -400,7 +405,13 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                         placeholder="-1.6098"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value
+                              ? parseFloat(e.target.value)
+                              : undefined,
+                          )
+                        }
                         disabled={isSubmitting}
                         className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                       />
@@ -425,7 +436,13 @@ export function UnitDialog({ open, onOpenChange, unit }: UnitDialogProps) {
                         placeholder="103.6071"
                         {...field}
                         value={field.value ?? ""}
-                        onChange={(e) => field.onChange(e.target.value ? parseFloat(e.target.value) : undefined)}
+                        onChange={(e) =>
+                          field.onChange(
+                            e.target.value
+                              ? parseFloat(e.target.value)
+                              : undefined,
+                          )
+                        }
                         disabled={isSubmitting}
                         className="bg-white text-slate-900 border-slate-300 focus-visible:ring-0 focus-visible:ring-offset-0 focus:border-primary-500 focus:ring-primary-500 placeholder:text-slate-400"
                       />

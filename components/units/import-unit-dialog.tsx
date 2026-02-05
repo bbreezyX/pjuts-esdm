@@ -45,7 +45,7 @@ export function ImportUnitDialog({
 
   const templateData = [
     {
-      serialNumber: "PJUTS-JMB-999",
+      serialNumber: "PJUTS-JAMBI-001",
       latitude: -1.6101,
       longitude: 103.6131,
       province: "Jambi",
@@ -89,7 +89,9 @@ export function ImportUnitDialog({
         const lng = row.longitude || row["Longitude"];
 
         return {
-          serialNumber: String(row.serialNumber || row["Serial Number"] || ""),
+          serialNumber: String(
+            row.serialNumber || row["Serial Number"] || "",
+          ).toUpperCase(), // Auto-convert to uppercase
           latitude:
             lat !== undefined && lat !== ""
               ? parseFloat(String(lat))
