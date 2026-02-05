@@ -97,8 +97,9 @@ export const createPjutsUnitSchema = z.object({
   serialNumber: z
     .string()
     .min(1, { message: "Serial number is required" })
-    .regex(/^PJUTS-[A-Z]{3}-\d{3}$/, {
-      message: "Serial number must follow format: PJUTS-XXX-000",
+    .regex(/^PJUTS-[A-Z]+-\d+$/, {
+      message:
+        "Serial number must follow format: PJUTS-[LETTERS]-[NUMBERS] (e.g., PJUTS-JAKARTA-001)",
     }),
 
   latitude: latitudeSchema.optional(),
@@ -117,15 +118,16 @@ export type CreatePjutsUnitInput = z.infer<typeof createPjutsUnitSchema>;
 // MAP BOUNDS SCHEMA (for filtering map points)
 // ============================================
 
-export const mapBoundsSchema = z.object({
-  north: z.number().min(-90).max(90),
-  south: z.number().min(-90).max(90),
-  east: z.number().min(-180).max(180),
-  west: z.number().min(-180).max(180),
-}).refine(
-  (data) => data.north > data.south,
-  { message: "North boundary must be greater than south boundary" }
-);
+export const mapBoundsSchema = z
+  .object({
+    north: z.number().min(-90).max(90),
+    south: z.number().min(-90).max(90),
+    east: z.number().min(-180).max(180),
+    west: z.number().min(-180).max(180),
+  })
+  .refine((data) => data.north > data.south, {
+    message: "North boundary must be greater than south boundary",
+  });
 
 export type MapBounds = z.infer<typeof mapBoundsSchema>;
 
@@ -139,8 +141,12 @@ export const createUserSchema = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters" })
-    .regex(/[A-Z]/, { message: "Password must contain at least one uppercase letter" })
-    .regex(/[a-z]/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/[A-Z]/, {
+      message: "Password must contain at least one uppercase letter",
+    })
+    .regex(/[a-z]/, {
+      message: "Password must contain at least one lowercase letter",
+    })
     .regex(/[0-9]/, { message: "Password must contain at least one number" }),
   role: z.enum(["ADMIN", "FIELD_STAFF"]).default("FIELD_STAFF"),
 });
@@ -152,17 +158,23 @@ export type CreateUserInput = z.infer<typeof createUserSchema>;
 // ============================================
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
 
 export const imageFileSchema = z.object({
   name: z.string(),
   size: z.number().max(MAX_FILE_SIZE, {
     message: `Image size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`,
   }),
-  type: z.string().refine(
-    (type) => ACCEPTED_IMAGE_TYPES.includes(type),
-    { message: "Only JPEG, PNG, and WebP images are accepted" }
-  ),
+  type: z
+    .string()
+    .refine((type) => ACCEPTED_IMAGE_TYPES.includes(type), {
+      message: "Only JPEG, PNG, and WebP images are accepted",
+    }),
 });
 
 // ============================================
@@ -178,9 +190,12 @@ export function isWithinIndonesia(lat: number, lng: number): boolean {
   );
 }
 
-export function validateCoordinates(lat: unknown, lng: unknown): {
+export function validateCoordinates(
+  lat: unknown,
+  lng: unknown,
+): {
   valid: boolean;
-  errors?: string[]
+  errors?: string[];
 } {
   const errors: string[] = [];
 
@@ -188,10 +203,10 @@ export function validateCoordinates(lat: unknown, lng: unknown): {
   const lngResult = longitudeSchema.safeParse(lng);
 
   if (!latResult.success) {
-    errors.push(...latResult.error.errors.map(e => e.message));
+    errors.push(...latResult.error.errors.map((e) => e.message));
   }
   if (!lngResult.success) {
-    errors.push(...lngResult.error.errors.map(e => e.message));
+    errors.push(...lngResult.error.errors.map((e) => e.message));
   }
 
   return {
@@ -199,4 +214,3 @@ export function validateCoordinates(lat: unknown, lng: unknown): {
     errors: errors.length > 0 ? errors : undefined,
   };
 }
-
