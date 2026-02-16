@@ -21,6 +21,7 @@ import {
   ArrowRight,
   MapPin,
 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -128,7 +129,10 @@ export function Navbar({ user }: NavbarProps) {
           <div className="flex h-16 lg:h-[72px] xl:h-20 items-center justify-between bg-card/80 backdrop-blur-xl px-4 lg:px-8 xl:px-10 rounded-2xl lg:rounded-bento border border-border/50 shadow-xl shadow-primary/5 gap-4 lg:gap-6 xl:gap-8">
             {/* Logo & Brand */}
             <div className="flex items-center gap-3 lg:gap-4 flex-shrink-0">
-              <Link href="/dashboard" className="flex items-center gap-2 lg:gap-3 xl:gap-4 group">
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 lg:gap-3 xl:gap-4 group"
+              >
                 <div className="relative">
                   <div className="absolute -inset-2 bg-primary/10 rounded-2xl scale-0 group-hover:scale-100 transition-transform duration-300" />
                   <Image
@@ -236,71 +240,141 @@ export function Navbar({ user }: NavbarProps) {
         </div>
       </header>
 
-      {/* Mobile Menu - Matching Bento Style */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden p-4">
-          <div
-            className="fixed inset-0 bg-background/60 backdrop-blur-md"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-          <div className="relative w-full max-w-sm ml-auto bg-card shadow-2xl rounded-3xl border border-border overflow-hidden animate-in slide-in-from-right duration-300">
-            <div className="flex items-center justify-between p-6 border-b border-border">
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/logo-esdm.png"
-                  alt="Logo"
-                  width={32}
-                  height={32}
-                  priority
-                />
-                <span className="font-bold text-foreground">Menu Navigasi</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-10 w-10 rounded-xl bg-muted hover:bg-muted/80"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
+      {/* Mobile Menu - Premium Animated Drawer */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm lg:hidden"
+              onClick={() => setMobileMenuOpen(false)}
+            />
 
-            <nav className="p-4 grid gap-2">
-              {navItems.map((item) => {
-                if (item.adminOnly && user.role !== "ADMIN") return null;
-                const isActive = pathname === item.href;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="fixed top-[72px] right-4 z-50 w-[calc(100vw-2rem)] max-w-sm bg-card/95 backdrop-blur-xl border border-border/60 shadow-2xl rounded-3xl lg:hidden flex flex-col overflow-hidden ring-1 ring-border/10"
+              style={{ maxHeight: "calc(100vh - 90px)" }}
+            >
+              {/* Header: User Profile Card (Compact) */}
+              <div className="p-4 border-b border-border/50 bg-muted/30 relative">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 p-[1px] shadow-lg shadow-primary/20 shrink-0">
+                    <div className="w-full h-full rounded-xl bg-card flex items-center justify-center overflow-hidden">
+                      <span className="text-lg font-black text-primary">
+                        {user.name.charAt(0)}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-sm leading-none text-foreground truncate max-w-[120px]">
+                        {user.name}
+                      </h4>
+                      <span
+                        className={cn(
+                          "px-1.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border",
+                          user.role === "ADMIN"
+                            ? "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                            : "bg-primary/10 text-primary border-primary/20",
+                        )}
+                      >
+                        {user.role}
+                      </span>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground mt-1 font-medium truncate">
+                      {user.email}
+                    </p>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg -mr-1 hover:bg-background/50"
                     onClick={() => setMobileMenuOpen(false)}
-                    className={cn(
-                      "flex items-center gap-4 px-4 py-4 rounded-2xl text-sm font-bold transition-all",
-                      isActive
-                        ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                        : "text-muted-foreground hover:bg-muted",
-                    )}
                   >
-                    <Icon className="w-5 h-5" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
 
-            <div className="p-4 bg-muted/30">
-              <button
-                onClick={handleLogout}
-                className="flex w-full items-center gap-4 px-4 py-4 rounded-2xl text-red-500 hover:bg-red-500/10 text-sm font-bold transition-colors"
-              >
-                <LogOut className="w-5 h-5" />
-                Keluar Sesi
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+              {/* Navigation Items */}
+              <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                {navItems.map((item, idx) => {
+                  if (item.adminOnly && user.role !== "ADMIN") return null;
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/dashboard" &&
+                      pathname.startsWith(`${item.href}/`)) ||
+                    pathname === item.href;
+
+                  const Icon = item.icon;
+
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.05 + idx * 0.03 }}
+                      key={item.href}
+                    >
+                      <Link
+                        href={item.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={cn(
+                          "relative flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-300",
+                          isActive
+                            ? "bg-primary text-primary-foreground shadow-md shadow-primary/20"
+                            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                        )}
+                      >
+                        <Icon
+                          className={cn(
+                            "w-4 h-4 transition-transform duration-300",
+                            isActive ? "scale-110" : "group-hover:scale-110",
+                          )}
+                        />
+                        <span className="font-bold text-xs tracking-wide flex-1">
+                          {item.label}
+                        </span>
+
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeDot"
+                            className="w-1.5 h-1.5 rounded-full bg-white shadow-sm"
+                          />
+                        )}
+                      </Link>
+                    </motion.div>
+                  );
+                })}
+              </div>
+
+              {/* Footer Actions (Minimal) */}
+              <div className="p-2 border-t border-border/50 bg-muted/20 flex items-center justify-between gap-2">
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleLogout}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-destructive hover:bg-destructive/10 transition-colors font-bold text-xs"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  Keluar
+                </motion.button>
+
+                <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="text-[9px] font-bold text-emerald-600 uppercase tracking-wider">
+                    Online
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Search Modal - Matching Bento Style */}
       {searchOpen && (
@@ -413,8 +487,8 @@ export function Navbar({ user }: NavbarProps) {
               )}
             </div>
 
-            <div className="p-4 border-t border-border bg-muted/20 flex items-center justify-between text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-8">
-              <div className="flex gap-4">
+            <div className="p-4 border-t border-border bg-muted/20 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-2 sm:gap-0 text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-4 sm:px-8">
+              <div className="hidden sm:flex gap-4">
                 <span className="flex items-center gap-1.5">
                   <span className="bg-card px-1.5 py-0.5 rounded border border-border shadow-sm">
                     ↵
@@ -428,7 +502,9 @@ export function Navbar({ user }: NavbarProps) {
                   Navigasi
                 </span>
               </div>
-              <span>System Cloud Monitor v1.0</span>
+              <span className="text-center sm:text-right">
+                System Cloud Monitor v1.0
+              </span>
             </div>
           </div>
         </div>

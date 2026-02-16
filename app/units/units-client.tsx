@@ -338,13 +338,14 @@ export function UnitsPageClient({
           </div>
           <div className="flex gap-2 sm:gap-3">
             <Button
-              variant="outline"
+              variant="ghost"
               onClick={() => setShowFilters(!showFilters)}
               className={cn(
-                "h-11 sm:h-14 px-4 sm:px-8 rounded-xl sm:rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shrink-0 border-2",
+                "h-11 sm:h-14 px-4 sm:px-8 rounded-xl sm:rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all duration-300 shrink-0 border relative",
+                "hover:scale-[1.01] active:scale-[0.98]",
                 showFilters
-                  ? "bg-slate-900 border-slate-900 text-white shadow-xl shadow-slate-200"
-                  : "bg-white border-slate-100 hover:border-primary text-slate-600 shadow-sm shadow-slate-200/5",
+                  ? "bg-primary/5 border-primary/20 text-primary hover:bg-primary/10"
+                  : "bg-white border-slate-200 text-slate-500 hover:border-primary hover:text-primary hover:bg-primary/[0.02] shadow-sm shadow-slate-200/50 hover:shadow-[0_12px_24px_-10px_rgba(0,51,102,0.25)]",
               )}
             >
               <Filter className="h-4 w-4 sm:mr-2" />

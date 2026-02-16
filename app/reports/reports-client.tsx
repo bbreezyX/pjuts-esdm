@@ -8,12 +8,14 @@ import { ReportData } from "@/app/actions/reports";
 import { ActionResult } from "@/types";
 
 // Promise types for streaming
-type ReportsPromise = Promise<ActionResult<{
-  reports: ReportData[];
-  total: number;
-  page: number;
-  totalPages: number;
-}>>;
+type ReportsPromise = Promise<
+  ActionResult<{
+    reports: ReportData[];
+    total: number;
+    page: number;
+    totalPages: number;
+  }>
+>;
 type RegenciesPromise = Promise<ActionResult<string[]>>;
 
 interface ReportsPageClientProps {
@@ -138,7 +140,7 @@ export function ReportsPageClient({
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-3 sm:space-y-5">
       <ReportsFilters
         regencies={regencies}
         selectedRegency={selectedRegency}

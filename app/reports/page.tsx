@@ -86,51 +86,53 @@ export default async function ReportsPage({
         role: session.user.role,
       }}
     >
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:mb-12">
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 mb-1">
-            <div className="w-1.5 h-4 bg-primary rounded-full" />
-            <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
-              Field Operations
-            </span>
+      <div className="space-y-3 sm:space-y-5 lg:space-y-8">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 lg:mb-12">
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-1.5 h-4 bg-primary rounded-full" />
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+                Field Operations
+              </span>
+            </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
+              Monitoring
+            </h1>
+            <p className="text-slate-500 text-sm font-medium max-w-md">
+              Kelola dan pantau seluruh laporan inspeksi unit PJUTS dari petugas
+              lapangan secara real-time.
+            </p>
           </div>
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-none">
-            Monitoring
-          </h1>
-          <p className="text-slate-500 text-sm font-medium max-w-md">
-            Kelola dan pantau seluruh laporan inspeksi unit PJUTS dari petugas
-            lapangan secara real-time.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex p-1 bg-slate-100/50 backdrop-blur-md rounded-2xl border border-slate-200/40">
-            <ExportReportsButton
-              regency={regency}
-              startDate={startDate}
-              endDate={endDate}
-            />
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex p-1 bg-slate-100/50 backdrop-blur-md rounded-2xl border border-slate-200/40 h-10 sm:h-12 items-center">
+              <ExportReportsButton
+                regency={regency}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </div>
+            <Link href="/report/new">
+              <Button
+                size="lg"
+                className="bg-slate-900 text-white hover:bg-slate-800 rounded-2xl px-6 h-12 font-black transition-all shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-95 text-[10px] uppercase tracking-[0.1em]"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Buat Laporan
+              </Button>
+            </Link>
           </div>
-          <Link href="/report/new">
-            <Button
-              size="lg"
-              className="bg-slate-900 text-white hover:bg-slate-800 rounded-2xl px-6 h-12 font-black transition-all shadow-xl shadow-slate-200 hover:scale-[1.02] active:scale-95 text-[10px] uppercase tracking-[0.1em]"
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Buat Laporan
-            </Button>
-          </Link>
         </div>
-      </div>
 
-      <Suspense fallback={<ReportsTableSkeleton />}>
-        <ReportsPageClient
-          reportsPromise={reportsPromise}
-          regenciesPromise={regenciesPromise}
-          page={page}
-          initialRegency={regency}
-          isAdmin={session.user.role === "ADMIN"}
-        />
-      </Suspense>
+        <Suspense fallback={<ReportsTableSkeleton />}>
+          <ReportsPageClient
+            reportsPromise={reportsPromise}
+            regenciesPromise={regenciesPromise}
+            page={page}
+            initialRegency={regency}
+            isAdmin={session.user.role === "ADMIN"}
+          />
+        </Suspense>
+      </div>
     </AppShell>
   );
 }

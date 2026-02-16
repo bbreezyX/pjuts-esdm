@@ -87,20 +87,17 @@ export function ExportReportsButton({
 
   return (
     <Button
-      variant="outline"
-      size="sm"
+      variant="ghost"
       onClick={handleExport}
       disabled={loading}
       className={cn(
-        "rounded-xl sm:rounded-2xl font-bold h-10 sm:h-11 px-4 sm:px-5",
-        "border-border/60 hover:bg-muted transition-all duration-200",
-        "text-xs sm:text-sm",
+        "h-8 sm:h-10 px-3 sm:px-4 rounded-xl font-black text-[10px] uppercase tracking-wider hover:bg-white hover:text-emerald-600 transition-all text-slate-500",
       )}
     >
       {loading ? (
-        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+        <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" />
       ) : (
-        <FileSpreadsheet className="h-4 w-4 mr-2 text-emerald-600" />
+        <FileSpreadsheet className="h-3.5 w-3.5 mr-2 text-emerald-600" />
       )}
       <span className="hidden sm:inline">Export Excel</span>
       <span className="sm:hidden">Export</span>
