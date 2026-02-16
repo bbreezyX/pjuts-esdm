@@ -1,11 +1,11 @@
 import XLSX from "xlsx-js-style";
 
-// ── Style Tokens ──────────────────────────────────────────────
+// ── Style Tokens (matched to ESDM brand palette) ─────────────
 const COLORS = {
-  headerBg: "006B5A", // Dark teal
+  headerBg: "003366", // Deep Corporate Blue (primary)
   headerFont: "FFFFFF",
-  zebraLight: "F0F9F6", // Light mint
-  borderColor: "D1D5DB", // Slate-300
+  zebraLight: "E6EBF0", // Primary-50
+  borderColor: "CCD7E1", // Primary-100
 };
 
 const HEADER_STYLE: XLSX.CellStyle = {
