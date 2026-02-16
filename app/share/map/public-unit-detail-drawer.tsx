@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
+  HelpCircle,
   BatteryFull,
   ExternalLink,
   Copy,
@@ -76,13 +77,20 @@ export function PublicUnitDetailDrawer({
       setLoading(true);
       try {
         const res = await fetch(`/api/public/map/${unitId}`);
-        if (!res.ok) throw new Error("Failed to fetch");
+        if (!res.ok) {
+          // Unit may be unverified or not found — close the drawer silently
+          onClose();
+          return;
+        }
         const json = await res.json();
         if (json.success && json.data) {
           setDetail(json.data);
+        } else {
+          onClose();
         }
       } catch (error) {
         console.error("Failed to fetch public unit detail:", error);
+        onClose();
       } finally {
         setLoading(false);
       }
@@ -114,22 +122,33 @@ export function PublicUnitDetailDrawer({
         onClick={onClose}
       />
 
-      <div className="fixed inset-x-0 bottom-0 z-[60] flex flex-col bg-white shadow-[0_-8px_30px_rgba(0,0,0,0.12)] rounded-t-[2rem] border-t border-slate-100 max-h-[85vh] sm:top-[180px] sm:bottom-4 sm:right-4 sm:left-auto sm:w-[440px] sm:max-h-[calc(100vh-200px)] sm:rounded-2xl sm:border sm:shadow-2xl animate-in slide-in-from-bottom duration-500 sm:slide-in-from-right">
+      <div className="fixed inset-x-0 bottom-0 z-[60] flex flex-col bg-white shadow-[0_-8px_30px_rgba(0,0,0,0.12)] rounded-t-[2rem] border-t border-slate-100 max-h-[85vh] sm:top-[250px] sm:bottom-4 sm:right-4 sm:left-4 sm:left-auto sm:w-[500px] sm:max-h-[calc(100vh-270px)] sm:rounded-3xl sm:border sm:border-white/20 sm:shadow-2xl animate-in slide-in-from-bottom duration-500 sm:slide-in-from-right">
         {/* Header - Mobile Handle */}
         <div className="sm:hidden w-full flex justify-center pt-3 pb-1 cursor-grab active:cursor-grabbing">
           <div className="w-12 h-1.5 bg-slate-200 rounded-full" />
         </div>
 
         {/* content header */}
-        <div className="flex items-center justify-between px-5 py-3 sm:p-4 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/50 sticky top-0 z-10 border-b border-slate-100/50">
+        <div className="flex items-center justify-between px-5 py-3 sm:p-4 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/50 sticky top-0 z-10">
           <div>
             <h3 className="font-bold text-lg text-slate-900 tracking-tight">
               Detail Unit
             </h3>
             {detail && (
-              <p className="text-sm font-medium text-slate-500 mt-0.5">
-                {detail.unit.serialNumber}
-              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <p className="text-sm font-medium text-slate-500">
+                  {detail.unit.serialNumber}
+                </p>
+                {detail.unit.installDate && (
+                  <>
+                    <span className="text-slate-300">&bull;</span>
+                    <span className="text-xs text-slate-400">
+                      Dipasang{" "}
+                      {formatDateTime(detail.unit.installDate).split(",")[0]}
+                    </span>
+                  </>
+                )}
+              </div>
             )}
           </div>
           <Button
@@ -149,9 +168,9 @@ export function PublicUnitDetailDrawer({
               <DrawerSkeleton />
             </div>
           ) : detail ? (
-            <div className="p-5 space-y-5 pb-8 sm:pb-5">
+            <div className="p-6 space-y-6 pb-8 sm:pb-6">
               {/* Status Card */}
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 overflow-hidden relative">
+              <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 overflow-hidden relative">
                 <div
                   className={cn(
                     "absolute top-0 right-0 w-24 h-24 -mr-6 -mt-6 rounded-full opacity-10 blur-xl",
@@ -159,12 +178,14 @@ export function PublicUnitDetailDrawer({
                       ? "bg-green-500"
                       : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
                         ? "bg-amber-500"
-                        : "bg-red-500",
+                        : detail.unit.lastStatus === "OFFLINE"
+                          ? "bg-red-500"
+                          : "bg-slate-400",
                   )}
                 />
 
                 <div className="relative z-10">
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center justify-between mb-4">
                     <span className="text-sm font-medium text-slate-500">
                       Status Terkini
                     </span>
@@ -184,37 +205,34 @@ export function PublicUnitDetailDrawer({
                           ? "bg-green-100 text-green-600"
                           : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
                             ? "bg-amber-100 text-amber-600"
-                            : "bg-red-100 text-red-600",
+                            : detail.unit.lastStatus === "OFFLINE"
+                              ? "bg-red-100 text-red-600"
+                              : "bg-slate-100 text-slate-500",
                       )}
                     >
                       {detail.unit.lastStatus === "OPERATIONAL" ? (
                         <CheckCircle2 className="h-6 w-6" />
                       ) : detail.unit.lastStatus === "MAINTENANCE_NEEDED" ? (
                         <AlertTriangle className="h-6 w-6" />
-                      ) : (
+                      ) : detail.unit.lastStatus === "OFFLINE" ? (
                         <XCircle className="h-6 w-6" />
+                      ) : (
+                        <HelpCircle className="h-6 w-6" />
                       )}
                     </div>
                     <div>
                       <h4 className="font-bold text-lg text-slate-900 leading-tight">
                         {getStatusLabel(detail.unit.lastStatus)}
                       </h4>
-                      {detail.unit.installDate && (
-                        <p className="text-xs text-slate-500 mt-0.5">
-                          Dipasang{" "}
-                          {
-                            formatDateTime(detail.unit.installDate).split(
-                              ",",
-                            )[0]
-                          }
-                        </p>
-                      )}
+                      <p className="text-sm text-slate-500">
+                        Unit beroperasi normal
+                      </p>
                     </div>
                   </div>
 
                   {/* Battery voltage from latest report */}
                   {detail.recentReports[0] && (
-                    <div className="mt-4 pt-3 border-t flex items-center gap-4">
+                    <div className="mt-4 pt-4 border-t flex items-center gap-4">
                       <div className="flex-1">
                         <span className="text-xs text-slate-500 block mb-1">
                           Tegangan Baterai
@@ -259,14 +277,14 @@ export function PublicUnitDetailDrawer({
               </div>
 
               {/* Location Card */}
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-slate-900 pl-1">
-                  Lokasi
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-slate-900 pl-2">
+                  Lokasi & Koordinat
                 </h4>
-                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
+                <div className="bg-slate-50 rounded-3xl p-5 border border-slate-100 space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="bg-white p-2 rounded-lg shadow-sm shrink-0 border border-slate-100">
-                      <MapPin className="h-4 w-4 text-primary" />
+                      <MapPin className="h-5 w-5 text-primary" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-slate-900 mb-0.5">
@@ -324,15 +342,15 @@ export function PublicUnitDetailDrawer({
 
               {/* Report history summary */}
               {detail.recentReports.length > 1 && (
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-slate-900 pl-1">
+                <div className="space-y-3">
+                  <h4 className="text-sm font-semibold text-slate-900 pl-2">
                     Riwayat Laporan Terbaru
                   </h4>
                   <div className="space-y-2">
                     {detail.recentReports.slice(1).map((report) => (
                       <div
                         key={report.id}
-                        className="flex items-center gap-3 bg-white rounded-xl p-3 border border-slate-100"
+                        className="flex items-center gap-3 bg-white rounded-2xl p-3.5 border border-slate-100 hover:border-primary/20 hover:shadow-sm transition-all"
                       >
                         <div className="flex items-center gap-2 flex-1">
                           <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
@@ -373,10 +391,10 @@ function DrawerSkeleton() {
         <Skeleton className="h-6 w-24" />
         <Skeleton className="h-4 w-20" />
       </div>
-      <Skeleton className="h-32 w-full rounded-xl" />
+      <Skeleton className="h-32 w-full rounded-3xl" />
       <div className="space-y-2">
         <Skeleton className="h-5 w-32" />
-        <Skeleton className="h-24 w-full rounded-xl" />
+        <Skeleton className="h-24 w-full rounded-3xl" />
       </div>
     </div>
   );

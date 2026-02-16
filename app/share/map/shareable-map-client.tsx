@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   AlertTriangle,
   XCircle,
+  HelpCircle,
   Copy,
   Check,
   LogIn,
@@ -89,6 +90,14 @@ const statusFilters = [
     activeColor: "bg-red-600 text-white hover:bg-red-700",
     dotColor: "bg-red-500",
   },
+  {
+    value: "UNVERIFIED",
+    label: "Belum Verifikasi",
+    icon: HelpCircle,
+    bgColor: "bg-slate-50 hover:bg-slate-100 border-slate-200",
+    activeColor: "bg-slate-600 text-white hover:bg-slate-700",
+    dotColor: "bg-slate-400",
+  },
 ];
 
 // ============================================
@@ -153,6 +162,7 @@ export function ShareableMapClient() {
       operational: 0,
       maintenanceNeeded: 0,
       offline: 0,
+      unverified: 0,
     };
     for (const p of points) {
       switch (p.lastStatus) {
@@ -165,13 +175,19 @@ export function ShareableMapClient() {
         case "OFFLINE":
           c.offline++;
           break;
+        case "UNVERIFIED":
+          c.unverified++;
+          break;
       }
     }
     return c;
   }, [points]);
 
   const totalCount =
-    counts.operational + counts.maintenanceNeeded + counts.offline;
+    counts.operational +
+    counts.maintenanceNeeded +
+    counts.offline +
+    counts.unverified;
 
   const handleCopyLink = useCallback(async () => {
     try {
@@ -302,7 +318,9 @@ export function ShareableMapClient() {
                 ? "operational"
                 : filter.value === "MAINTENANCE_NEEDED"
                   ? "maintenanceNeeded"
-                  : "offline";
+                  : filter.value === "OFFLINE"
+                    ? "offline"
+                    : "unverified";
             const count = counts[countKey];
             const isActive = selectedStatus === filter.value;
 
@@ -322,7 +340,9 @@ export function ShareableMapClient() {
                           ? "ring-emerald-500"
                           : filter.value === "MAINTENANCE_NEEDED"
                             ? "ring-amber-500"
-                            : "ring-red-500",
+                            : filter.value === "OFFLINE"
+                              ? "ring-red-500"
+                              : "ring-slate-400",
                       )
                     : "bg-white border-slate-200 text-slate-600",
                 )}
@@ -350,14 +370,16 @@ export function ShareableMapClient() {
         </div>
 
         {/* Desktop Status summary - Creative Pill Design */}
-        <div className="hidden sm:grid grid-cols-3 gap-3 mb-6 relative z-10 w-full max-w-3xl mx-auto">
+        <div className="hidden sm:grid grid-cols-4 gap-3 mb-6 relative z-10 w-full max-w-4xl mx-auto">
           {statusFilters.map((filter) => {
             const countKey =
               filter.value === "OPERATIONAL"
                 ? "operational"
                 : filter.value === "MAINTENANCE_NEEDED"
                   ? "maintenanceNeeded"
-                  : "offline";
+                  : filter.value === "OFFLINE"
+                    ? "offline"
+                    : "unverified";
             const count = counts[countKey];
             const isActive = selectedStatus === filter.value;
             const Icon = filter.icon;
@@ -378,7 +400,9 @@ export function ShareableMapClient() {
                           ? "ring-emerald-500"
                           : filter.value === "MAINTENANCE_NEEDED"
                             ? "ring-amber-500"
-                            : "ring-red-500",
+                            : filter.value === "OFFLINE"
+                              ? "ring-red-500"
+                              : "ring-slate-400",
                       )
                     : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300",
                 )}
@@ -404,7 +428,9 @@ export function ShareableMapClient() {
                           ? "text-emerald-600"
                           : filter.value === "MAINTENANCE_NEEDED"
                             ? "text-amber-600"
-                            : "text-red-600",
+                            : filter.value === "OFFLINE"
+                              ? "text-red-600"
+                              : "text-slate-500",
                     )}
                   />
                 </div>

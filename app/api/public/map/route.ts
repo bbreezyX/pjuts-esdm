@@ -80,22 +80,15 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const status = searchParams.get("status") as UnitStatus | null;
 
-    // Build where clause — exclude UNVERIFIED units from public view
+    // Build where clause
     const where: Record<string, unknown> = {
       NOT: {
         AND: [{ latitude: 0 }, { longitude: 0 }],
       },
-      lastStatus: {
-        not: UnitStatus.UNVERIFIED,
-      },
     };
 
-    // Allow filtering by status, but never show UNVERIFIED publicly
-    if (
-      status &&
-      Object.values(UnitStatus).includes(status) &&
-      status !== UnitStatus.UNVERIFIED
-    ) {
+    // Allow filtering by status
+    if (status && Object.values(UnitStatus).includes(status)) {
       where.lastStatus = status;
     }
 

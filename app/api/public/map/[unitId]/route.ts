@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
-import { UnitStatus } from "@prisma/client";
 import {
   withApiRateLimit,
   createRateLimitResponse,
@@ -98,14 +97,6 @@ export async function GET(
     });
 
     if (!unit) {
-      return NextResponse.json(
-        { success: false, error: "Unit not found" },
-        { status: 404 },
-      );
-    }
-
-    // Don't expose UNVERIFIED units publicly
-    if (unit.lastStatus === UnitStatus.UNVERIFIED) {
       return NextResponse.json(
         { success: false, error: "Unit not found" },
         { status: 404 },
