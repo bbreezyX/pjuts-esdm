@@ -3,14 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import {
-  Shield,
-  Lock,
-  ArrowRight,
-  AlertCircle,
-  Loader2,
-  MapPin,
-} from "lucide-react";
+import { Shield, Lock, ArrowRight, AlertCircle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ============================================
@@ -347,7 +340,8 @@ export function ShareCodeGate() {
                     Butuh Akses?
                   </h4>
                   <p className="text-[11px] text-slate-500 leading-relaxed">
-                    Kode akses diberikan oleh administrator. Hubungi admin jika Anda belum memiliki kode.
+                    Kode akses diberikan oleh administrator. Hubungi admin jika
+                    Anda belum memiliki kode.
                   </p>
                 </div>
               </div>

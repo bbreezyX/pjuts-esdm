@@ -18,7 +18,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { getStatusLabel, formatDateTime } from "@/lib/utils";
 import { BATTERY_THRESHOLDS } from "@/lib/constants";
 import { UnitStatus } from "@prisma/client";
@@ -123,238 +122,242 @@ export function PublicUnitDetailDrawer({
 
         {/* content header */}
         <div className="flex items-center justify-between px-5 py-3 sm:p-4 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/50 sticky top-0 z-10 border-b border-slate-100/50">
-        <div>
-          <h3 className="font-bold text-lg text-slate-900 tracking-tight">
-            Detail Unit
-          </h3>
-          {detail && (
-            <p className="text-sm font-medium text-slate-500 mt-0.5">
-              {detail.unit.serialNumber}
-            </p>
-          )}
-        </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onClose}
-          className="rounded-full hover:bg-slate-100"
-        >
-          <X className="h-5 w-5 text-slate-500" />
-        </Button>
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 overflow-auto bg-white">
-        {loading ? (
-          <div className="p-6">
-            <DrawerSkeleton />
-          </div>
-        ) : detail ? (
-          <div className="p-5 space-y-5 pb-8 sm:pb-5">
-            {/* Status Card */}
-            <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 overflow-hidden relative">
-              <div
-                className={cn(
-                  "absolute top-0 right-0 w-24 h-24 -mr-6 -mt-6 rounded-full opacity-10 blur-xl",
-                  detail.unit.lastStatus === "OPERATIONAL"
-                    ? "bg-green-500"
-                    : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
-                      ? "bg-amber-500"
-                      : "bg-red-500",
-                )}
-              />
-
-              <div className="relative z-10">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-slate-500">
-                    Status Terkini
-                  </span>
-                  {detail.recentReports[0] && (
-                    <span className="text-xs text-slate-400 flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {formatDateTime(detail.recentReports[0].createdAt)}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div
-                    className={cn(
-                      "p-2 rounded-full",
-                      detail.unit.lastStatus === "OPERATIONAL"
-                        ? "bg-green-100 text-green-600"
-                        : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
-                          ? "bg-amber-100 text-amber-600"
-                          : "bg-red-100 text-red-600",
-                    )}
-                  >
-                    {detail.unit.lastStatus === "OPERATIONAL" ? (
-                      <CheckCircle2 className="h-6 w-6" />
-                    ) : detail.unit.lastStatus === "MAINTENANCE_NEEDED" ? (
-                      <AlertTriangle className="h-6 w-6" />
-                    ) : (
-                      <XCircle className="h-6 w-6" />
-                    )}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-lg text-slate-900 leading-tight">
-                      {getStatusLabel(detail.unit.lastStatus)}
-                    </h4>
-                    {detail.unit.installDate && (
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Dipasang{" "}
-                        {formatDateTime(detail.unit.installDate).split(",")[0]}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Battery voltage from latest report */}
-                {detail.recentReports[0] && (
-                  <div className="mt-4 pt-3 border-t flex items-center gap-4">
-                    <div className="flex-1">
-                      <span className="text-xs text-slate-500 block mb-1">
-                        Tegangan Baterai
-                      </span>
-                      <div className="flex items-end gap-1.5">
-                        <BatteryFull
-                          className={cn(
-                            "h-5 w-5 mb-0.5",
-                            detail.recentReports[0].batteryVoltage >=
-                              BATTERY_THRESHOLDS.OPERATIONAL_MIN
-                              ? "text-green-500"
-                              : detail.recentReports[0].batteryVoltage >=
-                                  BATTERY_THRESHOLDS.MAINTENANCE_MIN
-                                ? "text-amber-500"
-                                : "text-red-500",
-                          )}
-                        />
-                        <span className="text-2xl font-bold tracking-tight text-slate-900">
-                          {detail.recentReports[0].batteryVoltage}
-                        </span>
-                        <span className="text-sm font-medium text-slate-500 mb-1">
-                          Volts
-                        </span>
-                      </div>
-                    </div>
-                    {detail.recentReports[0].notes && (
-                      <>
-                        <div className="w-px h-10 bg-slate-100" />
-                        <div className="flex-1">
-                          <span className="text-xs text-slate-500 block mb-1">
-                            Catatan
-                          </span>
-                          <p className="text-sm font-medium text-slate-900 line-clamp-2">
-                            {detail.recentReports[0].notes}
-                          </p>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Location Card */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-semibold text-slate-900 pl-1">
-                Lokasi
-              </h4>
-              <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="bg-white p-2 rounded-lg shadow-sm shrink-0 border border-slate-100">
-                    <MapPin className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-900 mb-0.5">
-                      {detail.unit.province}
-                    </p>
-                    <p className="text-sm text-slate-600 leading-relaxed">
-                      {[
-                        detail.unit.village,
-                        detail.unit.district,
-                        detail.unit.regency,
-                      ]
-                        .filter(Boolean)
-                        .join(", ")}
-                    </p>
-                  </div>
-                </div>
-
-                <Separator className="bg-slate-200" />
-
-                {/* Coordinates */}
-                <div className="flex items-center gap-2">
-                  <div
-                    className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 flex items-center justify-between group cursor-pointer hover:border-primary/40 transition-colors"
-                    onClick={handleCopyCoords}
-                  >
-                    <div className="flex items-center gap-2">
-                      <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
-                      <code className="text-xs text-slate-700 font-medium">
-                        {detail.unit.latitude.toFixed(6)},{" "}
-                        {detail.unit.longitude.toFixed(6)}
-                      </code>
-                    </div>
-                    {coordsCopied ? (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5 text-slate-400 group-hover:text-primary" />
-                    )}
-                  </div>
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    className="shrink-0 hover:bg-primary/5 hover:text-primary hover:border-primary/20"
-                    onClick={() => {
-                      window.open(
-                        `https://www.google.com/maps?q=${detail.unit.latitude},${detail.unit.longitude}`,
-                        "_blank",
-                      );
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
-
-            {/* Report history summary */}
-            {detail.recentReports.length > 1 && (
-              <div className="space-y-2">
-                <h4 className="text-sm font-semibold text-slate-900 pl-1">
-                  Riwayat Laporan Terbaru
-                </h4>
-                <div className="space-y-2">
-                  {detail.recentReports.slice(1).map((report) => (
-                    <div
-                      key={report.id}
-                      className="flex items-center gap-3 bg-white rounded-xl p-3 border border-slate-100"
-                    >
-                      <div className="flex items-center gap-2 flex-1">
-                        <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                        <span className="text-xs text-slate-500">
-                          {formatDateTime(report.createdAt)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <Zap className="h-3.5 w-3.5 text-amber-500" />
-                        <span className="text-sm font-bold text-slate-900">
-                          {report.batteryVoltage}V
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                <p className="text-xs text-slate-400 text-center pt-1">
-                  Total {detail.reportCount} laporan tercatat
-                </p>
-              </div>
+          <div>
+            <h3 className="font-bold text-lg text-slate-900 tracking-tight">
+              Detail Unit
+            </h3>
+            {detail && (
+              <p className="text-sm font-medium text-slate-500 mt-0.5">
+                {detail.unit.serialNumber}
+              </p>
             )}
           </div>
-        ) : null}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-full hover:bg-slate-100"
+          >
+            <X className="h-5 w-5 text-slate-500" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="flex-1 overflow-auto bg-white">
+          {loading ? (
+            <div className="p-6">
+              <DrawerSkeleton />
+            </div>
+          ) : detail ? (
+            <div className="p-5 space-y-5 pb-8 sm:pb-5">
+              {/* Status Card */}
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 overflow-hidden relative">
+                <div
+                  className={cn(
+                    "absolute top-0 right-0 w-24 h-24 -mr-6 -mt-6 rounded-full opacity-10 blur-xl",
+                    detail.unit.lastStatus === "OPERATIONAL"
+                      ? "bg-green-500"
+                      : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
+                        ? "bg-amber-500"
+                        : "bg-red-500",
+                  )}
+                />
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-medium text-slate-500">
+                      Status Terkini
+                    </span>
+                    {detail.recentReports[0] && (
+                      <span className="text-xs text-slate-400 flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {formatDateTime(detail.recentReports[0].createdAt)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        "p-2 rounded-full",
+                        detail.unit.lastStatus === "OPERATIONAL"
+                          ? "bg-green-100 text-green-600"
+                          : detail.unit.lastStatus === "MAINTENANCE_NEEDED"
+                            ? "bg-amber-100 text-amber-600"
+                            : "bg-red-100 text-red-600",
+                      )}
+                    >
+                      {detail.unit.lastStatus === "OPERATIONAL" ? (
+                        <CheckCircle2 className="h-6 w-6" />
+                      ) : detail.unit.lastStatus === "MAINTENANCE_NEEDED" ? (
+                        <AlertTriangle className="h-6 w-6" />
+                      ) : (
+                        <XCircle className="h-6 w-6" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-lg text-slate-900 leading-tight">
+                        {getStatusLabel(detail.unit.lastStatus)}
+                      </h4>
+                      {detail.unit.installDate && (
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          Dipasang{" "}
+                          {
+                            formatDateTime(detail.unit.installDate).split(
+                              ",",
+                            )[0]
+                          }
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Battery voltage from latest report */}
+                  {detail.recentReports[0] && (
+                    <div className="mt-4 pt-3 border-t flex items-center gap-4">
+                      <div className="flex-1">
+                        <span className="text-xs text-slate-500 block mb-1">
+                          Tegangan Baterai
+                        </span>
+                        <div className="flex items-end gap-1.5">
+                          <BatteryFull
+                            className={cn(
+                              "h-5 w-5 mb-0.5",
+                              detail.recentReports[0].batteryVoltage >=
+                                BATTERY_THRESHOLDS.OPERATIONAL_MIN
+                                ? "text-green-500"
+                                : detail.recentReports[0].batteryVoltage >=
+                                    BATTERY_THRESHOLDS.MAINTENANCE_MIN
+                                  ? "text-amber-500"
+                                  : "text-red-500",
+                            )}
+                          />
+                          <span className="text-2xl font-bold tracking-tight text-slate-900">
+                            {detail.recentReports[0].batteryVoltage}
+                          </span>
+                          <span className="text-sm font-medium text-slate-500 mb-1">
+                            Volts
+                          </span>
+                        </div>
+                      </div>
+                      {detail.recentReports[0].notes && (
+                        <>
+                          <div className="w-px h-10 bg-slate-100" />
+                          <div className="flex-1">
+                            <span className="text-xs text-slate-500 block mb-1">
+                              Catatan
+                            </span>
+                            <p className="text-sm font-medium text-slate-900 line-clamp-2">
+                              {detail.recentReports[0].notes}
+                            </p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Location Card */}
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold text-slate-900 pl-1">
+                  Lokasi
+                </h4>
+                <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="bg-white p-2 rounded-lg shadow-sm shrink-0 border border-slate-100">
+                      <MapPin className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-900 mb-0.5">
+                        {detail.unit.province}
+                      </p>
+                      <p className="text-sm text-slate-600 leading-relaxed">
+                        {[
+                          detail.unit.village,
+                          detail.unit.district,
+                          detail.unit.regency,
+                        ]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </p>
+                    </div>
+                  </div>
+
+                  <Separator className="bg-slate-200" />
+
+                  {/* Coordinates */}
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-2 flex items-center justify-between group cursor-pointer hover:border-primary/40 transition-colors"
+                      onClick={handleCopyCoords}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ChevronRight className="h-3.5 w-3.5 text-slate-400" />
+                        <code className="text-xs text-slate-700 font-medium">
+                          {detail.unit.latitude.toFixed(6)},{" "}
+                          {detail.unit.longitude.toFixed(6)}
+                        </code>
+                      </div>
+                      {coordsCopied ? (
+                        <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                      ) : (
+                        <Copy className="h-3.5 w-3.5 text-slate-400 group-hover:text-primary" />
+                      )}
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="shrink-0 hover:bg-primary/5 hover:text-primary hover:border-primary/20"
+                      onClick={() => {
+                        window.open(
+                          `https://www.google.com/maps?q=${detail.unit.latitude},${detail.unit.longitude}`,
+                          "_blank",
+                        );
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Report history summary */}
+              {detail.recentReports.length > 1 && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-semibold text-slate-900 pl-1">
+                    Riwayat Laporan Terbaru
+                  </h4>
+                  <div className="space-y-2">
+                    {detail.recentReports.slice(1).map((report) => (
+                      <div
+                        key={report.id}
+                        className="flex items-center gap-3 bg-white rounded-xl p-3 border border-slate-100"
+                      >
+                        <div className="flex items-center gap-2 flex-1">
+                          <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                          <span className="text-xs text-slate-500">
+                            {formatDateTime(report.createdAt)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Zap className="h-3.5 w-3.5 text-amber-500" />
+                          <span className="text-sm font-bold text-slate-900">
+                            {report.batteryVoltage}V
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-slate-400 text-center pt-1">
+                    Total {detail.reportCount} laporan tercatat
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
       </div>
-    </div>
     </>
   );
 }

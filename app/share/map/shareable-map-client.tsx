@@ -9,7 +9,6 @@ import {
   XCircle,
   Copy,
   Check,
-  ExternalLink,
   LogIn,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
@@ -306,7 +305,6 @@ export function ShareableMapClient() {
                   : "offline";
             const count = counts[countKey];
             const isActive = selectedStatus === filter.value;
-            const Icon = filter.icon;
 
             return (
               <button
