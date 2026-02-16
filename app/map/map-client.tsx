@@ -10,6 +10,7 @@ import {
 } from "react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import dynamic from "next/dynamic";
+import { Share2, Copy, Check } from "lucide-react";
 import { PageHeader } from "@/components/layout";
 import { MapFilters, MapLegend, UnitDetailDrawer } from "@/components/map";
 import { GisToolsPanel } from "@/components/map/gis-tools-panel";
@@ -19,6 +20,7 @@ import {
   type OverlayType,
 } from "@/components/map/layer-switcher";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MapPoint } from "@/types";
 import { DashboardStats, ActionResult } from "@/app/actions/dashboard";
@@ -206,6 +208,7 @@ export function MapPageClient({
 }: MapPageClientProps) {
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [selectedUnitId, setSelectedUnitId] = useState<string | null>(null);
+  const [shareCopied, setShareCopied] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const { setAutoHide } = useMobileNav();
@@ -240,6 +243,18 @@ export function MapPageClient({
     router.replace(pathname);
   }, [router, pathname]);
 
+  const handleShareMap = useCallback(async () => {
+    const shareUrl = `${window.location.origin}/share/map`;
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setShareCopied(true);
+      setTimeout(() => setShareCopied(false), 2000);
+    } catch {
+      // fallback: open in new tab
+      window.open(shareUrl, "_blank");
+    }
+  }, []);
+
   return (
     <>
       <Suspense fallback={null}>
@@ -249,7 +264,28 @@ export function MapPageClient({
       <PageHeader
         title="Peta PJUTS"
         description="Visualisasi lokasi unit penerangan jalan umum tenaga surya dengan fitur analisis GIS"
-      />
+      >
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleShareMap}
+            className="gap-1.5"
+          >
+            {shareCopied ? (
+              <>
+                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Link Tersalin!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-3.5 h-3.5" />
+                <span>Bagikan Peta</span>
+              </>
+            )}
+          </Button>
+        </div>
+      </PageHeader>
 
       {/* Filters with Suspense */}
       <div className="mb-4">

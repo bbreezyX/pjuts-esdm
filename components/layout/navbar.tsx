@@ -20,6 +20,7 @@ import {
   Loader2,
   ArrowRight,
   MapPin,
+  KeyRound,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
@@ -70,6 +71,12 @@ const navItems = [
   { href: "/reports", label: "Laporan", icon: ClipboardList },
   { href: "/analytics", label: "Analitik", icon: BarChart3 },
   { href: "/users", label: "Pengguna", icon: User, adminOnly: true },
+  {
+    href: "/share-codes",
+    label: "Kode Akses",
+    icon: KeyRound,
+    adminOnly: true,
+  },
 ];
 
 export function Navbar({ user }: NavbarProps) {

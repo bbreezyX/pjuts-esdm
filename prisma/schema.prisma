@@ -157,4 +157,24 @@ model AuditLog {
   @@index([createdAt, entityType, action])
 }
 
+// ============================================
+// MAP SHARE CODE MODEL
+// ============================================
+
+model MapShareCode {
+  id          String    @id @default(cuid())
+  code        String    @unique          // e.g., "ESDM-7K3X"
+  label       String                     // e.g., "Untuk Kontraktor PT XYZ"
+  isActive    Boolean   @default(true)
+  expiresAt   DateTime?                 // null = never expires
+  usageCount  Int       @default(0)
+  lastUsedAt  DateTime?
+  createdBy   String                     // Admin user ID who created it
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+  @@index([expiresAt])
+}
 

@@ -23,10 +23,14 @@ export function middleware(request: NextRequest) {
 
   // Public routes that don't require authentication
   const publicRoutes = ["/", "/login", "/forgot-password", "/reset-password"];
-  const isPublicRoute = publicRoutes.includes(pathname);
+  const publicPrefixes = ["/share"];
+  const isPublicRoute =
+    publicRoutes.includes(pathname) ||
+    publicPrefixes.some((p) => pathname.startsWith(p));
 
-  // API routes that require authentication
-  const isApiRoute = pathname.startsWith("/api");
+  // API routes that require authentication (except /api/public)
+  const isApiRoute =
+    pathname.startsWith("/api") && !pathname.startsWith("/api/public");
 
   // Check for session token (from NextAuth)
   const sessionToken =
@@ -39,7 +43,7 @@ export function middleware(request: NextRequest) {
   if (isApiRoute && !isLoggedIn) {
     return NextResponse.json(
       { error: "Authentication required" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 
