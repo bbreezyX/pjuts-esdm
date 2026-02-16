@@ -46,7 +46,7 @@ import { UnitStatus } from "@prisma/client";
 import { UnitDialog } from "@/components/units/unit-dialog";
 import { DeleteUnitDialog } from "@/components/units/delete-unit-dialog";
 import { ImportUnitDialog } from "@/components/units/import-unit-dialog";
-import { utils, writeFile } from "xlsx";
+import { downloadStyledExcel } from "@/lib/excel-style";
 import { toast } from "@/components/ui/use-toast";
 import { getPjutsUnits } from "@/app/actions/units";
 
@@ -226,11 +226,8 @@ export function UnitsPageClient({
         "Tanggal Install": u.installDate ? formatDate(u.installDate) : "-",
       }));
 
-      const wb = utils.book_new();
-      const ws = utils.json_to_sheet(dataToExport);
-      utils.book_append_sheet(wb, ws, "Units");
-      writeFile(
-        wb,
+      downloadStyledExcel(
+        [{ name: "Units", data: dataToExport }],
         `Data_Unit_PJUTS_${formatDate(new Date()).replace(/\//g, "-")}.xlsx`,
       );
 

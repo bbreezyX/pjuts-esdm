@@ -16,7 +16,8 @@ import {
   AlertCircle,
   CheckCircle2,
 } from "lucide-react";
-import { utils, read, writeFile } from "xlsx";
+import { utils, read } from "xlsx-js-style";
+import { downloadStyledExcel } from "@/lib/excel-style";
 import { bulkCreateUnits } from "@/app/actions/units";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
@@ -57,10 +58,10 @@ export function ImportUnitDialog({
   ];
 
   const downloadTemplate = () => {
-    const wb = utils.book_new();
-    const ws = utils.json_to_sheet(templateData);
-    utils.book_append_sheet(wb, ws, "Template_Import_Unit");
-    writeFile(wb, "Template_Import_PJUTS.xlsx");
+    downloadStyledExcel(
+      [{ name: "Template_Import_Unit", data: templateData }],
+      "Template_Import_PJUTS.xlsx",
+    );
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

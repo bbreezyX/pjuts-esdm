@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Download, RefreshCw } from "lucide-react";
-import { utils, writeFile } from "xlsx";
+import { downloadStyledExcel } from "@/lib/excel-style";
 import { format } from "date-fns";
 import { ProvinceStats, DashboardStats } from "@/app/actions/dashboard";
 import { useToast } from "@/components/ui/use-toast";
@@ -45,31 +45,25 @@ export function ExportDashboardButton({
         "Total Laporan": prov.totalReports,
       }));
 
-      // Create workbook
-      const wb = utils.book_new();
-
-      // Create Summary Sheet
-      const wsSummary = utils.json_to_sheet(summaryData);
-      wsSummary["!cols"] = [{ wch: 25 }, { wch: 15 }];
-      utils.book_append_sheet(wb, wsSummary, "Ringkasan");
-
-      // Create Province Sheet
-      const wsProvinces = utils.json_to_sheet(provinceData);
-      wsProvinces["!cols"] = [
-        { wch: 25 }, // Provinsi
-        { wch: 12 }, // Total Unit
-        { wch: 12 }, // Operasional
-        { wch: 15 }, // Perlu Perawatan
-        { wch: 12 }, // Offline
-        { wch: 15 }, // Total Laporan
-      ];
-      utils.book_append_sheet(wb, wsProvinces, "Statistik Provinsi");
-
       // Generate filename with timestamp
       const filename = `Dashboard_PJUTS_${format(new Date(), "yyyyMMdd_HHmmss")}.xlsx`;
 
-      // Download file
-      writeFile(wb, filename);
+      // Download styled file
+      downloadStyledExcel(
+        [
+          {
+            name: "Ringkasan",
+            data: summaryData,
+            columnWidths: [25, 15],
+          },
+          {
+            name: "Statistik Provinsi",
+            data: provinceData,
+            columnWidths: [25, 12, 12, 15, 12, 15],
+          },
+        ],
+        filename,
+      );
 
       toast({
         title: "Ekspor Berhasil",

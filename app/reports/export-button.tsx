@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2, FileSpreadsheet } from "lucide-react";
 import { getReports } from "@/app/actions/reports";
-import { utils, writeFile } from "xlsx";
+import { downloadStyledExcel } from "@/lib/excel-style";
 import { format } from "date-fns";
 import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
@@ -61,11 +61,8 @@ export function ExportReportsButton({
         "Email Pelapor": report.user.email,
       }));
 
-      const wb = utils.book_new();
-      const ws = utils.json_to_sheet(dataToExport);
-      utils.book_append_sheet(wb, ws, "Laporan");
-      writeFile(
-        wb,
+      downloadStyledExcel(
+        [{ name: "Laporan", data: dataToExport }],
         `Laporan_PJUTS_${format(new Date(), "yyyyMMdd_HHmmss")}.xlsx`,
       );
 
